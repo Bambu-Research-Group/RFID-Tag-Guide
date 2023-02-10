@@ -6,7 +6,6 @@ We are currently working on a way to sumbmit the tag data in a secure way so ana
 
 #  Table of contents
 <!--ts-->
-* [Bambulab RFID Tag Hacking Guide](#bambulab-rfid-tag-hacking-guide)
    * [Before you start](#before-you-start)
    * [Todos/Timeline/Next steps](#todostimelinenext-steps)
    * [Required Epuipment](#required-epuipment)
@@ -142,7 +141,7 @@ The following infos are already known
 |  2  | 10  | **Unkown binary data**                                                                 |
 |  2  | 11  | A-Keys Sector 2 (6 bytes), Permission Sector 2 (4 bytes), B-Keys Sector 2 (6 bytes)    |
 |  3  | 12  | Production Date and Time in ASCII ?  `<year>_<month>_<day>_<hour>_<minute>`            |
-|  3  | 13  | **Unkown binary data**                                                                 |
+|  3  | 13  | **Unkown binary data** could be part of production date/time                           |
 |  3  | 14  | **Unkown binary data**                                                                 |
 |  3  | 15  | A-Keys Sector 3 (6 bytes), Permission  Sector 3 (4 bytes), B-Keys Sector 3 (6 bytes)   |
 |  4  | 16  | **Empty**                                                                              |
@@ -171,6 +170,8 @@ The following infos are already known
 |  9  | 15  | A-Keys Sector 9 (6 bytes), Permission  Sector 9 (4 bytes), B-Keys Sector 9 (6 bytes)   |
 | 10-15 | *  | **Unkown binary data** Maybe CRC                                                      |
 
+
+The The first part of the filament serial number seems to be the Tag UID.
 
 
 ## Compatible RFID tags -  By generation
