@@ -84,3 +84,17 @@ The next steps need to be repeated until you have all keys. (A scirpt for this i
 
 
 Instructions on how to read out the bambulab nfc tags
+
+
+
+## Compatible RFID tags -  By generation
+
+Gen 1 --> **Not compatible**(due to AMS checking if tag is unlockable with command 0x40)
+
+Gen 2 --> **Not tested**
+
+Gen 2 OTW --> **Not tested**
+
+Gen 3 --> **Not tested**
+
+Gen 4 --> **Not tested**(The best option but pricey and hard to source in small chip formfactor)
