@@ -1,5 +1,10 @@
 # Bambulab RFID Tag Hacking Guide
 
+This guide gives you a basic overview how you can encrypt your tags. Since we don't know how Bambulab will react on this guide and the general reverse engineering of the tags: **Please don't share you tag's UID and the related keys for now.**
+
+We are currently working on a way to sumbmit the tag data in a secure way so analysis on the data could be done.
+
+#  Table of contents
 <!--ts-->
 * [Bambulab RFID Tag Hacking Guide](#bambulab-rfid-tag-hacking-guide)
    * [Before you start](#before-you-start)
@@ -16,14 +21,11 @@
    * [Compatible RFID tags -  By generation](#compatible-rfid-tags----by-generation)
 <!--te-->
 
-
-
-## Before you start
-
-This guide gives you a basic overview how you can encrypt your tags. Since we don't know how Bambulab will react on this guide and the general reverse engineering of the tags: **Please don't share you tag's UID and the related keys for now.**
-
-
 ## Todos/Timeline/Next steps
+
+- [ ] Tool for automatic trace analysis
+- [ ] Web service for tag submisson with automatic anonymized data publishing to github
+- [ ] Tag content analysis
 
 
 ## Required Epuipment
@@ -120,6 +122,54 @@ This can be viewed now in a hex or binary editor or you can view it with:
 ## Generate Keys based on random UID
 
 **TODO**
+
+## Tag stucture
+
+The following infos are already known
+
+| sec | blk | Data                                                                                   |
+|-----|-----|----------------------------------------------------------------------------------------|
+|  0  |  0  | UID and Manufacturing Data - Tag specific                                              |
+|  0  |  1  | Unkown ASCII string                                                                    |
+|  0  |  2  | Flimaent type in ASCII (PLA, ..)                                                       |
+|  0  |  3  | A-Keys Sector 0 (6 bytes), Permission Sector 1 (4 bytes), B-Keys Sector 0 (6 bytes)    |
+|  1  |  4  | ASCII string of detailed Filament type (PLA Basic, ...)                                |
+|  1  |  5  | Color in hex (first 3 Bytes) & **Unkown binary data**                                  |
+|  1  |  6  | **Unkown binary data**                                                                 |
+|  1  |  7  | A-Keys Sector 1 (6 bytes), Permission Sector 1 (4 bytes), B-Keys Sector 1 (6 bytes)    |
+|  2  |  8  | **Unkown binary data**                                                                 |
+|  2  |  9  | **Unkown binary data** and ASCII string                                                |
+|  2  | 10  | **Unkown binary data**                                                                 |
+|  2  | 11  | A-Keys Sector 2 (6 bytes), Permission Sector 2 (4 bytes), B-Keys Sector 2 (6 bytes)    |
+|  3  | 12  | Production Date and Time in ASCII ?  `<year>_<month>_<day>_<hour>_<minute>`            |
+|  3  | 13  | **Unkown binary data**                                                                 |
+|  3  | 14  | **Unkown binary data**                                                                 |
+|  3  | 15  | A-Keys Sector 3 (6 bytes), Permission  Sector 3 (4 bytes), B-Keys Sector 3 (6 bytes)   |
+|  4  | 16  | **Empty**                                                                              |
+|  4  | 17  | **Empty**                                                                              |
+|  4  | 18  | **Empty**                                                                              |
+|  4  | 19  | A-Keys Sector 4 (6 bytes), Permission  Sector 4 (4 bytes), B-Keys Sector 4 (6 bytes)   |
+|  5  | 20  | **Empty**                                                                              |
+|  5  | 21  | **Empty**                                                                              |
+|  5  | 22  | **Empty**                                                                              |
+|  5  | 23  | A-Keys Sector 5 (6 bytes), Permission  Sector 5 (4 bytes), B-Keys Sector 5 (6 bytes)   |
+|  6  | 24  | **Empty**                                                                              |
+|  6  | 25  | **Empty**                                                                              |
+|  6  | 26  | **Empty**                                                                              |
+|  6  | 27  | A-Keys Sector 6 (6 bytes), Permission  Sector 6 (4 bytes), B-Keys Sector 6 (6 bytes)   |
+|  7  | 28  | **Empty**                                                                              |
+|  7  | 29  | **Empty**                                                                              |
+|  7  | 30  | **Empty**                                                                              |
+|  7  | 31  | A-Keys Sector 7 (6 bytes), Permission  Sector 7 (4 bytes), B-Keys Sector 7 (6 bytes)   |
+|  8  | 32  | **Empty**                                                                              |
+|  8  | 33  | **Empty**                                                                              |
+|  8  | 34  | **Empty**                                                                              |
+|  8  | 35  | A-Keys Sector 8 (6 bytes), Permission  Sector 8 (4 bytes), B-Keys Sector 8 (6 bytes)   |
+|  9  | 37  | **Empty**                                                                              |
+|  9  | 38  | **Empty**                                                                              |
+|  9  | 39  | **Empty**                                                                              |
+|  9  | 15  | A-Keys Sector 9 (6 bytes), Permission  Sector 9 (4 bytes), B-Keys Sector 9 (6 bytes)   |
+| 10-15 | *  | **Unkown binary data** Maybe CRC                                                      |
 
 
 
