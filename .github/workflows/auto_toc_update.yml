@@ -2,7 +2,7 @@ name: auto-toc-update
 on:
   push:
     branches: [main]
-    paths: ['foo.md']
+    paths: ['README.md']
 
 jobs:
   build:
