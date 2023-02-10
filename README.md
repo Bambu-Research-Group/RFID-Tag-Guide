@@ -42,18 +42,35 @@ If you have already a single tag you need to place a spool **without a tag** in 
 
 ### Sniffing the data
 
-hf 14a sniff -c -r
+To start the sniffing connect your rfid reader and open your proxmark3. 
+Start sniffing with:
 
-trace list -t mf
+`hf 14a sniff -c -r`
+
+Hold no the proxmark3 reader next to the AMS reader and load the filament or if already loaded the update icon on the screen.
+
+When you are done you can press the button on the rfid-reader to stop the trace. To visualize the trace you just enter:
+
+`trace list -t mf`
 
 You should be able to see already first keys. Until you see a message :
-"Nested authentication detected." with some bruteforce command: tools/mf_nonce_brute/mf_nonce_brute ...
+"Nested authentication detected." with some bruteforce command: `tools/mf_nonce_brute/mf_nonce_brute <parameters>`
 
-Execute this command in the proxmark3 directory in an other terminal and write down the found key.
+Execute this command in the proxmark3 directory in an other terminal and write down or save the found key.
 
-Check the date for crc errors and if they are fine save the trace with the following command if we need it later.
+Check the date for crc errors and if it's fine save the trace with the following command.
 
-trace save -f <trace-name>
+`trace save -f <trace-name>`
+
+You can record now all your tags. If you want to load the traces later
+
+`trace load -f <trace-name>`
+
+To view the loaded trace just enter the following command.
+
+`trace list -1 -t <trace-name>`
+
+If you are using traces in the next steps you need to add the `-1` option when you analyze the traces.
 
 ### Getting the other keys by analyzing the log file
 
@@ -65,27 +82,31 @@ Enter the keys line by line into that file.
 
 The next steps need to be repeated until you have all keys. (A scirpt for this is already WIP)
 
-1. trace list -t mf -f <dic_file>
+1. `trace list -t mf -f <dic_file>`
 2. bruteforce the new keys with the displayed command in a seperate terminal and add all new keys to the dict file
-3. verify the keys: hf mf fchk -f <dic_file>
+3. verify the keys: `hf mf fchk --1k -f <dic_file>`
 4. Go to 1 until you found all keys
-
-
 
 ## Data Readout
 
+Before the data can be read we need to generate a key file
+
+`hf mf fchk --1k -f <dic_file> --dump`
+
+The output is a binary key file: `hf-mf-<TAG UID>-key.bin`
+
+Dump now the data:
+
+`hf mf dump --1k --keys hf-mf-<TAG UID>-key.bin`
+
+This can be viewed now in a hex or binary editor or you can view it with:
+
+`hf mf view -f hf-mf-<TAG UID>-dump.bin`
 
 
+## Generate Keys based on random UID
 
-
-
-
-
-
-## UID Creation - Theory only
-
-
-Instructions on how to read out the bambulab nfc tags
+**TODO**
 
 
 
