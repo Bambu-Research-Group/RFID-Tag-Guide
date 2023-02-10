@@ -7,6 +7,9 @@ on:
       - 'README.md'
       - '**.yml'
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,5 +23,4 @@ jobs:
           rm gh-md-toc
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
           commit_message: Auto update markdown TOC
