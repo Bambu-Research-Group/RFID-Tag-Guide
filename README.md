@@ -6,7 +6,6 @@ We are currently working on a way to sumbmit the tag data in a secure way so ana
 
 #  Table of contents
 <!--ts-->
-   * [Before you start](#before-you-start)
    * [Todos/Timeline/Next steps](#todostimelinenext-steps)
    * [Required Epuipment](#required-epuipment)
       * [Proxmark3 compatible readers](#proxmark3-compatible-readers)
@@ -17,6 +16,7 @@ We are currently working on a way to sumbmit the tag data in a secure way so ana
       * [Getting the other keys by analyzing the log file](#getting-the-other-keys-by-analyzing-the-log-file)
    * [Data Readout](#data-readout)
    * [Generate Keys based on random UID](#generate-keys-based-on-random-uid)
+   * [Tag stucture](#tag-stucture)
    * [Compatible RFID tags -  By generation](#compatible-rfid-tags----by-generation)
 <!--te-->
 
