@@ -1,8 +1,11 @@
 name: auto-toc-update
 on:
   push:
-    branches: [main]
-    paths: ['README.md']
+    branches:
+      - 'main'
+    paths:
+      - 'README.md'
+      - '**.yml'
 
 jobs:
   build:
