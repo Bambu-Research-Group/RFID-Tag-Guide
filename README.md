@@ -1,6 +1,8 @@
 # Bambulab RFID Tag Hacking Guide
 
-[TOC]
+<!--ts-->
+<!--te-->
+
 
 
 ## Before you start
