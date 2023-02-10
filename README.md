@@ -1,6 +1,19 @@
 # Bambulab RFID Tag Hacking Guide
 
 <!--ts-->
+* [Bambulab RFID Tag Hacking Guide](#bambulab-rfid-tag-hacking-guide)
+   * [Before you start](#before-you-start)
+   * [Todos/Timeline/Next steps](#todostimelinenext-steps)
+   * [Required Epuipment](#required-epuipment)
+      * [Proxmark3 compatible readers](#proxmark3-compatible-readers)
+         * [Proxmark3 easy](#proxmark3-easy)
+   * [Hacking a Bambulab Tag and readout of it's data](#hacking-a-bambulab-tag-and-readout-of-its-data)
+      * [Bambulab AMS RFID readers and sniffing](#bambulab-ams-rfid-readers-and-sniffing)
+      * [Sniffing the data](#sniffing-the-data)
+      * [Getting the other keys by analyzing the log file](#getting-the-other-keys-by-analyzing-the-log-file)
+   * [Data Readout](#data-readout)
+   * [Generate Keys based on random UID](#generate-keys-based-on-random-uid)
+   * [Compatible RFID tags -  By generation](#compatible-rfid-tags----by-generation)
 <!--te-->
 
 
