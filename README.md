@@ -1,8 +1,8 @@
 # Bambulab RFID Tag Guide
 
-This guide gives you a basic overview how you can encrypt your tags. Since we don't know how Bambulab will react on this guide and the general reverse engineering of the tags: **Please don't share you tag's UID and the related keys for now.**
+This guide gives you a basic overview how you can decrypt and read your tags. Since we don't know how Bambulab will react on this guide and the general reverse engineering of the tags: **Please don't share you tag's UID and the related keys for now.**
 
-We are currently working on a way to sumbmit the tag data in a secure way so analysis on the data could be done.
+We are currently working on a way to submit the tag data in a secure way so analysis on the data could be done.
 
 #  Table of contents
 <!--ts-->
@@ -27,7 +27,7 @@ We are currently working on a way to sumbmit the tag data in a secure way so ana
 - [ ] Tag content analysis
 
 
-## Required Epuipment
+## Required Equipment
 
 - Bambulab 3D Printer with AMS
 - Bambulab Filament spool **or** the related tags
@@ -39,12 +39,12 @@ We are currently working on a way to sumbmit the tag data in a secure way so ana
 #### Proxmark3 easy
 ![](images/Proxmark3_easy.png)
 
-A Proxmark 3 easy is sufficent for all the tasks that need to be done. You can buy a clone from alixepress, amazon or dangerous things.
+A Proxmark 3 easy is sufficient for all the tasks that need to be done. You can buy a clone from alixepress, amazon or dangerous things.
 
 
-## Hacking a Bambulab Tag and readout of it's data
+## Hacking a Bambulab Tag and readout of its data
 We document here the most simple approach to get all required A-Keys and the data of the tag.
-The easiest way is to sniff the data
+The easiest way is to sniff the data.
 
 ### Bambulab AMS RFID readers and sniffing
 The Bambulab AMS RFID readers are locate between slot 1&2 and slot 3&4
@@ -61,13 +61,13 @@ Start sniffing with:
 
 `hf 14a sniff -c -r`
 
-Hold no the proxmark3 reader next to the AMS reader and load the filament or if already loaded the update icon on the screen.
+Hold the proxmark3 reader next to the AMS reader and load the filament, or if already loaded tap the update icon on the screen.
 
-When you are done you can press the button on the rfid-reader to stop the trace. To visualize the trace you just enter:
+When you are done, you can press the button on the side of the Proxmark3 to stop the trace. To visualize the trace you just enter:
 
 `trace list -t mf`
 
-You should be able to see already first keys. Until you see a message :
+You should be able to already see the first keys. Until you see a message:
 "Nested authentication detected." with some bruteforce command: `tools/mf_nonce_brute/mf_nonce_brute <parameters>`
 
 Execute this command in the proxmark3 directory in an other terminal and write down or save the found key.
@@ -76,7 +76,7 @@ Check the date for crc errors and if it's fine save the trace with the following
 
 `trace save -f <trace-name>`
 
-You can record now all your tags. If you want to load the traces later
+You can now record all your tags. If you want to load the traces later
 
 `trace load -f <trace-name>`
 
@@ -88,16 +88,16 @@ If you are using traces in the next steps you need to add the `-1` option when y
 
 ### Getting the other keys by analyzing the log file
 
-Remove now the spool/tag from the printer and place it on the reader so we can check all the keys.
+Remove the spool/tag from the printer and place it on the reader so we can check all the keys.
 
-Now a dictonary (*.dic) file with all the already found and bruteforced keys must be created.
+Now a dictionary (`*.dic`) file with all the already found and bruteforced keys must be created.
 
 Enter the keys line by line into that file.
 
-The next steps need to be repeated until you have all keys. (A scirpt for this is already WIP)
+The next steps need to be repeated until you have all the keys. (A script for this is already WIP)
 
 1. `trace list -t mf -f <dic_file>`
-2. bruteforce the new keys with the displayed command in a seperate terminal and add all new keys to the dict file
+2. bruteforce the new keys with the displayed command in a separate terminal and add all new keys to the dict file
 3. verify the keys: `hf mf fchk --1k -f <dic_file>`
 4. Go to 1 until you found all keys
 
@@ -129,16 +129,16 @@ The following infos are already known
 | sec | blk | Data                                                                                   |
 |-----|-----|----------------------------------------------------------------------------------------|
 |  0  |  0  | UID and Manufacturing Data - Tag specific                                              |
-|  0  |  1  | Unkown ASCII string                                                                    |
+|  0  |  1  | Unknown ASCII string                                                                    |
 |  0  |  2  | Flimaent type in ASCII (PLA, ..)                                                       |
 |  0  |  3  | A-Keys Sector 0 (6 bytes), Permission Sector 1 (4 bytes), B-Keys Sector 0 (6 bytes)    |
 |  1  |  4  | ASCII string of detailed Filament type (PLA Basic, ...)                                |
-|  1  |  5  | Color in hex (first 3 Bytes) & **Unkown binary data**                                  |
-|  1  |  6  | **Unkown binary data**                                                                 |
+|  1  |  5  | Color in hex (first 3 Bytes) & **Unknown binary data**                                  |
+|  1  |  6  | **Unknown binary data**                                                                 |
 |  1  |  7  | A-Keys Sector 1 (6 bytes), Permission Sector 1 (4 bytes), B-Keys Sector 1 (6 bytes)    |
-|  2  |  8  | **Unkown binary data**                                                                 |
-|  2  |  9  | **Unkown binary data** and ASCII string                                                |
-|  2  | 10  | **Unkown binary data**                                                                 |
+|  2  |  8  | **Unknown binary data**                                                                 |
+|  2  |  9  | **Unknown binary data** and ASCII string                                                |
+|  2  | 10  | **Unknown binary data**                                                                 |
 |  2  | 11  | A-Keys Sector 2 (6 bytes), Permission Sector 2 (4 bytes), B-Keys Sector 2 (6 bytes)    |
 |  3  | 12  | Production Date and Time in ASCII ?  `<year>_<month>_<day>_<hour>_<minute>`            |
 |  3  | 13  | **Unkown binary data** could be part of production date/time                           |
@@ -168,10 +168,10 @@ The following infos are already known
 |  9  | 38  | **Empty**                                                                              |
 |  9  | 39  | **Empty**                                                                              |
 |  9  | 15  | A-Keys Sector 9 (6 bytes), Permission  Sector 9 (4 bytes), B-Keys Sector 9 (6 bytes)   |
-| 10-15 | *  | **Unkown binary data** Maybe CRC                                                      |
+| 10-15 | *  | **Unknown binary data** Maybe CRC                                                      |
 
 
-The The first part of the filament serial number seems to be the Tag UID.
+The first part of the filament serial number seems to be the Tag UID.
 
 
 ## Compatible RFID tags -  By generation
