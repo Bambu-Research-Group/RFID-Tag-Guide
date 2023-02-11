@@ -7,10 +7,10 @@ We are currently working on a way to submit the tag data in a secure way so anal
 #  Table of contents
 <!--ts-->
    * [Todos/Timeline/Next steps](#todostimelinenext-steps)
-   * [Required Epuipment](#required-epuipment)
+   * [Required Equipment](#required-equipment)
       * [Proxmark3 compatible readers](#proxmark3-compatible-readers)
          * [Proxmark3 easy](#proxmark3-easy)
-   * [Hacking a Bambulab Tag and readout of it's data](#hacking-a-bambulab-tag-and-readout-of-its-data)
+   * [Hacking a Bambulab Tag and readout of its data](#hacking-a-bambulab-tag-and-readout-of-its-data)
       * [Bambulab AMS RFID readers and sniffing](#bambulab-ams-rfid-readers-and-sniffing)
       * [Sniffing the data](#sniffing-the-data)
       * [Getting the other keys by analyzing the log file](#getting-the-other-keys-by-analyzing-the-log-file)
