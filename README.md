@@ -1,4 +1,4 @@
-# Bambulab RFID Tag Hacking Guide
+# Bambulab RFID Tag Guide
 
 This guide gives you a basic overview how you can encrypt your tags. Since we don't know how Bambulab will react on this guide and the general reverse engineering of the tags: **Please don't share you tag's UID and the related keys for now.**
 
