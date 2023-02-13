@@ -130,7 +130,7 @@ The following infos are already known
 |-----|-----|----------------------------------------------------------------------------------------|
 |  0  |  0  | UID and Manufacturing Data - Tag specific                                              |
 |  0  |  1  | Unknown ASCII string                                                                    |
-|  0  |  2  | Flimaent type in ASCII (PLA, ..)                                                       |
+|  0  |  2  | Filament type in ASCII (PLA, ..)                                                       |
 |  0  |  3  | A-Keys Sector 0 (6 bytes), Permission Sector 1 (4 bytes), B-Keys Sector 0 (6 bytes)    |
 |  1  |  4  | ASCII string of detailed Filament type (PLA Basic, ...)                                |
 |  1  |  5  | Color in hex (first 3 Bytes) & **Unknown binary data**                                  |
@@ -178,7 +178,7 @@ The first part of the filament serial number seems to be the Tag UID.
 
 Gen 1 --> **Not compatible**(due to AMS checking if tag is unlockable with command 0x40)
 
-Gen 2 --> **Not tested**
+Gen 2 --> **Works**
 
 Gen 2 OTW --> **Not tested**
 
