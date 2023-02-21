@@ -82,7 +82,7 @@ You can now record all your tags. If you want to load the traces later
 
 To view the loaded trace just enter the following command.
 
-`trace list -1 -t <trace-name>`
+`trace list -1 -t mf`
 
 If you are using traces in the next steps you need to add the `-1` option when you analyze the traces.
 
@@ -126,22 +126,24 @@ This can be viewed now in a hex or binary editor or you can view it with:
 
 The following infos are already known
 
+### Overview
+
 | sec | blk | Data                                                                                   |
 |-----|-----|----------------------------------------------------------------------------------------|
 |  0  |  0  | UID and Manufacturing Data - Tag specific                                              |
-|  0  |  1  | Unknown ASCII string                                                                    |
-|  0  |  2  | Filament type in ASCII (PLA, ..)                                                       |
+|  0  |  1  | [Block 1 Description](#block-1)                                                        |
+|  0  |  2  | [Block 2 Description](#block-2)                                                        |
 |  0  |  3  | A-Keys Sector 0 (6 bytes), Permission Sector 1 (4 bytes), B-Keys Sector 0 (6 bytes)    |
-|  1  |  4  | ASCII string of detailed Filament type (PLA Basic, ...)                                |
-|  1  |  5  | Color in hex (first 3 Bytes) & **Unknown binary data**                                  |
-|  1  |  6  | **Unknown binary data**                                                                 |
+|  1  |  4  | [Block 4 Description](#block-4)                                                        |
+|  1  |  5  | [Block 5 Description](#block-5)                                                        |
+|  1  |  6  | [Block 6 Description](#block-6)                                                        |
 |  1  |  7  | A-Keys Sector 1 (6 bytes), Permission Sector 1 (4 bytes), B-Keys Sector 1 (6 bytes)    |
-|  2  |  8  | **Unknown binary data**                                                                 |
-|  2  |  9  | **Unknown binary data** and ASCII string                                                |
-|  2  | 10  | **Unknown binary data**                                                                 |
+|  2  |  8  | [Block 8 Description](#block-8)                                                        |
+|  2  |  9  | [Block 9 Description](#block-9)                                                        |
+|  2  | 10  | **Unknown binary data**                                                                |
 |  2  | 11  | A-Keys Sector 2 (6 bytes), Permission Sector 2 (4 bytes), B-Keys Sector 2 (6 bytes)    |
-|  3  | 12  | Production Date and Time in ASCII ?  `<year>_<month>_<day>_<hour>_<minute>`            |
-|  3  | 13  | **Unkown binary data** could be part of production date/time                           |
+|  3  | 12  | [Block 12 Description](#block-12)                                                      |
+|  3  | 13  | **Unkown string data** could be part of production date/time                           |
 |  3  | 14  | **Unkown binary data**                                                                 |
 |  3  | 15  | A-Keys Sector 3 (6 bytes), Permission  Sector 3 (4 bytes), B-Keys Sector 3 (6 bytes)   |
 |  4  | 16  | **Empty**                                                                              |
@@ -168,10 +170,101 @@ The following infos are already known
 |  9  | 38  | **Empty**                                                                              |
 |  9  | 39  | **Empty**                                                                              |
 |  9  | 15  | A-Keys Sector 9 (6 bytes), Permission  Sector 9 (4 bytes), B-Keys Sector 9 (6 bytes)   |
-| 10-15 | *  | **Unknown binary data** Maybe CRC                                                      |
+| 10-15 | *  | **Unknown binary data** Maybe CRC                                                     |
 
 
 The first part of the filament serial number seems to be the Tag UID.
+
+LE = Little Endian
+
+
+### Block 1
+
+Example Data:
+`AA AA AA AA AA AA AA AA BB BB BB BB BB BB BB BB`
+
+| bytes | type     |  example data location   | Description                                   |
+|-------|----------|--------------------------|-----------------------------------------------|
+|  7-0  | string   | BB BB BB BB BB BB BB BB  | Tray Info Index - Unique Material Identifier  |
+| 15-8  |  string  | AA AA AA AA AA AA AA AA  | **Unkown**                                    |
+
+### Block 2
+
+Example Data:
+`AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA`
+
+| bytes | type     |  example data location                          | Description                       |
+|-------|----------|-------------------------------------------------|-----------------------------------|
+|  15-0  | string  | AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA | Filament type                     |
+
+
+### Block 4
+
+Example Data:
+`AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA`
+
+| bytes | type     |  example data location                          |description                      |
+|-------|----------|-------------------------------------------------|---------------------------------|
+|  15-0  | string  | AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA | detailed Filament type          |
+
+Known Values:
+- PLA Basic
+
+### Block 5
+
+Example Data:
+`AA AA AA AA BB BB CC CC CC CC CC CC CC CC CC CC`
+
+| bytes | type                 |  example data location         | Description                             |
+|-------|----------------|--------------------------------|-----------------------------------------------|
+|  9-0 | **Unkown**      | CC CC CC CC CC CC CC CC CC CC  | **Unkown**                                    |
+| 11-10  |  uint16 (LE)  | BB BB                          | Spool Weight in g  HEX: E803 --> 1000 g       |
+| 15-12  |  RGBA in HEX  | AA AA AA AA                    | Color in hex RBGA                             |
+
+### Block 6
+
+Example Data:
+`AA AA BB BB CC CC DD DD EE EE FF FF GG GG GG GG`
+
+| bytes | type          |  example data location   | Description                             |
+|-------|---------------|--------------------------|-----------------------------------------------|
+|  3-0  | **Unused?**   | GG GG GG GG              | **Unkown**                                    |
+|  5-4  | uint16 (LE)   | FF FF                    | Min- or Maxtemperature for Hotend             |
+|  7-6  | uint16 (LE)   | EE EE                    | Min- or Maxtemperature for Hotend             |
+|  9-8  | uint16 (LE)   | DD DD                    | Bed Temperatur in °C                          |
+| 11-10 | uint16 (LE)   | CC CC                    | Bed Temerature Type                           |
+| 13-12 | uint16 (LE)   | BB BB                    | Drying time in h                              |
+| 15-14 | uint16 (LE)   | AA AA                    | Drying temp in °C                             |
+
+
+### Block 8
+
+Example Data:
+`AA AA AA AA AA AA AA AA AA AA AA AA BB BB BB BB`
+
+| bytes | type       |  example data location              |description                      |
+|-------|------------|-------------------------------------|---------------------------------|
+|  3-0  | **Unkown** | BB BB BB BB                         | **Unkown**                      |
+| 15-4  | RAW Bin    | AA AA AA AA AA AA AA AA AA AA AA AA | X Cam info                      |
+
+### Block 9
+
+Example Data:
+`AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA`
+
+| bytes | type     |  example data location                          | Description                       |
+|-------|----------|-------------------------------------------------|-----------------------------------|
+| 15-0  | UID      | AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA | TrayUID                           |
+
+### Block 12
+
+Example Data:
+`AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA`
+
+| bytes | type     |  example data location                          | Description                       |
+|-------|----------|-------------------------------------------------|----------------------------------------|
+| 15-0  | string   | AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA | Production Date and Time in ASCII ?  `<year>_<month>_<day>_<hour>_<minute>`                           |
+
 
 
 ## Compatible RFID tags -  By generation
