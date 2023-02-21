@@ -17,6 +17,15 @@ We are currently working on a way to submit the tag data in a secure way so anal
    * [Data Readout](#data-readout)
    * [Generate Keys based on random UID](#generate-keys-based-on-random-uid)
    * [Tag stucture](#tag-stucture)
+      * [Overview](#overview)
+      * [Block 1](#block-1)
+      * [Block 2](#block-2)
+      * [Block 4](#block-4)
+      * [Block 5](#block-5)
+      * [Block 6](#block-6)
+      * [Block 8](#block-8)
+      * [Block 9](#block-9)
+      * [Block 12](#block-12)
    * [Compatible RFID tags -  By generation](#compatible-rfid-tags----by-generation)
 <!--te-->
 
