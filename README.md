@@ -6,18 +6,23 @@ We are currently working on a way to submit the tag data in a secure way so anal
 
 #  Table of contents
 <!--ts-->
+   * [Project Summary](#project-summary)
+      * [FAQs](#faqs)
+      * [How do RFID tags work?](#how-do-rfid-tags-work)
+      * [How to contribute](#how-to-contribute)
    * [Todos/Timeline/Next steps](#todostimelinenext-steps)
-   * [Required Equipment](#required-equipment)
-      * [Proxmark3 compatible readers](#proxmark3-compatible-readers)
-         * [Proxmark3 easy](#proxmark3-easy)
-   * [Hacking a Bambulab Tag and readout of its data](#hacking-a-bambulab-tag-and-readout-of-its-data)
-      * [Bambulab AMS RFID readers and sniffing](#bambulab-ams-rfid-readers-and-sniffing)
-      * [Sniffing the data](#sniffing-the-data)
-      * [Getting the other keys by analyzing the log file](#getting-the-other-keys-by-analyzing-the-log-file)
-   * [Data Readout](#data-readout)
-   * [Generate Keys based on random UID](#generate-keys-based-on-random-uid)
-   * [Tag stucture](#tag-stucture)
-      * [Overview](#overview)
+   * [RFID Development](#rfid-development) 
+      * [Required Equipment](#required-equipment)
+         * [Proxmark3 compatible readers](#proxmark3-compatible-readers)
+            * [Proxmark3 easy](#proxmark3-easy)
+      * [Hacking a Bambulab Tag and readout of its data](#hacking-a-bambulab-tag-and-readout-of-its-data)
+         * [Bambulab AMS RFID readers and sniffing](#bambulab-ams-rfid-readers-and-sniffing)
+         * [Sniffing the data](#sniffing-the-data)
+         * [Getting the other keys by analyzing the log file](#getting-the-other-keys-by-analyzing-the-log-file)
+      * [Data Readout](#data-readout)
+      * [Generate Keys based on random UID](#generate-keys-based-on-random-uid)
+   * [Tag Documentation](#tag-documentation)
+      * [Block Overview](#block-overview)
       * [Block 1](#block-1)
       * [Block 2](#block-2)
       * [Block 4](#block-4)
@@ -26,14 +31,62 @@ We are currently working on a way to submit the tag data in a secure way so anal
       * [Block 8](#block-8)
       * [Block 9](#block-9)
       * [Block 12](#block-12)
-   * [Compatible RFID tags -  By generation](#compatible-rfid-tags----by-generation)
+      * [Compatible RFID tags -  By generation](#compatible-rfid-tags----by-generation)
 <!--te-->
+
+## Project Summary
+This is a research group dedicated to documenting the data structures used by Bambulab 3D printers to identify filament data.
+
+### FAQs
+ * **Can I clone tags?**
+   * Yes, you can read and clone tags using a tool such as a ProxMark3
+ * **Can I create custom tags?**
+   * No, tags are digitally signed. Even if you modify the contents, the printer will reject any tags without a valid RSA signature
+ * **What are the next steps for this project?**
+   * Decyphering the rest of the unknwn tag content
+   * Custom AMS firmware that allows custom tags to be read while ignoring the signature
+   * See [Todos/Timeline/Next steps](#todostimelinenext-steps) for more info
+
+### How do RFID tags work?
+Here's a high-level summary of how everything works:
+* BambuLab printers use MiFare 13.56MHZ RFID tags
+   * These tags contain a unique ID that is not encrypted (called the UID)
+   * In most cases UID is fixed (not-changable).  Some "hackable" rfid tags allow you to set the UID to anything you want
+* Blocks (Encrypted)
+   * MiFare tags also contain "Blocks" of data. Each block contains info about the spool, such as Material, Color, Manufacturing Date, etc. See [Tag stucture](#tag-stucture) section for details
+   * The blocks are encrypted, meaning that you need to have a KEY to decipher them
+   * Each block is encrypted with a different key
+* Encryption Keys
+   * Keys are unique to each RFID tag. Even if you discover the key for one tag, that doesn't mean you can use that same key to unlock a different tag.
+   * Keys are likely derived from the UID. The UID goes through an algorithm (known only by Bambu) to reveal a set of keys for each block
+   * Keys can be sniffed by using a device (such as a ProxMark 3) to listen in on the communication between the AMS and the rfid tag.
+   * Once the keys have been sniffed, they can be saved and used to read the contents of the tag directly (without an AMS). (Reminder, the saved keys will ONLY work for the tag they were sniffed from)
+* RSA Signature
+   * One of the blocks contains a 2048-bit RSA Signature
+   * RSA signatures are a way to digitally sign / certify authenticity of content, and they are effectively un-breakable (this is how things like cryptocurrency remain secure)
+   * RSA signatures encompass all of the data of the RFID tag. Changing a single byte somewhere else in the tag would require a completely different signature to be considered genuine
+   * Bambu printers check the content of the tag and then check if the signature is valid.  If the signature is invalid, it rejects the tag
+* Cloning Tags
+   * Even though there is a signature, a tag can be cloned
+   * To clone a tag, it must have the same UID, identical content from the data blocks, and the identical RSA signature
+   * Changing even one byte will cause the signature to be invalid, and the tag will be rejected
+* Custom Tags
+   * This is very unlikely to happen, mostly due to the RSA signature.  Only Bambu has their "Private Key" which is used to digitally sign these tags.
+   * To create a custom key, you need to know the following info:
+      * UUID -> Encryption Key algorithm (or just use known UID + Key pairs)
+      * RSA Signature Private Key. You'd have to get this from bambu, good luck
+   * Since Bambulab will likely not remove the signature requirement, you would need custom AMS firmware to read tags and ignore the signature
+
+### How to contribute
+If you have a ProxMark3 (or other RFID debug tool), you can sniff and decrypt the contents of your tags and submit them for review.
+The more data we have, the easier it is to compare differences to learn what each byte represents. A lot of the contents have been decypher (see [Tag stucture](#tag-stucture)), but there is still more unknown data still left to decypher.
 
 ## Todos/Timeline/Next steps
 
 - [ ] Tool for automatic trace analysis
 - [ ] Web service for tag submisson with automatic anonymized data publishing to github
 - [ ] Tag content analysis
+- [ ] Generate keys based on an arbitrary UID
 
 
 ## Required Equipment
@@ -127,16 +180,10 @@ This can be viewed now in a hex or binary editor or you can view it with:
 `hf mf view -f hf-mf-<TAG UID>-dump.bin`
 
 
-## Generate Keys based on random UID
-
-**TODO**
-
-## Tag stucture
-
-The following infos are already known
-
-### Overview
-
+## Tag Documentation
+This contains documentation for the known and unknown data that is contained in each block on the RFID tag.
+### Block Overview
+Summary of what kind of data is stored in each block. Detailed info for each block is documented below.
 | sec | blk | Data                                                                                   |
 |-----|-----|----------------------------------------------------------------------------------------|
 |  0  |  0  | UID and Manufacturing Data - Tag specific                                              |
