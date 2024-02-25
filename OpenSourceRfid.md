@@ -1,11 +1,10 @@
 # Open Source RFID Standard (Open 3D-RFID)
-<div style="min-height: 300px">
-<img src="images/SpoolTag.jpg" height=300 style="float:right">
 More AMS clones are coming, and there shouldn't be a proprietary format for every 3D printer.
 This standard is designed to create compatibility across different 3D printers and Filament Manufacturers by creating a format that everyone can follow
 
 We want to make a standard that is simple to implement and as future-proof as possible. Therefore, it's important to get input from Filament Manufacturers, 3D Printer Manufacturers, and smart people in the 3D Printer community.
-</div>
+
+<img src="images/SpoolTag.jpg" height=300>
 
 # Table of Contents
 * [Backers](#backers)
