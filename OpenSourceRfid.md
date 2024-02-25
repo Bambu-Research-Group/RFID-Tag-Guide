@@ -77,14 +77,15 @@ This is a list of data that will live on the RFID chip, separated into required 
 All chips MUST contain this information, otherwise they are considered non-compliant
 | Field | Data Type | Size (bytes) | Example | Description
 |-------------|---------------|------------|----|-----|
-| Tag Version | Decimal (2,3) | 2 | `01.234` | RFID tag data format version to allow future compatibility in the event that the data format changes dramatically. Stored as an int with implied decimal points. Eg "1000" -> "1.000"|
+| Tag Version | Int | 2 | `1234` | RFID tag data format version to allow future compatibility in the event that the data format changes dramatically. Stored as an int with implied decimal points. Eg `1000` -> `version 1.000`|
 | Filament Manufacturer | String | 16 | `"Polar Filament"` | String representation of filament manufacturer.  16 bytes is the max data length per-block. Longer names will be abbreviated or truncated |
 | Material Name | String | 16 | `"PLA"` or `"Glass-Filled PC"` | Material name in plain text |
 | Color Name | String | 32 | `"Blue"` or `"Electric Watermellon"` | Color in plain text. Color spans 2-blocks |
-| Diameter (Target) | Decimal (2,3) | 2 | `01.750` or `02.850` | Filament diameter (target), stored as an integer with implied decimal points. Eg "1750" -> "1.750".  This is the target diameter of the spool. The actual measured diameter is stored as a different field
-| Weight in grams (Target) | Int |  2 | `1000` (1kg), `5000` (5kg), `750` (750g) | Filament weight in grams. This is the TARGET weight, eg "1kg".  Actual measured weight is stored in a different field
+| Diameter (Target) | Int | 2 | `1750` or `2850` | Filament diameter (target) in µm (micrometers) Eg "1750" -> "1.750mm"
+| Weight (Nominal, grams) | Int |  2 | `1000` (1kg), `5000` (5kg), `750` (750g) | Filament weight in grams, excluding spool weight. This is the TARGET weight, eg "1kg".  Actual measured weight is stored in a different field.
 | Print Temp (C)| Int | 2 | `210` (C), `240` (C) | The recommended print temp in degrees-C
-| Bed Temp (C) | Int | 2 | `60` (C), `80` (C) | The recommended bed temp in degrees-C
+| Bed Temp (C) | Int | 2 | `60` (C), `80` (C) | The recommended bed temp in degrees-C |
+| Density | Int | 2 | `1240` (1.240g/cm<sup>3</sup>), `3900` (3.900g/cm<sup>3</sup>) | Filament density, measured in µg (micrograms) per cubic centimeter.
 
 ### Optional Data
 This is additional data that not all manufacturers will implement. These fields are populated if available.  All unused fields should be populated with "-1" (all 1's in binary, eg 0xFFFFFFFFFFFFFFFF)
@@ -92,18 +93,17 @@ This is additional data that not all manufacturers will implement. These fields 
 | Field | Data Type | Size (bytes) | Example | Description
 |-------------|---------------|------------|----|-----|
 | Serial Number / Batch ID | String | 16 | `"1234-ABCD"`, `"2024-01-23-1234"` | An identifier to represent a serial number or batch number from manufacturing. Stored as a string, and this format will vary from manufacturer to manufacturer |
-| Manufacture Date | INT | 4 | `20240123` (Jan 23rd, 2024) | Date code in YYYYMMDD format, stored as a 32-bit integer |
-| Manufacture Time | INT | 3 | `103000` (10:30am), `152301` (3:23:01pm)  | 24-hour time code in HHMMSS format (Hour, Minumte, Second).
+| Manufacture Date | Int | 4 | `20240123` (Jan 23rd, 2024) | Date code in YYYYMMDD format, stored as a 32-bit integer |
+| Manufacture Time | Int | 3 | `103000` (10:30am), `152301` (3:23:01pm)  | 24-hour time code in HHMMSS format (Hour, Minumte, Second).
 | Spool Core Diameter (mm) | Int | 1 | `100` (mm), `80` (mm) | The diameter of the spool core, which is the part that the filament is wound around. This diameter is to estimate remaining filament by treating the tag as an encoder, and measuring how long it takes for one rotation of a spool.
 | MFI (Melt-flow index) | TBD | TBD | TBD | Format TBD. The melt-flow index describes how "melty" plastic is.  Meltier plastics can usually print faster.  Formula is somewhat complex, and often measured at different temperatures.  For example Corbion LX175 melt flow index is `MFI(210°C/2.16kg) = 6g/10min`, and `MFI(190°C/2.16kg) = 3g/10min`
-| Tolerance (Measured) | INT | 1 | `20` (±0.020mm), `55` (±0.055mm) | Actual tolerance, measured in µm (micrometers). This field is unique to each spool, and should only be populated if per-spool tolerances are measured and recorded during manufacturing. This is not a TARGET tolerance, this is ACTUAL.  If not recorded, leave undefined (0xFF)
-| Density | INT | 2 | `1240` (1.240g/cm<sup>3</sup>), `3900` (3.900g/cm<sup>3</sup>) | Filament density, measured in µg (micrograms) per cubic centimeter.
-| Additional Data URL | STRING | 32 | `pfil.us?i=8078-RQSR` | URL to access additional data in JSON format. This data may be unique to this spool, or just general info about this material.  All urls must be https, and the "https" at the beginning is implied. Eg `pfil.us?i=8078-RQSR` becomes `https:pfil.us?i=8078-RQSR`, formatted this way to save memory.
-| Empty Spool Weight (g) | INT | 2 | `105` (105 grams) | Weight of the empty spool in grams. This can be used to calculate how much filament is remaining on each spool
-| Filament Weight (Measured) | INT | 2 | `1002` (1002 grams) | ACTUAL weight of this spool, measured after filament manufacturing.  This is not the target weight (eg 1kg) but rather the actual weighed result (eg 1.002kg).
-| Filament Length (Measured) | INT | 2 | `336` (336 meters) | ACTUAL length of filament measured in meters.  This is unique to each spool.
-| TD (Transmission Distance) | INT | 2 | `2540` (2.540mm) | Transmission Distance in µm (micrometers). Transmission distance is the distance at which no light can pass through the filament.  See the HueForge project for more details |
-| Color Hex | INT | 3 | `0xffa64d` (Light orange color) | Color hexcode. Hex is a 3-byte number in the format 0xRRGGBB (Red, Green, Blue, one byte each) |
+| Tolerance (Measured) | Int | 1 | `20` (±0.020mm), `55` (±0.055mm) | Actual tolerance, measured in µm (micrometers). This field is unique to each spool, and should only be populated if per-spool tolerances are measured and recorded during manufacturing. This is not a TARGET tolerance, this is ACTUAL.  If not recorded, leave undefined (0xFF)
+| Additional Data URL | String | 32 | `pfil.us?i=8078-RQSR` | URL to access additional data in JSON format. This data may be unique to this spool, or just general info about this material.  All urls must be https, and the "https" at the beginning is implied. Eg `pfil.us?i=8078-RQSR` becomes `https:pfil.us?i=8078-RQSR`, formatted this way to save memory.
+| Empty Spool Weight (g) | Int | 2 | `105` (105 grams) | Weight of the empty spool in grams. This can be used to calculate how much filament is remaining on each spool
+| Filament Weight (Measured) | Int | 2 | `1002` (1002 grams) | ACTUAL weight of the filament, excluding empty-spool weight. Measured after filament manufacturing.  This is not the target weight (eg 1kg) but rather the actual weighed result (eg 1.002kg).
+| Filament Length (Measured) | Int | 2 | `336` (336 meters) | ACTUAL length of filament measured in meters.  This is unique to each spool.
+| TD (Transmission Distance) | Int | 2 | `2540` (2.540mm) | Transmission Distance in µm (micrometers). Transmission distance is the distance at which no light can pass through the filament.  See the HueForge project for more details |
+| Color Hex | Int | 3 | `0xffa64d` (Light orange color) | Color hexcode. Hex is a 3-byte number in the format 0xRRGGBB (Red, Green, Blue, one byte each) |
 
 
 ## Memory Map
