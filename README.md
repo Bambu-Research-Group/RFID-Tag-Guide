@@ -40,6 +40,7 @@ This is a research group dedicated to documenting the data structures used by Ba
    * Yes, you can read and clone tags using a tool such as a ProxMark3
  * **Can I create custom tags?**
    * No, tags are digitally signed. Even if you modify the contents, the printer will reject any tags without a valid RSA signature
+   * An [Open Source RFID Tag](OpenSourceRfid.md) has been proposed to allow anyone to create / modify their own tags. This must be adopted by printer manufacturers, or you can mod your own printer for support
  * **What are the next steps for this project?**
    * Decyphering the rest of the unknwn tag content
    * Custom AMS firmware that allows custom tags to be read while ignoring the signature

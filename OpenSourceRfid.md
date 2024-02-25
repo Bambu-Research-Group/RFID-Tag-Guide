@@ -1,14 +1,16 @@
 # Open Source RFID Standard (Open 3D-RFID)
+<div style="min-height: 300px">
+<img src="images/SpoolTag.jpg" height=300 style="float:right">
 More AMS clones are coming, and there shouldn't be a proprietary format for every 3D printer.
 This standard is designed to create compatibility across different 3D printers and Filament Manufacturers by creating a format that everyone can follow
 
 We want to make a standard that is simple to implement and as future-proof as possible. Therefore, it's important to get input from Filament Manufacturers, 3D Printer Manufacturers, and smart people in the 3D Printer community.
-
-<img src="images/SpoolTag.jpg" width=300>
+</div>
 
 # Table of Contents
 * [Backers](#backers)
 * [Why RFID](#why-rfid)
+* [Add RFID support to your printer](#add-rfid-support-to-your-printer)
 * [RFID Hardware](#rfid-hardware)
 * [Mechanical Requirements](#mechanical-requirements)
 * [Data Structure](#data-structure)
@@ -33,6 +35,15 @@ What is the benefit of adding RFID chips to filament?
     * **Filament Remaining Estimation:** Using the RFID tag as an encoder, printers can measure how long it takes for one rotation of a spool of filament, and use this to estimate how much filament is remaining.
     * **Print Profiles**: Each spool can contain print/bed temps, as well as other settings like retraction settings. This makes it much easier to use different brands/colors/materials without worrying about creating a bunch of different slicer profiles.
 
+# Add RFID support to your printer
+This standard was designed to be simple to implement in firmware. You will need to add custom firmware and potentially an RFID reader (if your printer doesn't already have one).
+
+RFID support can theoretically be added to any printer using off-the-shelf RFID Modules such as the RC522 (as low as $1). This module communicates over SPI.
+
+<img src="images/RC522-Reader.jpg" width=200>
+
+Did you make a design to add RFID to your printer? Let us know so we can link to it here!  Designs can be 3D models, or firmware.
+
 # RFID Hardware
 MiFare 13.56MHZ Classic 1K tags
 
@@ -52,6 +63,8 @@ Requirements
 
 ## RFID Memory
 MiFare 1K chips store 1024 bytes across 16 **sectors**, 4 **blocks** per sector, and 16 bytes per block.  The last block of each sector contains key information, and cannot be used for custom data. This means that each sector contains 3 blocks of usable data, for a total of 48 bytes of usable memory per sector
+
+<img src="images/mifareclassicsticker.jpg" width="200">
 
 Note: There are 2k chips that allow 2048 bytes, but they are less common and more expensive.
 
@@ -85,6 +98,7 @@ All strings use 16 bytes of memory, unused space is wasted:
 ## Data Points
 This is a list of data that will live on the RFID chip, separated into required and optional data.  All REQUIRED data must be populated to be compliant with this open source RFID protocol.
 
+1K chips have 1024 bytes of total memory, with 768 bytes of usable memory (remaining memory is used for keys/encryption)
 
 ### Required Data
 All chips MUST contain this information, otherwise they are considered non-compliant
