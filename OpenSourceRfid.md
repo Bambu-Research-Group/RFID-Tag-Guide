@@ -8,6 +8,7 @@ We want to make a standard that is simple to implement and as future-proof as po
 * [Backers](#backers)
 * [Why RFID](#why-rfid)
 * [RFID Hardware](#rfid-hardware)
+* [Mechanical Requirements](#mechanical-requirements)
 * [Data Structure](#data-structure)
     * [RFID Memory](#rfid-memory)
     * [Lookup Tables vs Plain-Text](#lookup-tables-vs-plain-text)
@@ -34,6 +35,17 @@ What is the benefit of adding RFID chips to filament?
 MiFare 13.56MHZ Classic 1K tags
 
 These are cheap, common, and allow 1kilobyte of data to be stored on them, which is plenty of space to store required information.  13.56Mhz readers are also very low-cost, and there are plenty of arduino-compatible reader/writers to allow user-made printer upgrades to add RFID support.
+
+# Mechanical Requirements
+TBD, open to discussion. 
+
+Questions to answer:
+* Should tag location be relative to center of spool, or outer diameter?
+* What is the maximum spool thickness allowed?
+* Does the tag go on the inside or outside of the spool?
+* Which side does the tag go on? One side? Both?
+
+<img src="images/TagLocation.png" width="400">
 
 # Data Structure
 
