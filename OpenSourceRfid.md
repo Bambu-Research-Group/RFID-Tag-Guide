@@ -102,6 +102,8 @@ This is additional data that not all manufacturers will implement. These fields 
 | Empty Spool Weight (g) | INT | 2 | `105` (105 grams) | Weight of the empty spool in grams. This can be used to calculate how much filament is remaining on each spool
 | Filament Weight (Measured) | INT | 2 | `1002` (1002 grams) | ACTUAL weight of this spool, measured after filament manufacturing.  This is not the target weight (eg 1kg) but rather the actual weighed result (eg 1.002kg).
 | Filament Length (Measured) | INT | 2 | `336` (336 meters) | ACTUAL length of filament measured in meters.  This is unique to each spool.
+| TD (Transmission Distance) | INT | 2 | `2540` (2.540mm) | Transmission Distance in µm (micrometers). Transmission distance is the distance at which no light can pass through the filament.  See the HueForge project for more details |
+| Color Hex | INT | 3 | `0xffa64d` (Light orange color) | Color hexcode. Hex is a 3-byte number in the format 0xRRGGBB (Red, Green, Blue, one byte each) |
 
 
 ## Memory Map
