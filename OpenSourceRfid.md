@@ -4,6 +4,8 @@ This standard is designed to create compatibility across different 3D printers a
 
 We want to make a standard that is simple to implement and as future-proof as possible. Therefore, it's important to get input from Filament Manufacturers, 3D Printer Manufacturers, and smart people in the 3D Printer community.
 
+<img src="images/SpoolTag.jpg" width=300>
+
 # Table of Contents
 * [Backers](#backers)
 * [Why RFID](#why-rfid)
@@ -37,13 +39,12 @@ MiFare 13.56MHZ Classic 1K tags
 These are cheap, common, and allow 1kilobyte of data to be stored on them, which is plenty of space to store required information.  13.56Mhz readers are also very low-cost, and there are plenty of arduino-compatible reader/writers to allow user-made printer upgrades to add RFID support.
 
 # Mechanical Requirements
-TBD, open to discussion. 
+Requirements are not set in stone.  Still open to discussion. 
 
-Questions to answer:
-* Should tag location be relative to center of spool, or outer diameter?
-* What is the maximum spool thickness allowed?
-* Does the tag go on the inside or outside of the spool?
-* Which side does the tag go on? One side? Both?
+Requirements
+* Tag center should be 56.0mm away from the center of the spool (see pic)
+* The tag should never be more than 4.0mm away from the outside edge of the spool.  For spool sides thicker than 4mm, there must be a cutout to embed the tag, or the tag should be fixed to the outside of the spool
+* Two tags should be used, one on each end of the spool
 
 <img src="images/TagLocation.png" width="400">
 
@@ -116,6 +117,7 @@ This is additional data that not all manufacturers will implement. These fields 
 | Filament Length (Measured) | Int | 2 | `336` (336 meters) | ACTUAL length of filament measured in meters.  This is unique to each spool.
 | TD (Transmission Distance) | Int | 2 | `2540` (2.540mm) | Transmission Distance in µm (micrometers). Transmission distance is the distance at which no light can pass through the filament.  See the HueForge project for more details |
 | Color Hex | Int | 3 | `0xffa64d` (Light orange color) | Color hexcode. Hex is a 3-byte number in the format 0xRRGGBB (Red, Green, Blue, one byte each) |
+| Max Dry Temp (C) | Int | 1 | `55` (55C), `50` (50C) Maximum drying temperature in Degrees-C. Drying above this temperature can damage the filament
 
 
 ## Memory Map
