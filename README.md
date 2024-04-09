@@ -117,12 +117,14 @@ If you have already a single tag you need to place a spool **without a tag** in 
 
 ### Sniffing the data
 
-To start the sniffing connect your rfid reader and open your proxmark3. 
+To start the sniffing connect your rfid reader and open your proxmark3.
 Start sniffing with:
 
 `hf 14a sniff -c -r`
 
-Hold the proxmark3 reader next to the AMS reader and load the filament, or if already loaded tap the update icon on the screen.
+Hold the proxmark3 reader next to the AMS reader and load the filament, or if already loaded tap the update icon on the screen
+
+![](images/proxmark-sniff-example.jpg)
 
 When you are done, you can press the button on the side of the Proxmark3 to stop the trace. To visualize the trace you just enter:
 
@@ -133,7 +135,7 @@ You should be able to already see the first keys. Until you see a message:
 
 Execute this command in the proxmark3 directory in an other terminal and write down or save the found key.
 
-Check the date for crc errors and if it's fine save the trace with the following command.
+Check the data for crc errors and if it's fine save the trace with the following command.
 
 `trace save -f <trace-name>`
 
