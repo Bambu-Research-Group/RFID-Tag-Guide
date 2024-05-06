@@ -185,53 +185,78 @@ This contains documentation for the known and unknown data that is contained in 
 Summary of what kind of data is stored in each block. Detailed info for each block is documented below.
 | sec | blk | Data                                                                                   |
 |-----|-----|----------------------------------------------------------------------------------------|
-|  0  |  0  | UID and Manufacturing Data - Tag specific                                              |
-|  0  |  1  | [Block 1 Description](#block-1)                                                        |
-|  0  |  2  | [Block 2 Description](#block-2)                                                        |
-|  0  |  3  | A-Keys Sector 0 (6 bytes), Permission Sector 1 (4 bytes), B-Keys Sector 0 (6 bytes)    |
-|  1  |  4  | [Block 4 Description](#block-4)                                                        |
-|  1  |  5  | [Block 5 Description](#block-5)                                                        |
-|  1  |  6  | [Block 6 Description](#block-6)                                                        |
-|  1  |  7  | A-Keys Sector 1 (6 bytes), Permission Sector 1 (4 bytes), B-Keys Sector 1 (6 bytes)    |
-|  2  |  8  | [Block 8 Description](#block-8)                                                        |
-|  2  |  9  | [Block 9 Description](#block-9)                                                        |
-|  2  | 10  | **Unknown binary data**                                                                |
-|  2  | 11  | A-Keys Sector 2 (6 bytes), Permission Sector 2 (4 bytes), B-Keys Sector 2 (6 bytes)    |
-|  3  | 12  | [Block 12 Description](#block-12)                                                      |
-|  3  | 13  | **Unkown string data** could be part of production date/time                           |
-|  3  | 14  | **Unkown binary data**                                                                 |
-|  3  | 15  | A-Keys Sector 3 (6 bytes), Permission  Sector 3 (4 bytes), B-Keys Sector 3 (6 bytes)   |
-|  4  | 16  | **Empty**                                                                              |
-|  4  | 17  | **Empty**                                                                              |
-|  4  | 18  | **Empty**                                                                              |
-|  4  | 19  | A-Keys Sector 4 (6 bytes), Permission  Sector 4 (4 bytes), B-Keys Sector 4 (6 bytes)   |
-|  5  | 20  | **Empty**                                                                              |
-|  5  | 21  | **Empty**                                                                              |
-|  5  | 22  | **Empty**                                                                              |
-|  5  | 23  | A-Keys Sector 5 (6 bytes), Permission  Sector 5 (4 bytes), B-Keys Sector 5 (6 bytes)   |
-|  6  | 24  | **Empty**                                                                              |
-|  6  | 25  | **Empty**                                                                              |
-|  6  | 26  | **Empty**                                                                              |
-|  6  | 27  | A-Keys Sector 6 (6 bytes), Permission  Sector 6 (4 bytes), B-Keys Sector 6 (6 bytes)   |
-|  7  | 28  | **Empty**                                                                              |
-|  7  | 29  | **Empty**                                                                              |
-|  7  | 30  | **Empty**                                                                              |
-|  7  | 31  | A-Keys Sector 7 (6 bytes), Permission  Sector 7 (4 bytes), B-Keys Sector 7 (6 bytes)   |
-|  8  | 32  | **Empty**                                                                              |
-|  8  | 33  | **Empty**                                                                              |
-|  8  | 34  | **Empty**                                                                              |
-|  8  | 35  | A-Keys Sector 8 (6 bytes), Permission  Sector 8 (4 bytes), B-Keys Sector 8 (6 bytes)   |
-|  9  | 37  | **Empty**                                                                              |
-|  9  | 38  | **Empty**                                                                              |
-|  9  | 39  | **Empty**                                                                              |
-|  9  | 15  | A-Keys Sector 9 (6 bytes), Permission  Sector 9 (4 bytes), B-Keys Sector 9 (6 bytes)   |
-| 10-15 | *  | **Unknown binary data** Maybe CRC                                                     |
+|  0  |  0  | [Block 0](#block-0) UID and Tag Manufacturer Data                                      |
+|  0  |  1  | [Block 1](#block-1) Tray Info Index                                                    |
+|  0  |  2  | [Block 2](#block-2) Filament Type                                                      |
+|  0  |  3  | [Block 3](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab       |
+|  1  |  0  | [Block 4](#block-4) Detailed Filament Type                                             |
+|  1  |  1  | [Block 5](#block-5) Spool Weight, Color Code                                           |
+|  1  |  2  | [Block 6](#block-6) Min/Max Hotend, Bed Temp, Bed Temp Type, Drying Time, Drying Temp  |
+|  1  |  3  | [Block 7](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab       |
+|  2  |  0  | [Block 8](#block-8) X Cam Info                                                         |
+|  2  |  1  | [Block 9](#block-9) Tray UID                                                           |
+|  2  |  2  | [Block 10](#block-10) **Unknown**                                                      |
+|  2  |  3  | [Block 11](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab      |
+|  3  |  0  | [Block 12](#block-12) Production Date/Time                                             |
+|  3  |  1  | [Block 13](#block-13) **Unknown**                                                      |
+|  3  |  2  | [Block 14](#block-14) **Unknown**                                                      |
+|  3  |  3  | [Block 15](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab      |
+|  4  |  0  | **Empty**                                                                              |
+|  4  |  1  | **Empty**                                                                              |
+|  4  |  2  | **Empty**                                                                              |
+|  4  |  3  | [Block 19](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab      |
+|  5  |  0  | **Empty**                                                                              |
+|  5  |  1  | **Empty**                                                                              |
+|  5  |  2  | **Empty**                                                                              |
+|  5  |  3  | [Block 23](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab      |
+|  6  |  0  | **Empty**                                                                              |
+|  6  |  1  | **Empty**                                                                              |
+|  6  |  2  | **Empty**                                                                              |
+|  6  |  3  | [Block 27](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab      |
+|  7  |  0  | **Empty**                                                                              |
+|  7  |  1  | **Empty**                                                                              |
+|  7  |  2  | **Empty**                                                                              |
+|  7  |  3  | [Block 31](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab      |
+|  8  |  0  | **Empty**                                                                              |
+|  8  |  1  | **Empty**                                                                              |
+|  8  |  2  | **Empty**                                                                              |
+|  8  |  3  | [Block 35](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab      |
+|  9  |  0  | **Empty**                                                                              |
+|  9  |  1  | **Empty**                                                                              |
+|  9  |  2  | **Empty**                                                                              |
+|  9  |  3  | [Block 39](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab      |
+| 10-15 | *  | **RSA-2048 Signature**                                                                |
 
 
 The first part of the filament serial number seems to be the Tag UID.
 
 LE = Little Endian
 
+### MIFARE Encryption Keys
+Every 4th block (eg Sector X, Block 3) contains encryption keys that are part of the MIFARE RFID standard.
+This has nothing to do with BambuLab's memory format.
+All BambuLab tags use the same Permission Bits (Access Control)
+
+Example Data:
+`AA AA AA AA AA AA PP PP PP PP BB BB BB BB BB BB`
+
+| bytes   | type     |  example data location   | Description                                   |
+|---------|----------|--------------------------|-----------------------------------------------|
+|  5-0    | RAW Bin  | AA AA AA AA AA AA        | A-Key                                         |
+|  9-6    | RAW Bin  | PP PP PP PP              | Permission Bits (Access Control) ALWAYS `87 87  87 69` (hex) for Bambu Tags |
+|  15-10  | RAW Bin  | BB BB BB BB BB BB        | B-Key (always `00 00 00 00 00 00` for Bambu tags) |
+
+### Block 0
+
+Note: Block 0 is Read-only. The contents are set by the tag manufacturer.
+
+Example Data:
+`AA AA AA AA BB BB BB BB BB BB BB BB BB BB BB BB`
+
+| bytes | type     |  example data location              | Description                                   |
+|-------|----------|-------------------------------------|-----------------------------------------------|
+|  7-0  | string   | AA AA AA AA                         | Tag UID                                       |
+| 15-8  |  string  | BB BB BB BB BB BB BB BB BB BB BB BB | Tag Manufacturer Data (Bin)                   |
 
 ### Block 1
 
@@ -311,6 +336,15 @@ Example Data:
 |-------|----------|-------------------------------------------------|-----------------------------------|
 | 15-0  | UID      | AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA | TrayUID                           |
 
+### Block 10
+
+Example Data:
+`AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA`
+
+| bytes | type     |  example data location                          | Description                       |
+|-------|----------|-------------------------------------------------|-----------------------------------|
+| 15-0  | Unknown  | AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA | **Unknown** (binary data)             |
+
 ### Block 12
 
 Example Data:
@@ -320,6 +354,23 @@ Example Data:
 |-------|----------|-------------------------------------------------|----------------------------------------|
 | 15-0  | string   | AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA | Production Date and Time in ASCII ?  `<year>_<month>_<day>_<hour>_<minute>`                           |
 
+### Block 13
+
+Example Data:
+`AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA`
+
+| bytes | type     |  example data location                          | Description                       |
+|-------|----------|-------------------------------------------------|-----------------------------------|
+| 15-0  | Unknown  | AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA | **Unknown** (ASCII data)             |
+
+### Block 14
+
+Example Data:
+`AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA`
+
+| bytes | type     |  example data location                          | Description                       |
+|-------|----------|-------------------------------------------------|-----------------------------------|
+| 15-0  | Unknown  | AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA | **Unknown** (binary data)             |
 
 
 ## Compatible RFID tags -  By generation
