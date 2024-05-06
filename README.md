@@ -21,6 +21,8 @@ We are currently working on a way to submit the tag data in a secure way so anal
    * [Dump RFID Contents (.bin)](#dump-rfid-contents-bin)
    * [Tag Documentation](#tag-documentation)
       * [Block Overview](#block-overview)
+      * [MIFARE Encryption Keys](#mifare-encryption-keys)
+      * [Block 0](#block-0)
       * [Block 1](#block-1)
       * [Block 2](#block-2)
       * [Block 4](#block-4)
@@ -28,7 +30,10 @@ We are currently working on a way to submit the tag data in a secure way so anal
       * [Block 6](#block-6)
       * [Block 8](#block-8)
       * [Block 9](#block-9)
+      * [Block 10](#block-10)
       * [Block 12](#block-12)
+      * [Block 13](#block-13)
+      * [Block 14](#block-14)
    * [Compatible RFID tags -  By generation](#compatible-rfid-tags----by-generation)
 <!--te-->
 
