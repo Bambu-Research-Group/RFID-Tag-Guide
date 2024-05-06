@@ -18,7 +18,7 @@ We are currently working on a way to submit the tag data in a secure way so anal
       * [Bambulab AMS RFID readers and sniffing](#bambulab-ams-rfid-readers-and-sniffing)
       * [Sniffing the data](#sniffing-the-data)
       * [Getting the other keys by analyzing the log file](#getting-the-other-keys-by-analyzing-the-log-file)
-   * [Data Readout](#data-readout)
+   * [Dump RFID Contents (.bin)](#dump-rfid-contents-bin)
    * [Tag Documentation](#tag-documentation)
       * [Block Overview](#block-overview)
       * [Block 1](#block-1)
@@ -115,68 +115,122 @@ The Bambulab AMS RFID readers are locate between slot 1&2 and slot 3&4
 For sniffing you can place a bambulab spool in slot 1 and place the reader next to the AMS reader.
 If you have already a single tag you need to place a spool **without a tag** in slot one and tape a tag on the top side of the reader and hold the proxmark3 next to the reader in such a way that the proxmark3 reader's bottom side is directed to the AMS reader so the proxmark3 reader is between the tag and the AMS reader. It is recommended to rotate the proxmark3 reader similar to the spool. Details can be found in the next steps.
 
-### Sniffing the data
+### Dump RFID Contents (.bin)
 
-To start the sniffing connect your rfid reader and open your proxmark3. 
-Start sniffing with:
+1. **Run ProxMark3 Software**
 
-`hf 14a sniff -c -r`
+   In a terminal, run `pm3` to start the ProxMark3 Software
 
-Hold the proxmark3 reader next to the AMS reader and load the filament, or if already loaded tap the update icon on the screen.
+2. **Sniff Communication**
 
-When you are done, you can press the button on the side of the Proxmark3 to stop the trace. To visualize the trace you just enter:
+   - Start sniffing with: `hf 14a sniff -c -r`<br>
+   (hf=High Frequency, 14a=Tag Type, Sniff=command, -c and -r mean "capture on triggers instead of continuously)
 
-`trace list -t mf`
+   - Place your ProxMark3 Between the tag and the AMS. Recommended: Use tape to hold it in place.
+   - Load a strand of filament into the AMS. This is what triggers the AMS to attempt to read the RFID tag.
+   - Press the button on the ProxMark to end capture after the filament has completed loading
 
-You should be able to already see the first keys. Until you see a message:
-"Nested authentication detected." with some bruteforce command: `tools/mf_nonce_brute/mf_nonce_brute <parameters>`
+3. **Create a Key Dictionary**
+   - We will discover keys one at a time, and save them to a dictionary file.
+   - Navigate to your ProxMark3 software installation directory. This will be specific to your Operating System and Installation.
+      - Mac Example: `/usr/local/Cellar/proxmark3/4.17768/share/proxmark3/`
+      - Windows Example: TBD
+   - Open Notepad or other text editor, and save a blank file called `myDictionary.dic` into the `dictionaries/` folder of your ProxMark3 software installation directory.
+   
+      (You can call this file anything you want, but for the rest of this example, we will refer to it as "myDictionary")
 
-Execute this command in the proxmark3 directory in an other terminal and write down or save the found key.
+   - Leave this file open, we will continue to add keys to it in the next step
 
-Check the date for crc errors and if it's fine save the trace with the following command.
+4. **Extract Keys From Trace**
+   - Run `trace list -t mf -f myDictionary` to view the trace that was recorded from sniffing in the previous step.
 
-`trace save -f <trace-name>`
+      This uses the key dictionary `myDictionary.dic` that we created in step 3 
+   - Read the output and look for anything that mentions a key.
+      - Three Possible Formats:
+         - `key E0B50731BE27 prng WEAK` - Follow Step 5
+         - `nested probable key: 50B0318A4FE7` - Follow Step 6
+         - `Nested authentication detected.` - Follow Step 7
+        
+      - Each of these 3 entries can provide us with a valid key.  Follow step 5, 6, or 7 depending on which type of key you encounter
 
-You can now record all your tags. If you want to load the traces later
+5. **First Key - Plain Text**
+   - Example: `key E0B50731BE27 prng WEAK`
+   - This is the first key that was discovered by sniffing AMS traffic.
+   - Copy/paste this key into the `myDictionary.dic` that you created in step 3.
+6. **Nested Probable Key**
+   - Example: `nested probable key: 50B0318A4FE7`
+   - Just copy/paste this key into your dictionary and SAVE IT
+7. **Nested Authentication Key**
+   - Example:
+      ```
+      Nested authentication detected.
+      tools/mf_nonce_brute/mf_nonce_brute 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C
+      ```
+   - Open a second terminal window, and change directories into your ProxMark3 software installation directory. This is specific to your OS and PM3 installation.
+      - Example (Mac): `cd /usr/local/Cellar/proxmark3/4.17768/share/proxmark3/`
+   - CD into the tools folder `cd tools/`
+   - Copy the command from ProxMark starting at `mf_nonce_brute`, including all the arguments (random letters/numbers) after it, and run the program from the `tools/`directory.
+      - Example (Mac/Linux): `./mf_nonce_brute 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C`
+      - Example (Windows): TBD, likely needs to be ".exe"
+   - The program will discover a key. Copy/paste this key into your `myDictionary.dic` file, and SAVE IT.
+      - Example Output:
+         ```
+         Valid Key found [ 202efd3dcdfd ]
+         ```
+8. **Check Keys (Optional)**
+   - If you want to check how many valid keys you've discovered, you can do this test
+   - This is optional, and you can choose to wait until you have discovered all of the keys
+   - **WARNING**: Performing a key check will erase the trace that you recorded during step 2, and will require you to re-sniff data (repeat step 2)
+      - If you want to save your trace to avoid re-sniffing, use `trace save -f <trace-name>` and `trace load -f <trace-name>`
+   
+   - Run `hf mf fchk --1k -f myDictionary` to test your keys
+      - Example Output (showing 11/16 keys discovered):
+         ```
+         [+] found keys:
 
-`trace load -f <trace-name>`
+         [+] -----+-----+--------------+---+--------------+----
+         [+]  Sec | Blk | key A        |res| key B        |res
+         [+] -----+-----+--------------+---+--------------+----
+         [+]  000 | 003 | E0B50731BE27 | 1 | ------------ | 0
+         [+]  001 | 007 | 63654DB94D97 | 1 | ------------ | 0
+         [+]  002 | 011 | 387C06EFFDC8 | 1 | ------------ | 0
+         [+]  003 | 015 | 38963E577E43 | 1 | ------------ | 0
+         [+]  004 | 019 | 8A3EA2564692 | 1 | ------------ | 0
+         [+]  005 | 023 | 935E0F11857A | 1 | ------------ | 0
+         [+]  006 | 027 | EBC8F7D23A06 | 1 | ------------ | 0
+         [+]  007 | 031 | DD6128F13D4C | 1 | ------------ | 0
+         [+]  008 | 035 | ------------ | 0 | ------------ | 0
+         [+]  009 | 039 | 4E470B09521F | 1 | ------------ | 0
+         [+]  010 | 043 | 50EB8811A69C | 1 | ------------ | 0
+         [+]  011 | 047 | 4BDD25091824 | 1 | ------------ | 0
+         [+]  012 | 051 | ------------ | 0 | ------------ | 0
+         [+]  013 | 055 | ------------ | 0 | ------------ | 0
+         [+]  014 | 059 | ------------ | 0 | ------------ | 0
+         [+]  015 | 063 | ------------ | 0 | ------------ | 0
+         [+] -----+-----+--------------+---+--------------+----
+         [+] ( 0:Failed / 1:Success )
+         ```
+         
+9. **Find Remaining Keys**
+   - Repeat step 4 until all 16 keys are discovered
+   - Your dictionary may be larger than 16 entries if you accidentally copied a duplicate key or an invalid key. These invalid entries are fine, and you can ignore them
+   - **Recommended**: When you think you have discovered all 16 keys, perform step 8 to verify that your keys are correct.
 
-To view the loaded trace just enter the following command.
-
-`trace list -1 -t mf`
-
-If you are using traces in the next steps you need to add the `-1` option when you analyze the traces.
-
-### Getting the other keys by analyzing the log file
-
-Remove the spool/tag from the printer and place it on the reader so we can check all the keys.
-
-Now a dictionary (`*.dic`) file with all the already found and bruteforced keys must be created.
-
-Enter the keys line by line into that file.
-
-The next steps need to be repeated until you have all the keys. (A script for this is already WIP)
-
-1. `trace list -t mf -f <dic_file>`
-2. bruteforce the new keys with the displayed command in a separate terminal and add all new keys to the dict file
-3. verify the keys: `hf mf fchk --1k -f <dic_file>`
-4. Go to 1 until you found all keys
-
-## Data Readout
-
-Before the data can be read we need to generate a key file
-
-`hf mf fchk --1k -f <dic_file> --dump`
-
-The output is a binary key file: `hf-mf-<TAG UID>-key.bin`
-
-Dump now the data:
-
-`hf mf dump --1k --keys hf-mf-<TAG UID>-key.bin`
-
-This can be viewed now in a hex or binary editor or you can view it with:
-
-`hf mf view -f hf-mf-<TAG UID>-dump.bin`
+10. **Convert Dictionary to Key File**
+   - Run `hf mf fchk --1k -f myDictionary --dump` to create a key file
+   - The program will report the destination of the key file that it saved. Copy this filepath to your clipboard
+      - Example:
+         ```
+         [+] Found keys have been dumped to /Users/mitch/hf-mf-75066B1D-key.bin
+         ```
+11. **Dump RFID Contents**
+   - Run `hf mf fchk --1k -f myDictionary --dump` to dump the contents of the tag using the 16 keys we discovered
+   - There should be no errors
+   - The output should tell you where your `.bin` file is saved
+      - Example:
+         ```
+         [+] saved 1024 bytes to binary file /Users/mitch/hf-mf-75066B1D-dump.bin
+         ```
 
 
 ## Tag Documentation
@@ -243,7 +297,7 @@ Example Data:
 | bytes   | type     |  example data location   | Description                                   |
 |---------|----------|--------------------------|-----------------------------------------------|
 |  5-0    | RAW Bin  | AA AA AA AA AA AA        | A-Key                                         |
-|  9-6    | RAW Bin  | PP PP PP PP              | Permission Bits (Access Control) ALWAYS `87 87  87 69` (hex) for Bambu Tags |
+|  9-6    | RAW Bin  | PP PP PP PP              | Permission Bits (Access Control)<br>ALWAYS `87 87  87 69` (hex) for Bambu Tags |
 |  15-10  | RAW Bin  | BB BB BB BB BB BB        | B-Key (always `00 00 00 00 00 00` for Bambu tags) |
 
 ### Block 0
