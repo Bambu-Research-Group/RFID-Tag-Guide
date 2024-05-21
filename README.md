@@ -227,7 +227,7 @@ If you have already a single tag you need to place a spool **without a tag** in 
          [+] Found keys have been dumped to /Users/mitch/hf-mf-75066B1D-key.bin
          ```
 11. **Dump RFID Contents**
-   - Run `hf mf fchk --1k -f myDictionary --dump` to dump the contents of the tag using the 16 keys we discovered
+   - Run `hf mf dump -k [path-to-dumpfile]` to dump the contents of the tag using the 16 keys we discovered
    - There should be no errors
    - The output should tell you where your `.bin` file is saved
       - Example:
