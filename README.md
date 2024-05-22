@@ -182,10 +182,8 @@ If you place the Proxmark in between the AMS reader and the spool, make sure tha
       tools/mf_nonce_brute/mf_nonce_brute 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C
       ```
    - Open a second terminal window, and change directories into your Proxmark3 software installation directory. This is specific to your OS and PM3 installation.
-      - macOS (Intel) Example: `cd /usr/local/Cellar/proxmark3/4.17768/share/proxmark3/`
-      - macOS (ARM) Eample: `cd /opt/homebrew/Cellar/proxmark3/4.17768/share/proxmark3/`
-      - Windows Example: TBD
-      - Linux Example: TBD
+      - macOS/Linux: `cd $(brew --prefix proxmark3)/share/proxmark3/`
+      - Windows: TBD
    - CD into the tools folder `cd tools/`
    - Copy the command from ProxMark starting at `mf_nonce_brute`, including all the arguments (random letters/numbers) after it, and run the program from the `tools/` directory.
       - Example (macOS/Linux): `./mf_nonce_brute 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C`
