@@ -40,7 +40,7 @@ This is a research group dedicated to documenting the data structures used by Ba
 
 ### FAQs
  * **Can I clone tags?**
-   * Yes, you can read and clone tags using a tool such as a ProxMark3
+   * Yes, you can read and clone tags using a tool such as a Proxmark3
  * **Can I create custom tags?**
    * No, tags are digitally signed. Even if you modify the contents, the printer will reject any tags without a valid RSA signature
    * An [Open Source RFID Tag](OpenSourceRfid.md) has been proposed to allow anyone to create / modify their own tags. This must be adopted by printer manufacturers, or you can mod your own printer for support
@@ -80,8 +80,8 @@ Here's a high-level summary of how everything works:
    * Since Bambulab will likely not remove the signature requirement, you would need custom AMS firmware to read tags and ignore the signature
 
 ### How to contribute
-If you have a ProxMark3 (or other RFID debug tool), you can sniff and decrypt the contents of your tags and submit them for review.
-The more data we have, the easier it is to compare differences to learn what each byte represents. A lot of the contents have been decypher (see [Tag stucture](#tag-stucture)), but there is still more unknown data still left to decypher.
+If you have a Proxmark3 (or other RFID debugging tool), you can sniff and decrypt the contents of your tags and submit them for review.
+The more data we have, the easier it is to compare differences to learn what each byte represents. A lot of the contents have been deciphered (see [Tag stucture](#tag-stucture)), but there is still more unknown data still left.
 
 ## Todos/Timeline/Next steps
 
@@ -93,52 +93,64 @@ The more data we have, the easier it is to compare differences to learn what eac
 
 ## Required Equipment
 
-- Bambulab 3D Printer with AMS
+- Bambulab 3D Printer with AMS or AMS Lite
 - Bambulab Filament spool **or** the related tags
-- A proxmark3 compatible rfid reader
-- proxmark3 installed on your computer
+- A Proxmark3-compatible RFID reader
+- The [proxmark3 software](https://github.com/RfidResearchGroup/proxmark3)
 
 ### Proxmark3 compatible readers
 
-#### Proxmark3 easy
+#### Proxmark3 Easy
 ![](images/Proxmark3_easy.png)
 
-A Proxmark 3 easy is sufficient for all the tasks that need to be done. You can buy a clone from alixepress, amazon or dangerous things.
-
+A Proxmark3 Easy is sufficient for all the tasks that need to be done. You can buy a clone from Alixepress, Amazon or Dangerous Things.
 
 ## Hacking a Bambulab Tag and readout of its data
+The easiest way to obtain the 
 We document here the most simple approach to get all required A-Keys and the data of the tag.
 The easiest way is to sniff the data.
 
-### Bambulab AMS RFID readers and sniffing
-The Bambulab AMS RFID readers are locate between slot 1&2 and slot 3&4
+### Bambulab AMS RFID reader location
+The Bambulab AMS RFID readers are located between slots 1&2 and slots 3&4.
 
 ![](images/filament-slots.jpg)
 
-For sniffing you can place a bambulab spool in slot 1 and place the reader next to the AMS reader.
-If you have already a single tag you need to place a spool **without a tag** in slot one and tape a tag on the top side of the reader and hold the proxmark3 next to the reader in such a way that the proxmark3 reader's bottom side is directed to the AMS reader so the proxmark3 reader is between the tag and the AMS reader. It is recommended to rotate the proxmark3 reader similar to the spool. Details can be found in the next steps.
+### Bambulab AMS Lite RFID reader location
+The Bambulab AMS Lite RFID readers are located at the base of each spool holder.
+
+For sniffing, you will need to place the Proxmark in between the RFID tag and the reader on the AMS. As there is not much clearance, it is recommended to temporarily remove the low frequency radio (the topmost piece) if you can, as it will not be used in this process.
+
+### Proxmark3 placement for sniffing
+
+For sniffing, you will need to place the Proxmark3 against the reader.  On the AMS, you may place it on the other side (for example, load the spool into slot one and place the Proxmark3 against the reader in slot 2).  On the AMS lite, you will need to place it in between the reader and the spool.
+
+As there is not much clearance, it is recommended to temporarily remove the low frequency radio (the topmost piece) if you can, as it will not be used in this process.
+
+If you place the Proxmark in between the AMS reader and the spool, make sure that spool rotates so that the RFID tag moves away from the reader, otherwise the AMS will assume that it is reading the tag from its neighboring slot and attempt to rewind it until it cannot see the RFID tag.
 
 ### Dump RFID Contents (.bin)
 
 1. **Run ProxMark3 Software**
 
-   In a terminal, run `pm3` to start the ProxMark3 Software
+   In a terminal, run `pm3` to start the Proxmark3 Software
 
 2. **Sniff Communication**
 
    - Start sniffing with: `hf 14a sniff -c -r`<br>
    (hf=High Frequency, 14a=Tag Type, Sniff=command, -c and -r mean "capture on triggers instead of continuously)
 
-   - Place your ProxMark3 Between the tag and the AMS. Recommended: Use tape to hold it in place.
+   - Place your Proxmark3 between the tag and the AMS. Recommended: Use tape to hold it in place.
    - Load a strand of filament into the AMS. This is what triggers the AMS to attempt to read the RFID tag.
    - Press the button on the ProxMark to end capture after the filament has completed loading
 
 3. **Create a Key Dictionary**
-   - We will discover keys one at a time, and save them to a dictionary file.
-   - Navigate to your ProxMark3 software installation directory. This will be specific to your Operating System and Installation.
-      - Mac Example: `/usr/local/Cellar/proxmark3/4.17768/share/proxmark3/`
+   - We will discover keys one at a time and save them to a dictionary file.
+   - Navigate to your Proxmark3 software installation directory. This will be specific to your Operating System and Installation.
+      - macOS (Intel) Example: `/usr/local/Cellar/proxmark3/4.17768/share/proxmark3/`
+      - macOS (ARM) Eample: `/opt/homebrew/Cellar/proxmark3/4.17768/share/proxmark3/`
       - Windows Example: TBD
-   - Open Notepad or other text editor, and save a blank file called `myDictionary.dic` into the `dictionaries/` folder of your ProxMark3 software installation directory.
+      - Linux Example: TBD
+   - Open a text editor and save a blank file called `myDictionary.dic` into the `dictionaries/` folder of your Proxmark3 software installation directory.
    
       (You can call this file anything you want, but for the rest of this example, we will refer to it as "myDictionary")
 
@@ -147,34 +159,35 @@ If you have already a single tag you need to place a spool **without a tag** in 
 4. **Extract Keys From Trace**
    - Run `trace list -t mf -f myDictionary` to view the trace that was recorded from sniffing in the previous step.
 
-      This uses the key dictionary `myDictionary.dic` that we created in step 3 
+      This uses the key dictionary `myDictionary.dic` that we created in step 3.
    - Read the output and look for anything that mentions a key.
       - Three Possible Formats:
          - `key E0B50731BE27 prng WEAK` - Follow Step 5
          - `nested probable key: 50B0318A4FE7` - Follow Step 6
          - `Nested authentication detected.` - Follow Step 7
         
-      - Each of these 3 entries can provide us with a valid key.  Follow step 5, 6, or 7 depending on which type of key you encounter
+      - Each of these 3 entries can provide us with a valid key.  Follow step 5, 6, or 7 depending on which type of key you encounter.
 
 5. **First Key - Plain Text**
    - Example: `key E0B50731BE27 prng WEAK`
    - This is the first key that was discovered by sniffing AMS traffic.
-   - Copy/paste this key into the `myDictionary.dic` that you created in step 3.
+   - Copy/paste this key into the `myDictionary.dic` file that you created in step 3, then save the file.
 6. **Nested Probable Key**
    - Example: `nested probable key: 50B0318A4FE7`
-   - Just copy/paste this key into your dictionary and SAVE IT
+   - Copy/paste this key into the `myDictionary.dic` file that you created in step 3, then save the file.
 7. **Nested Authentication Key**
    - Example:
       ```
       Nested authentication detected.
       tools/mf_nonce_brute/mf_nonce_brute 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C
       ```
-   - Open a second terminal window, and change directories into your ProxMark3 software installation directory. This is specific to your OS and PM3 installation.
-      - Example (Mac): `cd /usr/local/Cellar/proxmark3/4.17768/share/proxmark3/`
+   - Open a second terminal window, and change directories into your Proxmark3 software installation directory. This is specific to your OS and PM3 installation.
+      - macOS/Linux: `cd $(brew --prefix proxmark3)/share/proxmark3/`
+      - Windows: TBD
    - CD into the tools folder `cd tools/`
-   - Copy the command from ProxMark starting at `mf_nonce_brute`, including all the arguments (random letters/numbers) after it, and run the program from the `tools/`directory.
-      - Example (Mac/Linux): `./mf_nonce_brute 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C`
-      - Example (Windows): TBD, likely needs to be ".exe"
+   - Copy the command from ProxMark starting at `mf_nonce_brute`, including all the arguments (random letters/numbers) after it, and run the program from the `tools/` directory.
+      - Example (macOS/Linux): `./mf_nonce_brute 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C`
+      - Example (Windows): `mf_nonce_brute.exe 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C`
    - The program will discover a key. Copy/paste this key into your `myDictionary.dic` file, and SAVE IT.
       - Example Output:
          ```
@@ -227,7 +240,7 @@ If you have already a single tag you need to place a spool **without a tag** in 
          [+] Found keys have been dumped to /Users/mitch/hf-mf-75066B1D-key.bin
          ```
 11. **Dump RFID Contents**
-   - Run `hf mf fchk --1k -f myDictionary --dump` to dump the contents of the tag using the 16 keys we discovered
+   - Run `hf mf dump -k [path-to-keyfile]` to dump the contents of the tag using the 16 keys we discovered
    - There should be no errors
    - The output should tell you where your `.bin` file is saved
       - Example:
