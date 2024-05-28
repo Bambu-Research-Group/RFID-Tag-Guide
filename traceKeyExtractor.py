@@ -1,9 +1,7 @@
-#########################
-# CONFIGURATION (Begin) #
-#########################
-# Change these variables to match the install locations for your specific computer
-# Some examples are provided, and you can comment/uncomment specific lines, or
-# manually type them in if your computer differs from the examples
+import subprocess
+import os
+import re
+from pathlib import Path
 
 # -----------
 # PM3 Program
@@ -13,29 +11,10 @@
 # If your computer doesn't recognize this, you may need to navigate to the actual
 # installation directory
 
-#List of possible commands to try
-pm3 = [
-    #"pm3",                                #Default installation location
-    "/usr/local/opt/proxmark3/bin/pm3",   #MAC Installataion - using BREW
-    ""                                    #Windows specific install location TBD
-   ]
-
-# ---------------------------------
-# Brute Force Tool (mf_nonce_brute)
-# ---------------------------------
-# This is a tool that comes with the PM3 program
-# It is located in the "tools" directory of your PM3 installation location
-mfNonceBrute = [
-    "/usr/local/opt/proxmark3/share/proxmark3/tools/mf_nonce_brute",  #MAC Install, using Brew
-    ""                                                                  #Windows TBD
+# List of possible directories for Proxmark3 to try
+pm3_dirs = [
+    os.environ.get('PROXMARK3_DIR'),
 ]
-
-
-#########################
-# CONFIGURATION (End)   #
-#########################
-# Do not modify anything beyond this point, unless you're a developer
-
 
 #Global variables
 #Default name of the dictionary file we create
@@ -43,17 +22,14 @@ dictionaryFilename = "myKeyDictionary.dic"  #Arbitrary filename for storing dict
 dictionaryFilepath = ""                     #Calculated. Absolute path to dictionary file
 dictionaryFile = ""                         #File object for writing keys
 
-pm3Command = "";            #Calculated. The command that works to start proxmark3
-mfNonceBruteCommand = ""    #Calculated. The command to execute mfNonceBrute
+pm3Location = ""                            #Calculated. The location of Proxmark3
+pm3Command = "bin/pm3"                      # The command that works to start proxmark3
+mfNonceBruteCommand = "share/proxmark3/tools/mf_nonce_brute" # The command to execute mfNonceBrute
 
 trace = "";                 #Prompted during runtime. Trace filename that the user provides
 
-import subprocess
-import os
-import re
-
 def main():
-    global pm3Command, mfNonceBruteCommand,dictionaryFilepath,trace
+    global pm3Location,dictionaryFilepath,trace
 
     print("--------------------------------------------------------")
     print("RFID Key Extractor v0.1 - Bambu Research Group 2024")
@@ -69,16 +45,23 @@ def main():
 
     # Find a "pm3" command that works from a list of OS-specific possibilities
     print("Checking program: pm3")
-    pm3Command = testCommands(pm3,"--help"); #Execute "pm3 --help" to test if the install location works
-    if pm3Command is None:
-        print("Failed to find working PM3 command. Modify the \"pm3\" variable in this program to match your installation location")
-        return; #Halt program
 
-    # Find a "mf_nonce_brute" command that works from a list of OS-specific possibilities
-    print("Checking program: mf_nonce_brute")
-    mfNonceBruteCommand = testCommands(mfNonceBrute,""); #Execute "mf_nonce_brute" to test if the install location works
-    if mfNonceBruteCommand is None:
-        print("Failed to find working mf_nonce_brute command. Modify the \"mf_nonce_brute\" variable in this program to match your installation location")
+    # Check for Homebrew installation
+    try:
+        # On Windows, use the shell=True argument to run the command
+        result = subprocess.run(["brew", "--prefix", "proxmark3"], shell=os.name == 'nt', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # Check the return code to determine if the command was successful
+        if result.returncode == 0 or result.returncode == 1:
+            print("Found installation via Homebrew!")
+            pm3Location = Path(result.stdout)
+    except Exception as e:
+        # If Homebrew command failed, it's probably not installed
+        pass
+
+    if pm3Location is None:
+        pm3Location = testCommands(pm3_dirs, "bin/pm3","--help"); #Execute "pm3 --help" to test if the install location works
+    if pm3Location is None:
+        print("Failed to find working PM3 command. You can set the Proxmark3 directory via the 'PROXMARK3_DIR' environment variable.")
         return; #Halt program
 
     #Create a dictionary file to store keys that we discover
@@ -116,7 +99,7 @@ def discoverKeys():
         #Run PM3 with the trace
         # -o means run without connecting to PM3 hardware
         # -c specifies commands within proxmark 3 software
-        cmd_list = [pm3Command,"-o","-c", f"trace load -f {trace}; trace list -1 -t mf -f {dictionaryFilepath}; exit"];
+        cmd_list = [pm3Location / pm3Command,"-o","-c", f"trace load -f {trace}; trace list -1 -t mf -f {dictionaryFilepath}; exit"];
         print(f"Viewing tracelog with {len(keyList)} discovered keys")
         print(" ".join(cmd_list))
         result = subprocess.run(cmd_list, shell=os.name == 'nt',stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -222,7 +205,7 @@ def discoverKeys():
 #Run the mf_nonce_brute program with the provided arguments to decode a key
 #Returns a key on success, "" otherwise
 def bruteForce(args):
-    cmd_list = [mfNonceBruteCommand] + args
+    cmd_list = [pm3Location / mfNonceBruteCommand] + args
     print("    Running bruteforce command:")
     print("    ",end = "")
     print(" ".join(cmd_list))
@@ -263,22 +246,25 @@ def strip_color_codes(input_string):
 #       - arguments: Optional arguments to be appended to the command. Useful for programs that don't exit on their own
 # This returns the command (string) of the first working command we encounter
 #
-def testCommands(commandList, arguments = ""):
+def testCommands(directories, command, arguments = ""):
 
-    for command in commandList:
+    for directory in directories:
+
+        if directory is None:
+            continue
 
         #OPTIONAL: add arguments such as "--help" to help identify programs that don't exit on their own
-        cmd_list = [command, arguments]
+        cmd_list = [directory+"/"+command, arguments]
 
         #Test if this program works
-        print("    Trying:", command, end=" ... ")
+        print("    Trying:", directory, end=" ... ")
         try:
             # On Windows, use the shell=True argument to run the command
             result = subprocess.run(cmd_list, shell=os.name == 'nt', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             # Check the return code to determine if the command was successful
             if result.returncode == 0 or result.returncode == 1:
                 print(" SUCCESS!")
-                return command
+                return Path(directory)
         except Exception as e:
             #print(e) #DEBUG
             print(" FAIL");
