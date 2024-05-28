@@ -77,8 +77,6 @@ class Unit():
         values = self.__get_comparison_values(self, other)
         return values[0] > values[1]
 
-print(type(Unit(1, "g")))
-
 class Tag():
     def __init__(self, filename, data):
         # Check to make sure the data is 1KB
