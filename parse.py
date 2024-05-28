@@ -48,6 +48,37 @@ class TagLengthMismatchError(TypeError):
     def __init__(self, actual_length):
         super().__init__(f"The data does not appear to be a valid MIFARE 1K RFID tag (received {actual_length} bytes / {int(actual_length / BYTES_PER_BLOCK)} blocks, expected {TOTAL_BYTES} bytes / {BLOCKS_PER_TAG} blocks).")
 
+class Unit():
+    def __init__(self, value, unit):
+        self.value = value
+        self.unit = unit
+
+    def __str__(self):
+        return str(self.value) + ("º" if self.unit in ["C", "F"] else "") + self.unit
+
+    def __get_comparison_values(self, other):
+        if type(other) in [int, float]:
+            return [self.value, other]
+        if type(other) != Unit:
+            raise TypeError(f"Type {type(other)} cannot be compared with type Unit")
+        if self.unit != other.unit:
+            raise TypeError(f"Unit type {other.unit} is not identical to {self.unit}")
+        return [self.value, other.value]
+
+    def __eq__(self, other):
+        values = self.__get_comparison_values(self, other)
+        return values[0] == values[1]
+
+    def __lt__(self, other):
+        values = self.__get_comparison_values(self, other)
+        return values[0] < values[1]
+
+    def __gt__(self, other):
+        values = self.__get_comparison_values(self, other)
+        return values[0] > values[1]
+
+print(type(Unit(1, "g")))
+
 class Tag():
     def __init__(self, filename, data):
         # Check to make sure the data is 1KB
@@ -64,20 +95,20 @@ class Tag():
             "filament_type": bytes_to_string(self.blocks[2]),
             "detailed_filament_type": bytes_to_string(self.blocks[4]),
             "color": "#" + bytes_to_hex(self.blocks[5][0:4]),
-            "weight": bytes_to_int(self.blocks[5][4:6]), # in g (grams)
-            "length": bytes_to_int(self.blocks[14][4:6]), # in m (meters)
-            "diameter": bytes_to_float(self.blocks[5][8:12]), # in mm (meters)
-            "spool_width": bytes_to_int(self.blocks[10][4:6]) / 100, # in mm (meters)
+            "weight": Unit(bytes_to_int(self.blocks[5][4:6]), "g"),
+            "length": Unit(bytes_to_int(self.blocks[14][4:6]), "m"),
+            "diameter": Unit(bytes_to_float(self.blocks[5][8:12]), "mm"),
+            "spool_width": Unit(bytes_to_int(self.blocks[10][4:6]) / 100, "mm"),
             "material_id": bytes_to_string(self.blocks[1][8:16]),
             "variant_id": bytes_to_string(self.blocks[1][0:8]),
-            "nozzle_diameter": bytes_to_float(self.blocks[8][12:16]), # in mm (meters)
+            "nozzle_diameter": Unit(round(bytes_to_float(self.blocks[8][12:16]), 1), "mm"),
             "temperatures": {
-                "min_hotend": bytes_to_int(self.blocks[6][10:12]), # in C (Celsius)
-                "max_hotend": bytes_to_int(self.blocks[6][8:10]), # in C (Celsius)
-                "bed_temp": bytes_to_int(self.blocks[6][6:8]), # in C (Celsius)
+                "min_hotend": Unit(bytes_to_int(self.blocks[6][10:12]), "C"),
+                "max_hotend": Unit(bytes_to_int(self.blocks[6][8:10]), "C"),
+                "bed_temp": Unit(bytes_to_int(self.blocks[6][6:8]), "C"),
                 "bed_temp_type": bytes_to_int(self.blocks[6][4:6]),
-                "drying_time": bytes_to_int(self.blocks[6][2:4]), # in hours
-                "drying_temp": bytes_to_int(self.blocks[6][0:2]), # in C (Celsius)
+                "drying_time": Unit(bytes_to_int(self.blocks[6][2:4]), "h"),
+                "drying_temp": Unit(bytes_to_int(self.blocks[6][0:2]), "C"),
             },
             "x_cam_info": self.blocks[8][0:12],
             "tray_uid": self.blocks[9],
@@ -91,7 +122,12 @@ class Tag():
         result = ""
 
         for key in self.data:
-            result += f"- {key}: {bytes_to_hex(self.data[key]) if type(self.data[key]) == bytes else self.data[key]}\n"
+            if type(self.data[key]) == dict:
+                result += f"- {key}:\n"
+                for tkey in self.data[key]:
+                    result += f"  - {tkey}: {self.data[key][tkey]}\n"
+            else:
+                result += f"- {key}: {bytes_to_hex(self.data[key]) if type(self.data[key]) == bytes else self.data[key]}\n"
 
         return result[:-1]
 
