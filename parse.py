@@ -87,6 +87,11 @@ class Tag():
         self.filename = filename
         self.blocks = list(data[0+i:BYTES_PER_BLOCK+i] for i in range(0, len(data), BYTES_PER_BLOCK))
 
+        # Check for blank blocks
+        for bi in IMPORTANT_BLOCKS:
+            if self.blocks[bi] == b'\x00' * BYTES_PER_BLOCK:
+                print(f"Warning! Block {bi} is blank!")
+
         # Parse the data
         self.data = {
             "uid": bytes_to_hex(self.blocks[0][0:4]),
