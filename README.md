@@ -384,14 +384,14 @@ Example Data:
 Example Data:
 `AA AA BB BB CC CC DD DD EE EE FF FF __ __ __ __`
 
-| position | length | type        | Description                       |
-| -------- | ------ | ----------- | --------------------------------- |
-| 0 (AA)   | 2      | uint16 (LE) | Drying temp in °C                 |
-| 2 (BB)   | 2      | uint16 (LE) | Drying time in h                  |
-| 4 (CC)   | 4      | uint16 (LE) | Bed Temerature Type               |
-| 6 (DD)   | 2      | uint16 (LE) | Bed Temperatur in °C              |
-| 8 (EE)   | 2      | uint16 (LE) | Min- or Maxtemperature for Hotend |
-| 10 (FF)  | 2      | uint16 (LE) | Min- or Maxtemperature for Hotend |
+| position | length | type        | Description                             |
+| -------- | ------ | ----------- | --------------------------------------- |
+| 0 (AA)   | 2      | uint16 (LE) | Drying Temperature in °C                |
+| 2 (BB)   | 2      | uint16 (LE) | Drying time in hours                    |
+| 4 (CC)   | 4      | uint16 (LE) | Bed Temerature Type **(types unknown)** |
+| 6 (DD)   | 2      | uint16 (LE) | Bed Temperature in °C                   |
+| 8 (EE)   | 2      | uint16 (LE) | Min Temperature for Hotend in °C        |
+| 10 (FF)  | 2      | uint16 (LE) | Max Temperature for Hotend in °C        |
 
 ### Block 8
 
