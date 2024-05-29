@@ -7,6 +7,11 @@
 import sys
 import struct
 from datetime import datetime
+from pathlib import Path
+
+if not sys.version_info >= (3, 6):
+   print("Python 3.6 or higher is required!")
+   exit(-1)
 
 COMPARISON_BLOCKS = [1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14]
 IMPORTANT_BLOCKS = [0] + COMPARISON_BLOCKS
@@ -189,11 +194,12 @@ def load_data(files_to_load, silent = False):
     data = []
     for filename in files_to_load:
         try:
-            with open(filename, "rb") as f:
-                newdata = Tag(filename, f.read())
+            filepath = Path(filename)
+            with open(filepath, "rb") as f:
+                newdata = Tag(filepath, f.read())
                 data.append(newdata)
         except TagLengthMismatchError:
-            if not silent: print(f"{filename} not a valid tag, skipping")
+            if not silent: print(f"{filepath} not a valid tag, skipping")
 
     return data
 
