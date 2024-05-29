@@ -1,7 +1,12 @@
 import subprocess
 import os
 import re
+import sys
 from pathlib import Path
+
+if not sys.version_info >= (3, 6):
+   print("Python 3.6 or higher is required!")
+   exit(-1)
 
 # -----------
 # PM3 Program
