@@ -58,9 +58,7 @@ def main():
         # Check the return code to determine if the command was successful
         if result.returncode == 0 or result.returncode == 1:
             print("Found installation via Homebrew!")
-            pm3Location = result.stdout.decode("utf-8")
-            pm3Location = pm3Location.replace("\n","").replace("\r","")
-            pm3Location = Path(pm3Location)
+            pm3Location = Path(result.stdout.decode("utf-8").strip())
     except Exception as e:
         # If Homebrew command failed, it's probably not installed
         pass
