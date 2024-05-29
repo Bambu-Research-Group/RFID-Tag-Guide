@@ -8,18 +8,9 @@ if not sys.version_info >= (3, 6):
    print("Python 3.6 or higher is required!")
    exit(-1)
 
-# -----------
-# PM3 Program
-# -----------
-#The main proxmark program, for most installations, proxmark3 can be started
-# with the command "pm3" in the terminal.
-# If your computer doesn't recognize this, you may need to navigate to the actual
-# installation directory
-
 # List of possible directories for Proxmark3 to try
-pm3_dirs = [
-    os.environ.get('PROXMARK3_DIR'),
-]
+# XXX Populate with results for Windows
+pm3_dirs = []
 
 #Global variables
 #Default name of the dictionary file we create
@@ -27,7 +18,7 @@ dictionaryFilename = "myKeyDictionary.dic"  #Arbitrary filename for storing dict
 dictionaryFilepath = ""                     #Calculated. Absolute path to dictionary file
 dictionaryFile = ""                         #File object for writing keys
 
-pm3Location = ""                            #Calculated. The location of Proxmark3
+pm3Location = None                            #Calculated. The location of Proxmark3
 pm3Command = "bin/pm3"                      # The command that works to start proxmark3
 mfNonceBruteCommand = "share/proxmark3/tools/mf_nonce_brute" # The command to execute mfNonceBrute
 
@@ -48,26 +39,7 @@ def main():
     print("--------------------------------------------------------")
     print("")
 
-    # Find a "pm3" command that works from a list of OS-specific possibilities
-    print("Checking program: pm3")
-
-    # Check for Homebrew installation
-    try:
-        # On Windows, use the shell=True argument to run the command
-        result = subprocess.run(["brew", "--prefix", "proxmark3"], shell=os.name == 'nt', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # Check the return code to determine if the command was successful
-        if result.returncode == 0 or result.returncode == 1:
-            print("Found installation via Homebrew!")
-            pm3Location = Path(result.stdout.decode("utf-8").strip())
-    except Exception as e:
-        # If Homebrew command failed, it's probably not installed
-        pass
-
-    if pm3Location is None:
-        pm3Location = testCommands(pm3_dirs, "bin/pm3","--help"); #Execute "pm3 --help" to test if the install location works
-    if pm3Location is None:
-        print("Failed to find working PM3 command. You can set the Proxmark3 directory via the 'PROXMARK3_DIR' environment variable.")
-        return; #Halt program
+    pm3Location = get_proxmark3_location()
 
     #Create a dictionary file to store keys that we discover
     print(f"Creating dictionary file '{dictionaryFilename}'")
@@ -243,6 +215,52 @@ def strip_color_codes(input_string):
     # Use the sub method to replace the escape sequences with an empty string
     return ansi_escape.sub('', input_string)
 
+def get_proxmark3_location():
+    # Find a "pm3" command that works from a list of OS-specific possibilities
+    print("Checking program: pm3")
+
+    # Check PROXMARK3_DIR environment variable
+    if os.environ.get('PROXMARK3_DIR'):
+        if run_command(os.environ['PROXMARK3_DIR'] + "/bin/pm3", "--help"):
+            return os.environ['PROXMARK3_DIR']
+        else:
+            print("Warning: PROXMARK3_DIR environment variable points to the wrong folder, ignoring")
+
+    # Get Homebrew installation
+    brew_install = run_command(["brew", "--prefix", "proxmark3"])
+    if brew_install:
+        print("Found installation via Homebrew!")
+        return Path(brew_install)
+
+    # Get global installation
+    which_pm3 = run_command(["which", "pm3"])
+    if which_pm3:
+        which_pm3 = Path(which_pm3)
+        pm3_location = which_pm3.parent.parent
+        print(f"Found global installation ({pm3_location})!")
+        return pm3_location
+
+    # Check pm3_dirs paths
+    pm3_dirs_result = testCommands(pm3_dirs, "bin/pm3", "--help")
+    if pm3_dirs_result:
+        print(f"Found installation in {pm3_dirs_result}!")
+        return pm3_dirs_result
+
+    # At this point, we've tried all the paths to find it
+    print("Failed to find working 'pm3' command. You can set the Proxmark3 directory via the 'PROXMARK3_DIR' environment variable.")
+    exit(-1) # Halt program
+
+def run_command(command):
+    try:
+        # On Windows, use the shell=True argument to run the command
+        result = subprocess.run(command, shell=os.name == 'nt', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # Check the return code to determine if the command was successful
+        if result.returncode == 0 or result.returncode == 1:
+            return result.stdout.decode("utf-8").strip()
+        return None
+    except Exception as e:
+        return None
+
 # Test a list of commands to see which one works
 # This lets us provide a list of OS-specific commands, test them
 # and figure out which one works on this specific computer
@@ -263,17 +281,8 @@ def testCommands(directories, command, arguments = ""):
 
         #Test if this program works
         print("    Trying:", directory, end=" ... ")
-        try:
-            # On Windows, use the shell=True argument to run the command
-            result = subprocess.run(cmd_list, shell=os.name == 'nt', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            # Check the return code to determine if the command was successful
-            if result.returncode == 0 or result.returncode == 1:
-                print(" SUCCESS!")
-                return Path(directory)
-        except Exception as e:
-            #print(e) #DEBUG
-            print(" FAIL");
-            continue
+        if run_command(cmd_list):
+            return Path(directory)
     
     return None #We didn't find any program that worked
 
