@@ -297,16 +297,16 @@ Summary of what kind of data is stored in each block. Detailed info for each blo
 | 0 | 2 | [Block 2](#block-2) Filament Type |
 | 0 | 3 | [Block 3](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab |
 | 1 | 0 | [Block 4](#block-4) Detailed Filament Type |
-| 1 | 1 | [Block 5](#block-5) Spool Weight, Color Code |
-| 1 | 2 | [Block 6](#block-6) Min/Max Hotend, Bed Temp, Bed Temp Type, Drying Time, Drying Temp |
+| 1 | 1 | [Block 5](#block-5) Spool Weight, Color Code, Filament Diameter |
+| 1 | 2 | [Block 6](#block-6) Temperatures and Drying Info |
 | 1 | 3 | [Block 7](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab |
-| 2 | 0 | [Block 8](#block-8) X Cam Info |
+| 2 | 0 | [Block 8](#block-8) X Cam Info, Nozzle Diameter |
 | 2 | 1 | [Block 9](#block-9) Tray UID |
-| 2 | 2 | [Block 10](#block-10) **Unknown** |
+| 2 | 2 | [Block 10](#block-10) Spool Width |
 | 2 | 3 | [Block 11](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab |
 | 3 | 0 | [Block 12](#block-12) Production Date/Time |
-| 3 | 1 | [Block 13](#block-13) **Unknown** |
-| 3 | 2 | [Block 14](#block-14) **Unknown** |
+| 3 | 1 | [Block 13](#block-13) Short Production Date/Time |
+| 3 | 2 | [Block 14](#block-14) Filament Length |
 | 3 | 3 | [Block 15](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab |
 | 4 | 0 | [Block 16](#block-16) Color Count, Second Color Code, **Unknown** |
 | 4 | 1 | [Block 17](#block-17) **Unknown** |
