@@ -16,8 +16,8 @@
 #List of possible commands to try
 pm3 = [
     #"pm3",                                #Default installation location
-    "/usr/local/opt/proxmark3/bin/pm3",   #MAC Installataion - using BREW
-    ""                                    #Windows specific install location TBD
+    #"/usr/local/opt/proxmark3/bin/pm3",   #MAC Installataion - using BREW
+    "proxmark3.exe"                                    #Windows specific install location TBD
    ]
 
 # ---------------------------------
@@ -26,8 +26,8 @@ pm3 = [
 # This is a tool that comes with the PM3 program
 # It is located in the "tools" directory of your PM3 installation location
 mfNonceBrute = [
-    "/usr/local/opt/proxmark3/share/proxmark3/tools/mf_nonce_brute",  #MAC Install, using Brew
-    ""                                                                  #Windows TBD
+   # "/usr/local/opt/proxmark3/share/proxmark3/tools/mf_nonce_brute",  #MAC Install, using Brew
+    "tools\mf_nonce_brute\mf_nonce_brute.exe"                                                                  #Windows TBD
 ]
 
 
@@ -114,9 +114,9 @@ def discoverKeys():
         print(f"Loop {loopNum} of 16")
 
         #Run PM3 with the trace
-        # -o means run without connecting to PM3 hardware
+        # -o means run without connecting to PM3 hardware (mac)
         # -c specifies commands within proxmark 3 software
-        cmd_list = [pm3Command,"-o","-c", f"trace load -f {trace}; trace list -1 -t mf -f {dictionaryFilepath}; exit"];
+        cmd_list = [pm3Command,"-c", f"trace load -f {trace}; trace list -1 -t mf -f {dictionaryFilepath}; exit"]; #win
         print(f"Viewing tracelog with {len(keyList)} discovered keys")
         print(" ".join(cmd_list))
         result = subprocess.run(cmd_list, shell=os.name == 'nt',stdout=subprocess.PIPE, stderr=subprocess.PIPE)
