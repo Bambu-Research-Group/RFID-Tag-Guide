@@ -363,9 +363,12 @@ Example Data:
 Known Values:
 
 - PLA Basic
-- PLA Tough
-- Support for PLA
-- PLA-CF
+- PLA Matte
+- PLA Silk
+- PLA Galaxy
+- PLA Sparkle
+- Support for PLA (prev. Support W)
+- PLA-CF (prev. PLA Tough)
 - PETG Basic
 
 ### Block 5
