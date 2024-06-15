@@ -78,7 +78,7 @@ def discoverKeys():
         # -c specifies commands within proxmark 3 software
         cmd_list = [pm3Location / pm3Command,"-o","-c", f"trace load -f {trace}; trace list -1 -t mf -f {dictionaryFilepath}; exit"];
         print(f"Viewing tracelog with {len(keyList)} discovered keys")
-        print(" ".join(cmd_list))
+        print(f"pm3 {" ".join(cmd_list[1:])}")
         result = subprocess.run(cmd_list, shell=os.name == 'nt',stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output = result.stdout;
 
@@ -185,7 +185,7 @@ def bruteForce(args):
     cmd_list = [pm3Location / mfNonceBruteCommand] + args
     print("    Running bruteforce command:")
     print("    ",end = "")
-    print(" ".join(cmd_list))
+    print(f"tools/mf_nonce_brute {" ".join(cmd_list[1:])}")
     result = subprocess.run(cmd_list, shell=os.name == 'nt', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     #Parse out the key
