@@ -308,8 +308,8 @@ Summary of what kind of data is stored in each block. Detailed info for each blo
 | 3 | 1 | [Block 13](#block-13) **Unknown** |
 | 3 | 2 | [Block 14](#block-14) **Unknown** |
 | 3 | 3 | [Block 15](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab |
-| 4 | 0 | [Block 16](#block-16) Second Color Code, **Unknown** |
-| 4 | 1 | **Empty** |
+| 4 | 0 | [Block 16](#block-16) Color Count, Second Color Code, **Unknown** |
+| 4 | 1 | [Block 17](#block-17) **Unknown** |
 | 4 | 2 | **Empty** |
 | 4 | 3 | [Block 19](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab |
 | 5 | 0 | **Empty** |
@@ -495,6 +495,15 @@ Example Data:
 | 0 (AA)   | 2      | **Unknown** | **Unknown**                        |
 | 2 (BB)   | 2      | uint16 (LE) | **Color Count...?**                |
 | 4 (CC)   | 4      | RGBA        | Second color in _reverse_ hex ABGR |
+
+### Block 17
+
+Example Data:
+`AA AA __ __ __ __ __ __ __ __ __ __ __ __ __ __`
+
+| position | length | type        | Description                        |
+| -------- | ------ | ----------- | ---------------------------------- |
+| 0 (AA)   | 2      | **Unknown** | **Unknown**                        |
 
 ## Compatible RFID tags -  By generation
 
