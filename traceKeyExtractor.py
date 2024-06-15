@@ -48,16 +48,23 @@ def main():
     dictionaryFilepath = os.path.abspath(dictionaryFilename)
     print(f"Saved dictionary to {dictionaryFilepath}")
 
+    #Instruct the user to create a trace file
+    print()
+    print("Start by creating a trace file. In the proxmark terminal, execute command `hf 14a sniff -c -r`.")
+    print("Then, place the Proxmark3 between the RFID reader and spool.")
+    print("Load in filament and wait for the process to complete, then press the button on the Proxmark3.")
+    print("Finally, in the proxmark terminal, execute command `trace save -f [FILEPATH]` to create the trace file.")
+    print("See the GitHub repository for more details.")
+    print()
+
     #Get the tracename/filepath from user
-    print("");
     trace = input("Enter trace name or full trace filepath: ")
 
-    discoverKeys();
+    discoverKeys()
     
-    print(f"In proxmark terminal, execute command `hf mf fchk -f {dictionaryFilepath} --dump`")
-    print(" to create a keyfile from this dictionary")
-    print()
-    print("Then execute `hf mf dump` to dump the contents of the RFID tag")
+    print("Keys obtained. Remove the spool from the AMS and place the Proxmark3 on the spool's tag.")
+    print(f"In proxmark terminal, execute command `hf mf fchk -f {dictionaryFilepath} --dump` to create a keyfile from this dictionary.")
+    print("Then, execute `hf mf dump` to dump the contents of the RFID tag.")
 
 
 #Loop 16 times to attempt to extract all 16 keys from the tracefile
