@@ -34,6 +34,7 @@ We are currently working on a way to submit the tag data in a secure way so anal
       * [Block 12](#block-12)
       * [Block 13](#block-13)
       * [Block 14](#block-14)
+      * [Block 16](#block-16)
    * [Compatible RFID tags -  By generation](#compatible-rfid-tags----by-generation)
 <!--te-->
 
@@ -274,7 +275,7 @@ Summary of what kind of data is stored in each block. Detailed info for each blo
 | 3 | 1 | [Block 13](#block-13) **Unknown** |
 | 3 | 2 | [Block 14](#block-14) **Unknown** |
 | 3 | 3 | [Block 15](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab |
-| 4 | 0 | **Empty** |
+| 4 | 0 | [Block 16](#block-16) Second Color Code, **Unknown** |
 | 4 | 1 | **Empty** |
 | 4 | 2 | **Empty** |
 | 4 | 3 | [Block 19](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab |
@@ -375,7 +376,7 @@ Example Data:
 
 | position | length | type        | Description                                  |
 | -------- | ------ | ----------- | -------------------------------------------- |
-| 0 (AA)   | 4      | RGBA        | Color in hex RBGA                            |
+| 0 (AA)   | 4      | RGBA        | Color in hex RGBA                            |
 | 4 (BB)   | 2      | uint16 (LE) | Spool Weight in grams (`E8 03` --> 1000 g)   |
 | 8 (CC)   | 8      | float (LE)  | Filament Diameter in milimeters              |
 
@@ -447,6 +448,16 @@ Example Data:
 | position | length | type        | Description                       |
 | -------- | ------ | ----------- | --------------------------------- |
 | 4 (AA)   | 2      | uint16 (LE) | **Filament length in meters...?** |
+
+### Block 16
+
+Example Data:
+`AA AA AA AA BB BB BB BB __ __ __ __ __ __ __ __`
+
+| position | length | type        | Description                        |
+| -------- | ------ | ----------- | ---------------------------------- |
+| 0 (AA)   | 4      | **Unknown** | **Unknown**                        |
+| 4 (BB)   | 4      | RGBA        | Second color in _reverse_ hex ABGR |
 
 ## Compatible RFID tags -  By generation
 
