@@ -488,12 +488,13 @@ Example Data:
 ### Block 16
 
 Example Data:
-`AA AA AA AA BB BB BB BB __ __ __ __ __ __ __ __`
+`AA AA BB BB CC CC CC CC __ __ __ __ __ __ __ __`
 
 | position | length | type        | Description                        |
 | -------- | ------ | ----------- | ---------------------------------- |
-| 0 (AA)   | 4      | **Unknown** | **Unknown**                        |
-| 4 (BB)   | 4      | RGBA        | Second color in _reverse_ hex ABGR |
+| 0 (AA)   | 2      | **Unknown** | **Unknown**                        |
+| 2 (BB)   | 2      | uint16 (LE) | **Color Count...?**                |
+| 4 (CC)   | 4      | RGBA        | Second color in _reverse_ hex ABGR |
 
 ## Compatible RFID tags -  By generation
 

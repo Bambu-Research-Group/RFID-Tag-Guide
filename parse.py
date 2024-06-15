@@ -99,6 +99,7 @@ class Tag():
             "uid": bytes_to_hex(self.blocks[0][0:4]),
             "filament_type": bytes_to_string(self.blocks[2]),
             "detailed_filament_type": bytes_to_string(self.blocks[4]),
+            "filament_color_count": bytes_to_int(self.blocks[16][2:4]),
             "filament_color": "#" + bytes_to_hex(self.blocks[5][0:4]),
             "spool_weight": Unit(bytes_to_int(self.blocks[5][4:6]), "g"),
             "filament_length": Unit(bytes_to_int(self.blocks[14][4:6]), "m"),
@@ -142,7 +143,7 @@ class Tag():
                     self.warnings.append(f"Data found in block {block}, position {pos} that was expected to be blank (received {byte})")
 
         # Check for a second color
-        if self.blocks[16][4]:
+        if self.data["filament_color_count"] == 2:
             self.data["filament_color"] += " / #" + bytes_to_hex(self.blocks[16][4:8][::-1])
 
     def __str__(self, blocks_to_output = IMPORTANT_BLOCKS):
