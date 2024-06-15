@@ -127,9 +127,10 @@ class Tag():
             5: [*range(6,8),*range(12,16)],
             6: range(12,16),
             10: [*range(0,4), *range(6,16)],
-            14: [*range(0,4), *range(6,16)]
+            14: [*range(0,4), *range(6,16)],
+            17: range(2,16)
         }
-        for block in range(17,39):
+        for block in range(18,39):
             if block % 4 == 3:
                 continue # Skip MIFARE encryption key blocks
             expected_to_be_blank[block] = list(range(0,16))
