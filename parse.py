@@ -21,7 +21,7 @@ def bytes_to_string(data):
 
 def bytes_to_hex(data, chunkify = False):
     output = data.hex().upper()
-    return " ".join((string[0+i:2+i] for i in range(0, len(string), 2))) if chunkify else output
+    return " ".join((output[0+i:2+i] for i in range(0, len(output), 2))) if chunkify else output
 
 def bytes_to_int(data):
     return int.from_bytes(data, 'little')
