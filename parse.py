@@ -141,6 +141,10 @@ class Tag():
                 if byte != 0:
                     self.warnings.append(f"Data found in block {block}, position {pos} that was expected to be blank (received {byte})")
 
+        # Check for a second color
+        if self.blocks[16][4]:
+            self.data["filament_color"] += " / #" + bytes_to_hex(self.blocks[16][4:8][::-1])
+
     def __str__(self, blocks_to_output = IMPORTANT_BLOCKS):
         result = ""
 
