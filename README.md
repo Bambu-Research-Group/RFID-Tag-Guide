@@ -107,6 +107,9 @@ The more data we have, the easier it is to compare differences to learn what eac
 
 A Proxmark3 Easy is sufficient for all the tasks that need to be done. You can buy a clone from Alixepress, Amazon or Dangerous Things.
 
+> [!TIP]
+> For this particular process, you will only need the bottom-most part of the Proxmark3 Easy assembly.  For convenience, it may be helpful to disassemble the device and remove the top and middle layers.
+
 ## Hacking a Bambulab Tag and readout of its data
 The easiest way to obtain the 
 We document here the most simple approach to get all required A-Keys and the data of the tag.
