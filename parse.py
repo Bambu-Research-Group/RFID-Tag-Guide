@@ -118,7 +118,9 @@ class Tag():
             "tray_uid": self.blocks[9],
             "production_date": bytes_to_date(self.blocks[12]),
 
-            "unknown": bytes_to_string(self.blocks[13]), # Appears to be some sort of date -- on some tags, this is identical to the production date, but not always
+            "unknown_1": bytes_to_string(self.blocks[13]), # Appears to be some sort of date -- on some tags, this is identical to the production date, but not always
+            "unknown_2": self.blocks[16][0:2], # So far, always "0200"
+            "unknown_3": self.blocks[17][0:2], # Only been "0100" on the PLA Silk Dual Color, "0000" otherwise
         }
 
         # Check for a second color
