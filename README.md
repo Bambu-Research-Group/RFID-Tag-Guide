@@ -108,9 +108,6 @@ The more data we have, the easier it is to compare differences to learn what eac
 
 A Proxmark3 Easy is sufficient for all the tasks that need to be done. You can buy a clone from Alixepress, Amazon or Dangerous Things.
 
-> [!TIP]
-> For this particular process, you will only need the bottom-most part of the Proxmark3 Easy assembly.  For convenience, it may be helpful to disassemble the device and remove the top and middle layers.
-
 ## Hacking a Bambulab Tag and readout of its data
 The easiest way to obtain the 
 We document here the most simple approach to get all required A-Keys and the data of the tag.
@@ -128,9 +125,10 @@ For sniffing, you will need to place the Proxmark in between the RFID tag and th
 
 ### Proxmark3 placement for sniffing
 
-For sniffing, you will need to place the Proxmark3 against the reader.  On the AMS, you may place it on the other side (for example, load the spool into slot one and place the Proxmark3 against the reader in slot 2).  On the AMS lite, you will need to place it in between the reader and the spool.
+For sniffing, you will need to place the Proxmark3 against the reader.  On the AMS lite, you must place it in between the reader and the spool.  On the AMS, it is recommended to place it between the reader and the spool, but you may place it on the other side (for example, load the spool into slot 1 and place the Proxmark3 against the reader in slot 2).
 
-As there is not much clearance, it is recommended to temporarily remove the low frequency radio (the topmost piece) if you can, as it will not be used in this process.
+> [!TIP]
+> As there is not much clearance, it may be helpful to disassemble the Proxmark3 Easy and remove the top and middle layers.  For this particular process, you will only need the bottom-most layer.
 
 If you place the Proxmark in between the AMS reader and the spool, make sure that spool rotates so that the RFID tag moves away from the reader, otherwise the AMS will assume that it is reading the tag from its neighboring slot and attempt to rewind it until it cannot see the RFID tag.
 
