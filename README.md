@@ -464,5 +464,6 @@ Gen 4 --> **Not tested**(The best option but pricey and hard to source in small 
 ## Reverse engineering RFID Board
 
 For ease of debugging and lowering the cost of failures the RFID board is reverse engineered. You can find complete production ready gerber files and bill of materials in rfid-board folder
+
 As a nice to benefit to have is that you can manufacture boards in different colors.
 ![](rfid-board/Photo_PCB_BBL-RFID.jpg)
