@@ -35,6 +35,7 @@ We are currently working on a way to submit the tag data in a secure way so anal
       * [Block 13](#block-13)
       * [Block 14](#block-14)
    * [Compatible RFID tags -  By generation](#compatible-rfid-tags----by-generation)
+   * [Reverse engineering RFID Board](#reverse-engineering-rfid-board)
 <!--te-->
 
 ## Project Summary
@@ -459,3 +460,9 @@ Gen 2 OTW --> **Not tested**
 Gen 3 --> **Not tested**
 
 Gen 4 --> **Not tested**(The best option but pricey and hard to source in small chip formfactor)
+
+## Reverse engineering RFID Board
+
+For ease of debugging and lowering the cost of failures the RFID board is reverse engineered. You can find complete production ready gerber files and bill of materials in rfid-board folder
+As a nice to benefit to have is that you can manufacture boards in different colors.
+![](rfid-board/Photo_PCB_BBL-RFID.jpg)
