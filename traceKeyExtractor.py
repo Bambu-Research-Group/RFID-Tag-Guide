@@ -233,8 +233,9 @@ def bruteForce(args):
     for line in output.splitlines():
         line = line.decode("utf-8") #Convert from byte array to string
 
-        #Search for the line that says valid key. Example: "Valid Key found [ 63654db94d97 ]
-        if "matches candidate" not in line:
+        #Search for the line that says valid key. Example: "Valid Key found [ 63654db94d97 ] - matches candidate"
+        #In rare cases, multiple possible keys will be found. The "matches candidate" tag should indicate the right one
+        if "Valid Key" not in line or "matches candidate" not in line:
             continue
 
         print(f"    {line}")
