@@ -390,8 +390,8 @@ Example Data:
 | 2 (BB)   | 2      | uint16 (LE) | Drying time in hours                    |
 | 4 (CC)   | 4      | uint16 (LE) | Bed Temerature Type **(types unknown)** |
 | 6 (DD)   | 2      | uint16 (LE) | Bed Temperature in °C                   |
-| 8 (EE)   | 2      | uint16 (LE) | Min Temperature for Hotend in °C        |
-| 10 (FF)  | 2      | uint16 (LE) | Max Temperature for Hotend in °C        |
+| 8 (EE)   | 2      | uint16 (LE) | Max Temperature for Hotend in °C        |
+| 10 (FF)  | 2      | uint16 (LE) | Min Temperature for Hotend in °C        |
 
 ### Block 8
 
