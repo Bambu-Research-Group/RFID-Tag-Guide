@@ -126,8 +126,8 @@ class Tag():
             "x_cam_info": self.blocks[8][0:12],
             "tray_uid": self.blocks[9],
             "production_date": bytes_to_date(self.blocks[12]),
-
-            "unknown_13": bytes_to_string(self.blocks[13]), # Appears to be some sort of date -- on some tags, this is identical to the production date, but not always
+            "production_date_short": bytes_to_string(self.blocks[13]),
+            
             "unknown_17": self.blocks[17][0:2], # Only been "0100" on the PLA Silk Dual Color, "0000" otherwise
         }
 
