@@ -82,6 +82,31 @@ class Unit():
         values = self.__get_comparison_values(self, other)
         return values[0] > values[1]
 
+class ColorList(list):
+    def __init__(self, value):
+        if type(value) in [list, tuple]:
+            super().__init__(value)
+        else:
+            super().__init__([value])
+
+    def __str__(self):
+        return " / ".join("#" + c for c in self)
+
+    def __setitem__(self, index, item):
+        super().__setitem__(index, str(item))
+
+    def insert(self, index, item):
+        super().insert(index, str(item))
+
+    def append(self, item):
+        super().append(str(item))
+
+    def extend(self, other):
+        if isinstance(other, type(self)):
+            super().extend(other)
+        else:
+            super().extend(str(item) for item in other)
+
 class Tag():
     def __init__(self, filename, data):
         # Check to make sure the data is 1KB
@@ -101,13 +126,13 @@ class Tag():
 
         # Parse the data
         has_extra_color_info = self.blocks[16][0:2] == b'\x02\x00'
+        filament_color_count = bytes_to_int(self.blocks[16][2:4]) if has_extra_color_info else 1
         
         self.data = {
             "uid": bytes_to_hex(self.blocks[0][0:4]),
             "filament_type": bytes_to_string(self.blocks[2]),
-            "detailed_filament_type": bytes_to_string(self.blocks[4]),
-            "filament_color_count": bytes_to_int(self.blocks[16][2:4]) if has_extra_color_info else 1,
-            "filament_color": "#" + bytes_to_hex(self.blocks[5][0:4]),
+            "filament_type_detailed": bytes_to_string(self.blocks[4]),
+            "filament_color": ColorList(bytes_to_hex(self.blocks[5][0:4])),
             "spool_weight": Unit(bytes_to_int(self.blocks[5][4:6]), "g"),
             "filament_length": Unit(bytes_to_int(self.blocks[14][4:6]), "m"),
             "filament_diameter": Unit(bytes_to_float(self.blocks[5][8:12]), "mm"),
@@ -151,8 +176,8 @@ class Tag():
                     self.warnings.append(f"Data found in block {block}, position {pos} that was expected to be blank (received {byte})")
 
         # Check for a second color
-        if self.data["filament_color_count"] == 2:
-            self.data["filament_color"] += " / #" + bytes_to_hex(self.blocks[16][4:8][::-1])
+        if filament_color_count == 2:
+            self.data["filament_color"].append(bytes_to_hex(self.blocks[16][4:8][::-1]))
 
     def __str__(self, blocks_to_output = IMPORTANT_BLOCKS):
         result = ""
