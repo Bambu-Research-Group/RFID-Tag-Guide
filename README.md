@@ -62,8 +62,8 @@ Here's a high-level summary of how everything works:
    * Each block is encrypted with a different key
 * Encryption Keys
    * Keys are unique to each RFID tag. Even if you discover the key for one tag, that doesn't mean you can use that same key to unlock a different tag.
-   * Keys are likely derived from the UID. The UID goes through an algorithm (known only by Bambu) to reveal a set of keys for each block
-   * Keys can be sniffed by using a device (such as a ProxMark 3) to listen in on the communication between the AMS and the rfid tag.
+   * As of 11/19/24, keys can be derived from the UID. After reading the UID from the tag, the KDF (key derivation function) can be used to derive the 16 keys.
+   * (Outdated, sniffing is no longer required now that the KDF is known) Keys can be sniffed by using a device (such as a ProxMark 3) to listen in on the communication between the AMS and the rfid tag.
    * Once the keys have been sniffed, they can be saved and used to read the contents of the tag directly (without an AMS). (Reminder, the saved keys will ONLY work for the tag they were sniffed from)
 * RSA Signature
    * One of the blocks contains a 2048-bit RSA Signature
@@ -77,7 +77,6 @@ Here's a high-level summary of how everything works:
 * Custom Tags
    * This is very unlikely to happen, mostly due to the RSA signature.  Only Bambu has their "Private Key" which is used to digitally sign these tags.
    * To create a custom key, you need to know the following info:
-      * UUID -> Encryption Key algorithm (or just use known UID + Key pairs)
       * RSA Signature Private Key. You'd have to get this from bambu, good luck
    * Since Bambulab will likely not remove the signature requirement, you would need custom AMS firmware to read tags and ignore the signature
 
@@ -130,7 +129,24 @@ As there is not much clearance, it is recommended to temporarily remove the low 
 
 If you place the Proxmark in between the AMS reader and the spool, make sure that spool rotates so that the RFID tag moves away from the reader, otherwise the AMS will assume that it is reading the tag from its neighboring slot and attempt to rewind it until it cannot see the RFID tag.
 
+### Key Derivation ###
+As of 11/19/24, keys can now be derived from the UID of a tag.
+
+```python
+from Cryptodome.Protocol.KDF import HKDF
+from Cryptodome.Hash import SHA256
+
+uid=bytes([0x02,0x3b,0x44,0x74])
+master = bytes([0x9a,0x75,0x9c,0xf2,0xc4,0xf7,0xca,0xff,0x22,0x2c,0xb9,0x76,0x9b,0x41,0xbc,0x96]) 
+
+keys=HKDF(uid, 6, master, SHA256, 16, context=b"RFID-A\0")
+
+print([a.hex() for a in keys])
+```
+
+
 ### Dump RFID Contents (.bin)
+
 
 1. **Run ProxMark3 Software**
 
@@ -450,6 +466,10 @@ Example Data:
 
 ## Compatible RFID tags -  By generation
 
+There are tags known as "Magic Tags" which allow functionality that's not part of the classic MIFARE spec.
+One example is that most Magic Tags allow the UID to be changed, which is normally read-only on MIFARE tags.
+Magic tags are often refered to by their "generation", eg "Magic Gen 1".  Each newer generation increases the functionality, but tends to also be more expensive)
+
 Gen 1 --> **Not compatible**(due to AMS checking if tag is unlockable with command 0x40)
 
 Gen 2 --> **Works**
@@ -459,3 +479,5 @@ Gen 2 OTW --> **Not tested**
 Gen 3 --> **Not tested**
 
 Gen 4 --> **Not tested**(The best option but pricey and hard to source in small chip formfactor)
+
+FUID --> **Works** "Fused UID" aka "write-once UID". Once a UID is written, it cannot be changed
