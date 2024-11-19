@@ -26,7 +26,7 @@ def bytes_to_string(data):
 
 def bytes_to_hex(data, chunkify = False):
     output = data.hex().upper()
-    return " ".join((string[0+i:2+i] for i in range(0, len(string), 2))) if chunkify else output
+    return " ".join((output[0+i:2+i] for i in range(0, len(output), 2))) if chunkify else output
 
 def bytes_to_int(data):
     return int.from_bytes(data, 'little')
@@ -92,10 +92,12 @@ class Tag():
         self.filename = filename
         self.blocks = list(data[0+i:BYTES_PER_BLOCK+i] for i in range(0, len(data), BYTES_PER_BLOCK))
 
+        self.warnings = []
+
         # Check for blank blocks
         for bi in IMPORTANT_BLOCKS:
             if self.blocks[bi] == b'\x00' * BYTES_PER_BLOCK:
-                print(f"Warning! Block {bi} is blank!")
+                self.warnings.append(f"Block {bi} is blank!")
 
         # Parse the data
         self.data = {
@@ -123,8 +125,26 @@ class Tag():
             "production_date": bytes_to_date(self.blocks[12]),
 
             "unknown": bytes_to_string(self.blocks[13]), # Appears to be some sort of date -- on some tags, this is identical to the production date, but not always
-
         }
+
+        # Check for any data in bits that are expected to be blank
+        expected_to_be_blank = {
+            5: [*range(6,8),*range(12,16)],
+            6: range(12,16),
+            10: [*range(0,4), *range(6,16)],
+            14: [*range(0,4), *range(6,16)],
+            17: range(2,16)
+        }
+        for block in range(18,39):
+            if block % 4 == 3:
+                continue # Skip MIFARE encryption key blocks
+            expected_to_be_blank[block] = list(range(0,16))
+
+        for block in expected_to_be_blank:
+            for pos in expected_to_be_blank[block]:
+                byte = self.blocks[block][pos]
+                if byte != 0:
+                    self.warnings.append(f"Data found in block {block}, position {pos} that was expected to be blank (received {byte})")
 
     def __str__(self, blocks_to_output = IMPORTANT_BLOCKS):
         result = ""
@@ -136,6 +156,11 @@ class Tag():
                     result += f"  - {tkey}: {self.data[key][tkey]}\n"
             else:
                 result += f"- {key}: {bytes_to_hex(self.data[key]) if type(self.data[key]) == bytes else self.data[key]}\n"
+
+        if len(self.warnings):
+            result += "- Warnings:\n"
+            for warning in self.warnings:
+                result += f"  - {warning}\n"
 
         return result[:-1]
 
