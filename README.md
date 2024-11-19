@@ -36,6 +36,7 @@ We are currently working on a way to submit the tag data in a secure way so anal
       * [Block 13](#block-13)
       * [Block 14](#block-14)
       * [Block 16](#block-16)
+      * [Block 17](#block-17)
    * [Compatible RFID tags -  By generation](#compatible-rfid-tags----by-generation)
 <!--te-->
 
