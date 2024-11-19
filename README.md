@@ -6,7 +6,6 @@ We are currently working on a way to submit the tag data in a secure way so anal
 
 #  Table of contents
 <!--ts-->
-
    * [Project Summary](#project-summary)
       * [FAQs](#faqs)
       * [How do RFID tags work?](#how-do-rfid-tags-work)
