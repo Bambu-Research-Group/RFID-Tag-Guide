@@ -82,6 +82,31 @@ class Unit():
         values = self.__get_comparison_values(self, other)
         return values[0] > values[1]
 
+class ColorList(list):
+    def __init__(self, value):
+        if type(value) in [list, tuple]:
+            super().__init__(value)
+        else:
+            super().__init__([value])
+
+    def __str__(self):
+        return " / ".join("#" + c for c in self)
+
+    def __setitem__(self, index, item):
+        super().__setitem__(index, str(item))
+
+    def insert(self, index, item):
+        super().insert(index, str(item))
+
+    def append(self, item):
+        super().append(str(item))
+
+    def extend(self, other):
+        if isinstance(other, type(self)):
+            super().extend(other)
+        else:
+            super().extend(str(item) for item in other)
+
 class Tag():
     def __init__(self, filename, data):
         # Check to make sure the data is 1KB
