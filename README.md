@@ -18,6 +18,7 @@ We are currently working on a way to submit the tag data in a secure way so anal
       * [Bambulab AMS RFID reader location](#bambulab-ams-rfid-reader-location)
       * [Bambulab AMS Lite RFID reader location](#bambulab-ams-lite-rfid-reader-location)
       * [Proxmark3 placement for sniffing](#proxmark3-placement-for-sniffing)
+      * [Key Derivation](#key-derivation)
       * [Dump RFID Contents (.bin)](#dump-rfid-contents-bin)
    * [Tag Documentation](#tag-documentation)
       * [Block Overview](#block-overview)
