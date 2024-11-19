@@ -100,10 +100,13 @@ class Tag():
                 self.warnings.append(f"Block {bi} is blank!")
 
         # Parse the data
+        has_extra_color_info = self.blocks[16][0:2] == b'\x02\x00'
+        
         self.data = {
             "uid": bytes_to_hex(self.blocks[0][0:4]),
             "filament_type": bytes_to_string(self.blocks[2]),
             "detailed_filament_type": bytes_to_string(self.blocks[4]),
+            "filament_color_count": bytes_to_int(self.blocks[16][2:4]) if has_extra_color_info else 1,
             "filament_color": "#" + bytes_to_hex(self.blocks[5][0:4]),
             "spool_weight": Unit(bytes_to_int(self.blocks[5][4:6]), "g"),
             "filament_length": Unit(bytes_to_int(self.blocks[14][4:6]), "m"),
@@ -123,9 +126,13 @@ class Tag():
             "x_cam_info": self.blocks[8][0:12],
             "tray_uid": self.blocks[9],
             "production_date": bytes_to_date(self.blocks[12]),
-
-            "unknown": bytes_to_string(self.blocks[13]), # Appears to be some sort of date -- on some tags, this is identical to the production date, but not always
+            "unknown_1": bytes_to_string(self.blocks[13]), # Appears to be some sort of date -- on some tags, this is identical to the production date, but not always
+            "unknown_2": self.blocks[17][0:2], # Only been "0100" on the PLA Silk Dual Color, "0000" otherwise
         }
+
+        # Check for a second color
+        if self.data["filament_color_count"] == 2:
+            self.data["filament_color"] += " / #" + bytes_to_hex(self.blocks[16][4:8][::-1])
 
         # Check for any data in bits that are expected to be blank
         expected_to_be_blank = {
