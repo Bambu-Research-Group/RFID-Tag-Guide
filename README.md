@@ -122,9 +122,13 @@ This script is included in proxmarx3 since its release "Backdoor" and later.
 
 Place your reader on the tag, start proxmark3 and run the following command.
 
-`script run fm11rf08s_recovery.py`
+`script run fm11rf08s_recovery`
 
 This requires some time but once done you receive a binary key file and a dump.
+
+To visualize the data on the tag you can run now:
+
+`script run fm11rf08_full -b`
 
 ### Bambulab AMS RFID reader location
 The Bambulab AMS RFID readers are located between slots 1&2 and slots 3&4.
