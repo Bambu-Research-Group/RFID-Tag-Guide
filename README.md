@@ -111,21 +111,32 @@ The more data we have, the easier it is to compare differences to learn what eac
 A Proxmark3 Easy is sufficient for all the tasks that need to be done. You can buy a clone from Alixepress, Amazon or Dangerous Things.
 
 ## Hacking a Bambulab Tag and readout of its data
-The easiest way to obtain the 
 We document here the most simple approach to get all required A-Keys and the data of the tag.
 The easiest way is to sniff the data.
+
+Update November 2024: In 2024 a new backdoor was found which requires no sniffing. Details can be found [here](https://eprint.iacr.org/2024/1275.pdf). Overall this makes it much easier get the keys and the tags data.
+
+### Proxmark3 fm11rf08s recovery script
+
+This script is included in proxmarx3 since its release "Backdoor" and later.
+
+Place your reader on the tag, start proxmark3 and run the following command.
+
+`script run fm11rf08s_recovery.py`
+
+This requires some time but once done you receive a binary key file and a dump.
 
 ### Bambulab AMS RFID reader location
 The Bambulab AMS RFID readers are located between slots 1&2 and slots 3&4.
 
 ![](images/filament-slots.jpg)
 
-### Bambulab AMS Lite RFID reader location
+### Bambulab AMS Lite RFID reader location (legacy)
 The Bambulab AMS Lite RFID readers are located at the base of each spool holder.
 
 For sniffing, you will need to place the Proxmark in between the RFID tag and the reader on the AMS. As there is not much clearance, it is recommended to temporarily remove the low frequency radio (the topmost piece) if you can, as it will not be used in this process.
 
-### Proxmark3 placement for sniffing
+### Proxmark3 placement for sniffing (legacy)
 
 For sniffing, you will need to place the Proxmark3 against the reader.  On the AMS lite, you must place it in between the reader and the spool.  On the AMS, it is recommended to place it between the reader and the spool, but you may place it on the other side (for example, load the spool into slot 1 and place the Proxmark3 against the reader in slot 2).
 
@@ -150,7 +161,7 @@ print([a.hex() for a in keys])
 ```
 
 
-### Dump RFID Contents (.bin)
+### Dump RFID Contents (.bin) (legacy)
 
 
 1. **Run ProxMark3 Software**
