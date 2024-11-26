@@ -19,10 +19,11 @@ We want to make a standard that is simple to implement and as future-proof as po
     
 # Backers
 These are companies that are implementing Open 3D-RFID into their printers, filament, add-ons, etc.  If you would like to join this list, please open an Issue on GitHub.
-* Filament Manufacturers:
+* Filament Manufacturers (Sorted by date backed):
   * [Polar Filament](https://polarfilament.com)
   * [3D Fuel](https://www.3dfuel.com/)
   * [Ecogenesis Biopolymers](https://ecogenesisbiopolymers.com)
+  * [Numakers](https://numakers.com/)
 * Printers + Hardware:
   * [OpenSpool](https://www.youtube.com/watch?v=ah7dm-dtQ5w) ([GitHub Source](https://github.com/spuder/OpenSpool))
   * [Cosmyx](https://www.cosmyx3d.com/)
