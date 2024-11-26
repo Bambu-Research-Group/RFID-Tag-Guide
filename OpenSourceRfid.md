@@ -128,7 +128,7 @@ This is additional data that not all manufacturers will implement. These fields 
 |-------------|---------------|------------|----|-----|
 | Serial Number / Batch ID | String | 16 | `"1234-ABCD"`, `"2024-01-23-1234"` | An identifier to represent a serial number or batch number from manufacturing. Stored as a string, and this format will vary from manufacturer to manufacturer |
 | Manufacture Date | Int | 4 | `20240123` (Jan 23rd, 2024) | Date code in YYYYMMDD format, stored as a 32-bit integer |
-| Manufacture Time | Int | 3 | `103000` (10:30am), `152301` (3:23:01pm)  | 24-hour time code in HHMMSS format (Hour, Minumte, Second).
+| Manufacture Time | Int | 3 | `103000` (10:30am), `152301` (3:23:01pm)  | 24-hour time code in HHMMSS format (Hour, Minumte, Second), specifying UTC.
 | Spool Core Diameter (mm) | Int | 1 | `100` (mm), `80` (mm) | The diameter of the spool core, which is the part that the filament is wound around. This diameter is to estimate remaining filament by treating the tag as an encoder, and measuring how long it takes for one rotation of a spool.
 | MFI (Melt-flow index) | TBD | TBD | TBD | Format TBD. The melt-flow index describes how "melty" plastic is.  Meltier plastics can usually print faster.  Formula is somewhat complex, and often measured at different temperatures.  For example Corbion LX175 melt flow index is `MFI(210°C/2.16kg) = 6g/10min`, and `MFI(190°C/2.16kg) = 3g/10min`
 | Tolerance (Measured) | Int | 1 | `20` (±0.020mm), `55` (±0.055mm) | Actual tolerance, measured in µm (micrometers). This field is unique to each spool, and should only be populated if per-spool tolerances are measured and recorded during manufacturing. This is not a TARGET tolerance, this is ACTUAL.  If not recorded, leave undefined (0xFF)
