@@ -17,8 +17,8 @@ COMPARISON_BLOCKS = [1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14]
 IMPORTANT_BLOCKS = [0] + COMPARISON_BLOCKS
 
 BYTES_PER_BLOCK = 16
-BLOCKS_PER_TAG = 64
-TOTAL_BYTES = BLOCKS_PER_TAG * BYTES_PER_BLOCK
+BLOCKS_PER_TAG = [64, 72] # 64 = 1KB, 72 = Output from Proxmark fm11rf08 script
+TOTAL_BYTES = [blocks * BYTES_PER_BLOCK for blocks in BLOCKS_PER_TAG]
 
 # Byte conversions
 def bytes_to_string(data):
@@ -109,8 +109,8 @@ class ColorList(list):
 
 class Tag():
     def __init__(self, filename, data):
-        # Check to make sure the data is 1KB
-        if len(data) != TOTAL_BYTES:
+        # Check to make sure the data is 1KB or a known alternative
+        if len(data) not in TOTAL_BYTES:
             raise TagLengthMismatchError(len(data))
 
         # Store the raw data
