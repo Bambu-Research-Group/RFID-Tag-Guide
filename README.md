@@ -40,7 +40,6 @@ We are currently working on a way to submit the tag data in a secure way so anal
       * [Block 17](#block-17)
    * [Compatible RFID tags -  By generation](#compatible-rfid-tags----by-generation)
    * [Reverse engineering RFID Board](#reverse-engineering-rfid-board)
-   * [Discord](https://discord.gg/zVfCVubwr7)
 <!--te-->
 
 ## Project Summary
