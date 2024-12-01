@@ -101,7 +101,7 @@ The more data we have, the easier it is to compare differences to learn what eac
 ## Todos/Timeline/Next steps
 
 - [ ] Tool for automatic trace analysis
-- [ ] Web service for tag submisson with automatic anonymized data publishing to github
+- [ ] Web service for tag submisson with automatic anonymized data publishing to GitHub
 - [ ] Tag content analysis
 - [ ] Generate keys based on an arbitrary UID
 
