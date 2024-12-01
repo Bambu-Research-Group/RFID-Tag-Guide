@@ -1,6 +1,6 @@
-# Bambulab RFID Tag Guide
+# Bambu Lab RFID Tag Guide
 
-This guide gives you a basic overview how you can decrypt and read your tags. Since we don't know how Bambulab will react on this guide and the general reverse engineering of the tags: **Please don't share you tag's UID and the related keys for now.**
+This guide gives you a basic overview how you can decrypt and read your tags. Since we don't know how Bambu Lab will react on this guide and the general reverse engineering of the tags: **Please don't share you tag's UID and the related keys for now.**
 
 We are currently working on a way to submit the tag data in a secure way so analysis on the data could be done.
 
@@ -16,10 +16,10 @@ We are currently working on a way to submit the tag data in a secure way so anal
 - [Required Equipment](#required-equipment)
   - [Proxmark3 compatible readers](#proxmark3-compatible-readers)
     - [Proxmark3 Easy](#proxmark3-easy)
-- [Hacking a Bambulab Tag and readout of its data](#hacking-a-bambulab-tag-and-readout-of-its-data)
+- [Hacking a Bambu Lab Tag and readout of its data](#hacking-a-bambu-lab-tag-and-readout-of-its-data)
   - [Proxmark3 fm11rf08s recovery script](#proxmark3-fm11rf08s-recovery-script)
-  - [Bambulab AMS RFID reader location](#bambulab-ams-rfid-reader-location)
-  - [Bambulab AMS Lite RFID reader location (legacy)](#bambulab-ams-lite-rfid-reader-location-legacy)
+  - [Bambu Lab AMS RFID reader location](#bambu-lab-ams-rfid-reader-location)
+  - [Bambu Lab AMS Lite RFID reader location (legacy)](#bambu-lab-ams-lite-rfid-reader-location-legacy)
   - [Proxmark3 placement for sniffing (legacy)](#proxmark3-placement-for-sniffing-legacy)
   - [Key Derivation](#key-derivation)
   - [Dump RFID Contents (.bin) (legacy)](#dump-rfid-contents-bin-legacy)
@@ -46,7 +46,7 @@ We are currently working on a way to submit the tag data in a secure way so anal
 
 ## Project Summary
 
-This is a research group dedicated to documenting the data structures used by Bambulab 3D printers to identify filament data.
+This is a research group dedicated to documenting the data structures used by Bambu Lab 3D printers to identify filament data.
 
 ### FAQs
 
@@ -64,7 +64,7 @@ This is a research group dedicated to documenting the data structures used by Ba
 
 Here's a high-level summary of how everything works:
 
-- BambuLab printers use MiFare 13.56MHZ RFID tags
+- Bambu Lab printers use MiFare 13.56MHZ RFID tags
   - These tags contain a unique ID that is not encrypted (called the UID)
   - In most cases UID is fixed (not-changable). Some "hackable" rfid tags allow you to set the UID to anything you want
 - Blocks (Encrypted)
@@ -89,7 +89,7 @@ Here's a high-level summary of how everything works:
   - This is very unlikely to happen, mostly due to the RSA signature. Only Bambu has their "Private Key" which is used to digitally sign these tags.
   - To create a custom key, you need to know the following info:
     - RSA Signature Private Key. You'd have to get this from bambu, good luck
-  - Since Bambulab will likely not remove the signature requirement, you would need custom AMS firmware to read tags and ignore the signature
+  - Since Bambu Lab will likely not remove the signature requirement, you would need custom AMS firmware to read tags and ignore the signature
 
 ### How to contribute
 
@@ -105,8 +105,8 @@ The more data we have, the easier it is to compare differences to learn what eac
 
 ## Required Equipment
 
-- Bambulab 3D Printer with AMS or AMS Lite
-- Bambulab Filament spool **or** the related tags
+- Bambu Lab 3D Printer with AMS or AMS Lite
+- Bambu Lab Filament spool **or** the related tags
 - A Proxmark3-compatible RFID reader
 - The [proxmark3 software](https://github.com/RfidResearchGroup/proxmark3)
 
@@ -118,7 +118,7 @@ The more data we have, the easier it is to compare differences to learn what eac
 
 A Proxmark3 Easy is sufficient for all the tasks that need to be done. You can buy a clone from Alixepress, Amazon or Dangerous Things.
 
-## Hacking a Bambulab Tag and readout of its data
+## Hacking a Bambu Lab Tag and readout of its data
 
 We document here the most simple approach to get all required A-Keys and the data of the tag.
 The easiest way is to sniff the data.
@@ -139,15 +139,15 @@ To visualize the data on the tag you can run now:
 
 `script run fm11rf08_full -b`
 
-### Bambulab AMS RFID reader location
+### Bambu Lab AMS RFID reader location
 
-The Bambulab AMS RFID readers are located between slots 1&2 and slots 3&4.
+The Bambu Lab AMS RFID readers are located between slots 1&2 and slots 3&4.
 
 ![](images/filament-slots.jpg)
 
-### Bambulab AMS Lite RFID reader location (legacy)
+### Bambu Lab AMS Lite RFID reader location (legacy)
 
-The Bambulab AMS Lite RFID readers are located at the base of each spool holder.
+The Bambu Lab AMS Lite RFID readers are located at the base of each spool holder.
 
 For sniffing, you will need to place the Proxmark in between the RFID tag and the reader on the AMS. As there is not much clearance, it is recommended to temporarily remove the low frequency radio (the topmost piece) if you can, as it will not be used in this process.
 
@@ -343,43 +343,43 @@ Summary of what kind of data is stored in each block. Detailed info for each blo
 | 0 | 0 | [Block 0](#block-0) UID and Tag Manufacturer Data |
 | 0 | 1 | [Block 1](#block-1) Tray Info Index |
 | 0 | 2 | [Block 2](#block-2) Filament Type |
-| 0 | 3 | [Block 3](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab |
+| 0 | 3 | [Block 3](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to Bambu Lab |
 | 1 | 0 | [Block 4](#block-4) Detailed Filament Type |
 | 1 | 1 | [Block 5](#block-5) Spool Weight, Color Code, Filament Diameter |
 | 1 | 2 | [Block 6](#block-6) Temperatures and Drying Info |
-| 1 | 3 | [Block 7](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab |
+| 1 | 3 | [Block 7](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to Bambu Lab |
 | 2 | 0 | [Block 8](#block-8) X Cam Info, Nozzle Diameter |
 | 2 | 1 | [Block 9](#block-9) Tray UID |
 | 2 | 2 | [Block 10](#block-10) Spool Width |
-| 2 | 3 | [Block 11](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab |
+| 2 | 3 | [Block 11](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to Bambu Lab |
 | 3 | 0 | [Block 12](#block-12) Production Date/Time |
 | 3 | 1 | [Block 13](#block-13) Short Production Date/Time |
 | 3 | 2 | [Block 14](#block-14) Filament Length |
-| 3 | 3 | [Block 15](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab |
+| 3 | 3 | [Block 15](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to Bambu Lab |
 | 4 | 0 | [Block 16](#block-16) Extra Color Info |
 | 4 | 1 | [Block 17](#block-17) **Unknown** |
 | 4 | 2 | **Empty** |
-| 4 | 3 | [Block 19](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab |
+| 4 | 3 | [Block 19](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to Bambu Lab |
 | 5 | 0 | **Empty** |
 | 5 | 1 | **Empty** |
 | 5 | 2 | **Empty** |
-| 5 | 3 | [Block 23](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab |
+| 5 | 3 | [Block 23](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to Bambu Lab |
 | 6 | 0 | **Empty** |
 | 6 | 1 | **Empty** |
 | 6 | 2 | **Empty** |
-| 6 | 3 | [Block 27](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab |
+| 6 | 3 | [Block 27](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to Bambu Lab |
 | 7 | 0 | **Empty** |
 | 7 | 1 | **Empty** |
 | 7 | 2 | **Empty** |
-| 7 | 3 | [Block 31](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab |
+| 7 | 3 | [Block 31](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to Bambu Lab |
 | 8 | 0 | **Empty** |
 | 8 | 1 | **Empty** |
 | 8 | 2 | **Empty** |
-| 8 | 3 | [Block 35](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab |
+| 8 | 3 | [Block 35](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to Bambu Lab |
 | 9 | 0 | **Empty** |
 | 9 | 1 | **Empty** |
 | 9 | 2 | **Empty** |
-| 9 | 3 | [Block 39](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to BambuLab |
+| 9 | 3 | [Block 39](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to Bambu Lab |
 | 10-15 | \* | **RSA-2048 Signature** |
 
 The first part of the filament serial number seems to be the Tag UID.
@@ -390,8 +390,8 @@ The first part of the filament serial number seems to be the Tag UID.
 ### MIFARE Encryption Keys
 
 Every 4th block (eg Sector X, Block 3) contains encryption keys that are part of the MIFARE RFID standard.
-This has nothing to do with BambuLab's memory format.
-All BambuLab tags use the same Permission Bits (Access Control)
+This has nothing to do with Bambu Lab's memory format.
+All Bambu Lab tags use the same Permission Bits (Access Control)
 
 Example Data:
 `AA AA AA AA AA AA PP PP PP PP BB BB BB BB BB BB`
