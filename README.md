@@ -4,6 +4,8 @@ This guide gives you a basic overview how you can decrypt and read your tags. Si
 
 We are currently working on a way to submit the tag data in a secure way so analysis on the data could be done.
 
+[![Link to Discord](https://img.shields.io/badge/Discord-join_now-blue?style=flat-square&logo=discord&logoColor=white&label=Discord&color=blue)](https://discord.gg/zVfCVubwr7)
+
 # Table of contents
 
 <!--ts-->
