@@ -107,7 +107,6 @@ A lot of the contents have been deciphered (see [Tag stucture](#tag-stucture)), 
 
 ## Required Equipment
 
-- Bambu Lab 3D Printer with AMS or AMS Lite
 - Bambu Lab Filament spool **or** the related tags
 - A Proxmark3-compatible RFID reader
 - The [proxmark3 (Iceman fork) software](https://github.com/RfidResearchGroup/proxmark3)
