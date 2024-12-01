@@ -4,88 +4,95 @@ This guide gives you a basic overview how you can decrypt and read your tags. Si
 
 We are currently working on a way to submit the tag data in a secure way so analysis on the data could be done.
 
-#  Table of contents
+# Table of contents
+
 <!--ts-->
-   * [Project Summary](#project-summary)
-      * [FAQs](#faqs)
-      * [How do RFID tags work?](#how-do-rfid-tags-work)
-      * [How to contribute](#how-to-contribute)
-   * [Todos/Timeline/Next steps](#todostimelinenext-steps)
-   * [Required Equipment](#required-equipment)
-      * [Proxmark3 compatible readers](#proxmark3-compatible-readers)
-         * [Proxmark3 Easy](#proxmark3-easy)
-   * [Hacking a Bambulab Tag and readout of its data](#hacking-a-bambulab-tag-and-readout-of-its-data)
-      * [Proxmark3 fm11rf08s recovery script](#proxmark3-fm11rf08s-recovery-script)
-      * [Bambulab AMS RFID reader location](#bambulab-ams-rfid-reader-location)
-      * [Bambulab AMS Lite RFID reader location (legacy)](#bambulab-ams-lite-rfid-reader-location-legacy)
-      * [Proxmark3 placement for sniffing (legacy)](#proxmark3-placement-for-sniffing-legacy)
-      * [Key Derivation](#key-derivation)
-      * [Dump RFID Contents (.bin) (legacy)](#dump-rfid-contents-bin-legacy)
-   * [Tag Documentation](#tag-documentation)
-      * [Block Overview](#block-overview)
-      * [MIFARE Encryption Keys](#mifare-encryption-keys)
-      * [Block 0](#block-0)
-      * [Block 1](#block-1)
-      * [Block 2](#block-2)
-      * [Block 4](#block-4)
-      * [Block 5](#block-5)
-      * [Block 6](#block-6)
-      * [Block 8](#block-8)
-      * [Block 9](#block-9)
-      * [Block 10](#block-10)
-      * [Block 12](#block-12)
-      * [Block 13](#block-13)
-      * [Block 14](#block-14)
-      * [Block 16](#block-16)
-      * [Block 17](#block-17)
-   * [Compatible RFID tags -  By generation](#compatible-rfid-tags----by-generation)
-   * [Reverse engineering RFID Board](#reverse-engineering-rfid-board)
+
+- [Project Summary](#project-summary)
+  - [FAQs](#faqs)
+  - [How do RFID tags work?](#how-do-rfid-tags-work)
+  - [How to contribute](#how-to-contribute)
+- [Todos/Timeline/Next steps](#todostimelinenext-steps)
+- [Required Equipment](#required-equipment)
+  - [Proxmark3 compatible readers](#proxmark3-compatible-readers)
+    - [Proxmark3 Easy](#proxmark3-easy)
+- [Hacking a Bambulab Tag and readout of its data](#hacking-a-bambulab-tag-and-readout-of-its-data)
+  - [Proxmark3 fm11rf08s recovery script](#proxmark3-fm11rf08s-recovery-script)
+  - [Bambulab AMS RFID reader location](#bambulab-ams-rfid-reader-location)
+  - [Bambulab AMS Lite RFID reader location (legacy)](#bambulab-ams-lite-rfid-reader-location-legacy)
+  - [Proxmark3 placement for sniffing (legacy)](#proxmark3-placement-for-sniffing-legacy)
+  - [Key Derivation](#key-derivation)
+  - [Dump RFID Contents (.bin) (legacy)](#dump-rfid-contents-bin-legacy)
+- [Tag Documentation](#tag-documentation)
+  - [Block Overview](#block-overview)
+  - [MIFARE Encryption Keys](#mifare-encryption-keys)
+  - [Block 0](#block-0)
+  - [Block 1](#block-1)
+  - [Block 2](#block-2)
+  - [Block 4](#block-4)
+  - [Block 5](#block-5)
+  - [Block 6](#block-6)
+  - [Block 8](#block-8)
+  - [Block 9](#block-9)
+  - [Block 10](#block-10)
+  - [Block 12](#block-12)
+  - [Block 13](#block-13)
+  - [Block 14](#block-14)
+  - [Block 16](#block-16)
+  - [Block 17](#block-17)
+- [Compatible RFID tags - By generation](#compatible-rfid-tags----by-generation)
+- [Reverse engineering RFID Board](#reverse-engineering-rfid-board)
 <!--te-->
 
 ## Project Summary
+
 This is a research group dedicated to documenting the data structures used by Bambulab 3D printers to identify filament data.
 
 ### FAQs
- * **Can I clone tags?**
-   * Yes, you can read and clone tags using a tool such as a Proxmark3
- * **Can I create custom tags?**
-   * No, tags are digitally signed. Even if you modify the contents, the printer will reject any tags without a valid RSA signature
-   * An [Open Source RFID Tag](OpenSourceRfid.md) has been proposed to allow anyone to create / modify their own tags. This must be adopted by printer manufacturers, or you can mod your own printer for support
- * **What are the next steps for this project?**
-   * Decyphering the rest of the unknwn tag content
-   * Custom AMS firmware that allows custom tags to be read while ignoring the signature
-   * See [Todos/Timeline/Next steps](#todostimelinenext-steps) for more info
+
+- **Can I clone tags?**
+  - Yes, you can read and clone tags using a tool such as a Proxmark3
+- **Can I create custom tags?**
+  - No, tags are digitally signed. Even if you modify the contents, the printer will reject any tags without a valid RSA signature
+  - An [Open Source RFID Tag](OpenSourceRfid.md) has been proposed to allow anyone to create / modify their own tags. This must be adopted by printer manufacturers, or you can mod your own printer for support
+- **What are the next steps for this project?**
+  - Decyphering the rest of the unknwn tag content
+  - Custom AMS firmware that allows custom tags to be read while ignoring the signature
+  - See [Todos/Timeline/Next steps](#todostimelinenext-steps) for more info
 
 ### How do RFID tags work?
+
 Here's a high-level summary of how everything works:
-* BambuLab printers use MiFare 13.56MHZ RFID tags
-   * These tags contain a unique ID that is not encrypted (called the UID)
-   * In most cases UID is fixed (not-changable).  Some "hackable" rfid tags allow you to set the UID to anything you want
-* Blocks (Encrypted)
-   * MiFare tags also contain "Blocks" of data. Each block contains info about the spool, such as Material, Color, Manufacturing Date, etc. See [Tag stucture](#tag-stucture) section for details
-   * The blocks are encrypted, meaning that you need to have a KEY to decipher them
-   * Each block is encrypted with a different key
-* Encryption Keys
-   * Keys are unique to each RFID tag. Even if you discover the key for one tag, that doesn't mean you can use that same key to unlock a different tag.
-   * As of 11/19/24, keys can be derived from the UID. After reading the UID from the tag, the KDF (key derivation function) can be used to derive the 16 keys.
-   * (Outdated, sniffing is no longer required now that the KDF is known) Keys can be sniffed by using a device (such as a ProxMark 3) to listen in on the communication between the AMS and the rfid tag.
-   * Once the keys have been sniffed, they can be saved and used to read the contents of the tag directly (without an AMS). (Reminder, the saved keys will ONLY work for the tag they were sniffed from)
-* RSA Signature
-   * One of the blocks contains a 2048-bit RSA Signature
-   * RSA signatures are a way to digitally sign / certify authenticity of content, and they are effectively un-breakable (this is how things like cryptocurrency remain secure)
-   * RSA signatures encompass all of the data of the RFID tag. Changing a single byte somewhere else in the tag would require a completely different signature to be considered genuine
-   * Bambu printers check the content of the tag and then check if the signature is valid.  If the signature is invalid, it rejects the tag
-* Cloning Tags
-   * Even though there is a signature, a tag can be cloned
-   * To clone a tag, it must have the same UID, identical content from the data blocks, and the identical RSA signature
-   * Changing even one byte will cause the signature to be invalid, and the tag will be rejected
-* Custom Tags
-   * This is very unlikely to happen, mostly due to the RSA signature.  Only Bambu has their "Private Key" which is used to digitally sign these tags.
-   * To create a custom key, you need to know the following info:
-      * RSA Signature Private Key. You'd have to get this from bambu, good luck
-   * Since Bambulab will likely not remove the signature requirement, you would need custom AMS firmware to read tags and ignore the signature
+
+- BambuLab printers use MiFare 13.56MHZ RFID tags
+  - These tags contain a unique ID that is not encrypted (called the UID)
+  - In most cases UID is fixed (not-changable). Some "hackable" rfid tags allow you to set the UID to anything you want
+- Blocks (Encrypted)
+  - MiFare tags also contain "Blocks" of data. Each block contains info about the spool, such as Material, Color, Manufacturing Date, etc. See [Tag stucture](#tag-stucture) section for details
+  - The blocks are encrypted, meaning that you need to have a KEY to decipher them
+  - Each block is encrypted with a different key
+- Encryption Keys
+  - Keys are unique to each RFID tag. Even if you discover the key for one tag, that doesn't mean you can use that same key to unlock a different tag.
+  - As of 11/19/24, keys can be derived from the UID. After reading the UID from the tag, the KDF (key derivation function) can be used to derive the 16 keys.
+  - (Outdated, sniffing is no longer required now that the KDF is known) Keys can be sniffed by using a device (such as a ProxMark 3) to listen in on the communication between the AMS and the rfid tag.
+  - Once the keys have been sniffed, they can be saved and used to read the contents of the tag directly (without an AMS). (Reminder, the saved keys will ONLY work for the tag they were sniffed from)
+- RSA Signature
+  - One of the blocks contains a 2048-bit RSA Signature
+  - RSA signatures are a way to digitally sign / certify authenticity of content, and they are effectively un-breakable (this is how things like cryptocurrency remain secure)
+  - RSA signatures encompass all of the data of the RFID tag. Changing a single byte somewhere else in the tag would require a completely different signature to be considered genuine
+  - Bambu printers check the content of the tag and then check if the signature is valid. If the signature is invalid, it rejects the tag
+- Cloning Tags
+  - Even though there is a signature, a tag can be cloned
+  - To clone a tag, it must have the same UID, identical content from the data blocks, and the identical RSA signature
+  - Changing even one byte will cause the signature to be invalid, and the tag will be rejected
+- Custom Tags
+  - This is very unlikely to happen, mostly due to the RSA signature. Only Bambu has their "Private Key" which is used to digitally sign these tags.
+  - To create a custom key, you need to know the following info:
+    - RSA Signature Private Key. You'd have to get this from bambu, good luck
+  - Since Bambulab will likely not remove the signature requirement, you would need custom AMS firmware to read tags and ignore the signature
 
 ### How to contribute
+
 If you have a Proxmark3 (or other RFID debugging tool), you can sniff and decrypt the contents of your tags and submit them for review.
 The more data we have, the easier it is to compare differences to learn what each byte represents. A lot of the contents have been deciphered (see [Tag stucture](#tag-stucture)), but there is still more unknown data still left.
 
@@ -95,7 +102,6 @@ The more data we have, the easier it is to compare differences to learn what eac
 - [ ] Web service for tag submisson with automatic anonymized data publishing to github
 - [ ] Tag content analysis
 - [ ] Generate keys based on an arbitrary UID
-
 
 ## Required Equipment
 
@@ -107,11 +113,13 @@ The more data we have, the easier it is to compare differences to learn what eac
 ### Proxmark3 compatible readers
 
 #### Proxmark3 Easy
+
 ![](images/Proxmark3_easy.png)
 
 A Proxmark3 Easy is sufficient for all the tasks that need to be done. You can buy a clone from Alixepress, Amazon or Dangerous Things.
 
 ## Hacking a Bambulab Tag and readout of its data
+
 We document here the most simple approach to get all required A-Keys and the data of the tag.
 The easiest way is to sniff the data.
 
@@ -132,25 +140,28 @@ To visualize the data on the tag you can run now:
 `script run fm11rf08_full -b`
 
 ### Bambulab AMS RFID reader location
+
 The Bambulab AMS RFID readers are located between slots 1&2 and slots 3&4.
 
 ![](images/filament-slots.jpg)
 
 ### Bambulab AMS Lite RFID reader location (legacy)
+
 The Bambulab AMS Lite RFID readers are located at the base of each spool holder.
 
 For sniffing, you will need to place the Proxmark in between the RFID tag and the reader on the AMS. As there is not much clearance, it is recommended to temporarily remove the low frequency radio (the topmost piece) if you can, as it will not be used in this process.
 
 ### Proxmark3 placement for sniffing (legacy)
 
-For sniffing, you will need to place the Proxmark3 against the reader.  On the AMS lite, you must place it in between the reader and the spool.  On the AMS, it is recommended to place it between the reader and the spool, but you may place it on the other side (for example, load the spool into slot 1 and place the Proxmark3 against the reader in slot 2).
+For sniffing, you will need to place the Proxmark3 against the reader. On the AMS lite, you must place it in between the reader and the spool. On the AMS, it is recommended to place it between the reader and the spool, but you may place it on the other side (for example, load the spool into slot 1 and place the Proxmark3 against the reader in slot 2).
 
 > [!TIP]
-> As there is not much clearance, it may be helpful to disassemble the Proxmark3 Easy and remove the top and middle layers.  For this particular process, you will only need the bottom-most layer.
+> As there is not much clearance, it may be helpful to disassemble the Proxmark3 Easy and remove the top and middle layers. For this particular process, you will only need the bottom-most layer.
 
 If you place the Proxmark in between the AMS reader and the spool, make sure that spool rotates so that the RFID tag moves away from the reader, otherwise the AMS will assume that it is reading the tag from its neighboring slot and attempt to rewind it until it cannot see the RFID tag.
 
-### Key Derivation ###
+### Key Derivation
+
 As of 11/19/24, keys can now be derived from the UID of a tag.
 
 ```python
@@ -158,16 +169,14 @@ from Cryptodome.Protocol.KDF import HKDF
 from Cryptodome.Hash import SHA256
 
 uid=bytes([0x02,0x3b,0x44,0x74])
-master = bytes([0x9a,0x75,0x9c,0xf2,0xc4,0xf7,0xca,0xff,0x22,0x2c,0xb9,0x76,0x9b,0x41,0xbc,0x96]) 
+master = bytes([0x9a,0x75,0x9c,0xf2,0xc4,0xf7,0xca,0xff,0x22,0x2c,0xb9,0x76,0x9b,0x41,0xbc,0x96])
 
 keys=HKDF(uid, 6, master, SHA256, 16, context=b"RFID-A\0")
 
 print([a.hex() for a in keys])
 ```
 
-
 ### Dump RFID Contents (.bin) (legacy)
-
 
 1. **Run ProxMark3 Software**
 
@@ -176,7 +185,7 @@ print([a.hex() for a in keys])
 2. **Sniff Communication**
 
    - Start sniffing with: `hf 14a sniff -c -r`<br>
-   (hf=High Frequency, 14a=Tag Type, Sniff=command, -c and -r mean "capture on triggers instead of continuously)
+     (hf=High Frequency, 14a=Tag Type, Sniff=command, -c and -r mean "capture on triggers instead of continuously)
 
    - Place your Proxmark3 between the tag and the AMS. Recommended: Use tape to hold it in place.
    - Load a strand of filament into the AMS. This is what triggers the AMS to attempt to read the RFID tag.
@@ -198,13 +207,13 @@ print([a.hex() for a in keys])
 
       6. Run `hf mf fchk -f [dictionaryFilepath] --dump` to create a key file
 
-            - The program will report the destination of the key file that it saved. Copy this filepath to your clipboard.
+         - The program will report the destination of the key file that it saved. Copy this filepath to your clipboard.
 
-              - Example:
+           - Example:
 
-                ```
-                [+] Found keys have been dumped to /Users/mitch/hf-mf-75066B1D-key.bin
-                ```
+             ```
+             [+] Found keys have been dumped to /Users/mitch/hf-mf-75066B1D-key.bin
+             ```
 
    2. **Manual** (not recommended)
 
@@ -212,27 +221,28 @@ print([a.hex() for a in keys])
 
          - We will discover keys one at a time and save them to a dictionary file.
          - Navigate to your Proxmark3 software installation directory. This will be specific to your Operating System and Installation.
-            - macOS (Intel) Example: `/usr/local/Cellar/proxmark3/4.17768/share/proxmark3/`
-            - macOS (ARM) Eample: `/opt/homebrew/Cellar/proxmark3/4.17768/share/proxmark3/`
-            - Windows Example: TBD
-            - Linux Example: TBD
+           - macOS (Intel) Example: `/usr/local/Cellar/proxmark3/4.17768/share/proxmark3/`
+           - macOS (ARM) Eample: `/opt/homebrew/Cellar/proxmark3/4.17768/share/proxmark3/`
+           - Windows Example: TBD
+           - Linux Example: TBD
          - Open a text editor and save a blank file called `myDictionary.dic` into the `dictionaries/` folder of your Proxmark3 software installation directory.
 
-            (You can call this file anything you want, but for the rest of this example, we will refer to it as "myDictionary")
+           (You can call this file anything you want, but for the rest of this example, we will refer to it as "myDictionary")
 
          - Leave this file open, we will continue to add keys to it in the next step
 
       2. **Extract Keys From Trace**
+
          - Run `trace list -t mf -f myDictionary` to view the trace that was recorded from sniffing in the previous step.
 
-            This uses the key dictionary `myDictionary.dic` that we created in step 3.
+           This uses the key dictionary `myDictionary.dic` that we created in step 3.
+
          - Read the output and look for anything that mentions a key.
-            - Three Possible Formats:
-               - `key E0B50731BE27 prng WEAK` - Follow Step 5
-               - `nested probable key: 50B0318A4FE7` - Follow Step 6
-               - `Nested authentication detected.` - Follow Step 7
-              
-            - Each of these 3 entries can provide us with a valid key.  Follow step 5, 6, or 7 depending on which type of key you encounter.
+           - Three Possible Formats:
+             - `key E0B50731BE27 prng WEAK` - Follow Step 5
+             - `nested probable key: 50B0318A4FE7` - Follow Step 6
+             - `Nested authentication detected.` - Follow Step 7
+           - Each of these 3 entries can provide us with a valid key. Follow step 5, 6, or 7 depending on which type of key you encounter.
 
       3. **First Key - Plain Text**
          - Example: `key E0B50731BE27 prng WEAK`
@@ -243,57 +253,60 @@ print([a.hex() for a in keys])
          - Copy/paste this key into the `myDictionary.dic` file that you created in step 3, then save the file.
       5. **Nested Authentication Key**
          - Example:
-            ```
-            Nested authentication detected.
-            tools/mf_nonce_brute/mf_nonce_brute 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C
-            ```
+           ```
+           Nested authentication detected.
+           tools/mf_nonce_brute/mf_nonce_brute 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C
+           ```
          - Open a second terminal window, and change directories into your Proxmark3 software installation directory. This is specific to your OS and PM3 installation.
-            - macOS/Linux: `cd $(brew --prefix proxmark3)/share/proxmark3/`
-            - Windows: TBD
+           - macOS/Linux: `cd $(brew --prefix proxmark3)/share/proxmark3/`
+           - Windows: TBD
          - CD into the tools folder `cd tools/`
          - Copy the command from ProxMark starting at `mf_nonce_brute`, including all the arguments (random letters/numbers) after it, and run the program from the `tools/` directory.
-            - Example (macOS/Linux): `./mf_nonce_brute 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C`
-            - Example (Windows): `mf_nonce_brute.exe 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C`
+           - Example (macOS/Linux): `./mf_nonce_brute 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C`
+           - Example (Windows): `mf_nonce_brute.exe 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C`
          - The program will discover a key. Copy/paste this key into your `myDictionary.dic` file, and SAVE IT.
-            - Example Output:
-               ```
-               Valid Key found [ 202efd3dcdfd ]
-               ```
+           - Example Output:
+             ```
+             Valid Key found [ 202efd3dcdfd ]
+             ```
       6. **Check Keys (Optional)**
+
          - If you want to check how many valid keys you've discovered, you can do this test
          - This is optional, and you can choose to wait until you have discovered all of the keys
          - **WARNING**: Performing a key check will erase the trace that you recorded during step 2, and will require you to re-sniff data (repeat step 2)
-            - If you want to save your trace to avoid re-sniffing, use `trace save -f <trace-name>` and `trace load -f <trace-name>`
+
+           - If you want to save your trace to avoid re-sniffing, use `trace save -f <trace-name>` and `trace load -f <trace-name>`
 
          - Run `hf mf fchk --1k -f myDictionary` to test your keys
-            - Example Output (showing 11/16 keys discovered):
-               ```
-               [+] found keys:
-               
-               [+] -----+-----+--------------+---+--------------+----
-               [+]  Sec | Blk | key A        |res| key B        |res
-               [+] -----+-----+--------------+---+--------------+----
-               [+]  000 | 003 | E0B50731BE27 | 1 | ------------ | 0
-               [+]  001 | 007 | 63654DB94D97 | 1 | ------------ | 0
-               [+]  002 | 011 | 387C06EFFDC8 | 1 | ------------ | 0
-               [+]  003 | 015 | 38963E577E43 | 1 | ------------ | 0
-               [+]  004 | 019 | 8A3EA2564692 | 1 | ------------ | 0
-               [+]  005 | 023 | 935E0F11857A | 1 | ------------ | 0
-               [+]  006 | 027 | EBC8F7D23A06 | 1 | ------------ | 0
-               [+]  007 | 031 | DD6128F13D4C | 1 | ------------ | 0
-               [+]  008 | 035 | ------------ | 0 | ------------ | 0
-               [+]  009 | 039 | 4E470B09521F | 1 | ------------ | 0
-               [+]  010 | 043 | 50EB8811A69C | 1 | ------------ | 0
-               [+]  011 | 047 | 4BDD25091824 | 1 | ------------ | 0
-               [+]  012 | 051 | ------------ | 0 | ------------ | 0
-               [+]  013 | 055 | ------------ | 0 | ------------ | 0
-               [+]  014 | 059 | ------------ | 0 | ------------ | 0
-               [+]  015 | 063 | ------------ | 0 | ------------ | 0
-               [+] -----+-----+--------------+---+--------------+----
-               [+] ( 0:Failed / 1:Success )
-               ```
+           - Example Output (showing 11/16 keys discovered):
+             ```
+             [+] found keys:
+
+             [+] -----+-----+--------------+---+--------------+----
+             [+]  Sec | Blk | key A        |res| key B        |res
+             [+] -----+-----+--------------+---+--------------+----
+             [+]  000 | 003 | E0B50731BE27 | 1 | ------------ | 0
+             [+]  001 | 007 | 63654DB94D97 | 1 | ------------ | 0
+             [+]  002 | 011 | 387C06EFFDC8 | 1 | ------------ | 0
+             [+]  003 | 015 | 38963E577E43 | 1 | ------------ | 0
+             [+]  004 | 019 | 8A3EA2564692 | 1 | ------------ | 0
+             [+]  005 | 023 | 935E0F11857A | 1 | ------------ | 0
+             [+]  006 | 027 | EBC8F7D23A06 | 1 | ------------ | 0
+             [+]  007 | 031 | DD6128F13D4C | 1 | ------------ | 0
+             [+]  008 | 035 | ------------ | 0 | ------------ | 0
+             [+]  009 | 039 | 4E470B09521F | 1 | ------------ | 0
+             [+]  010 | 043 | 50EB8811A69C | 1 | ------------ | 0
+             [+]  011 | 047 | 4BDD25091824 | 1 | ------------ | 0
+             [+]  012 | 051 | ------------ | 0 | ------------ | 0
+             [+]  013 | 055 | ------------ | 0 | ------------ | 0
+             [+]  014 | 059 | ------------ | 0 | ------------ | 0
+             [+]  015 | 063 | ------------ | 0 | ------------ | 0
+             [+] -----+-----+--------------+---+--------------+----
+             [+] ( 0:Failed / 1:Success )
+             ```
 
       7. **Find Remaining Keys**
+
          - Repeat step 4 until all 16 keys are discovered
          - Your dictionary may be larger than 16 entries if you accidentally copied a duplicate key or an invalid key. These invalid entries are fine, and you can ignore them
          - **Recommended**: When you think you have discovered all 16 keys, perform step 8 to verify that your keys are correct.
@@ -303,20 +316,21 @@ print([a.hex() for a in keys])
          - Remove the spool from the AMS and hold the Proxmark3 against the RFID tag of the spool
          - Run `hf mf fchk --1k -f myDictionary --dump` to create a key file
          - The program will report the destination of the key file that it saved. Copy this filepath to your clipboard
-            - Example:
-               ```
-               [+] Found keys have been dumped to /Users/mitch/hf-mf-75066B1D-key.bin
-               ```
+           - Example:
+             ```
+             [+] Found keys have been dumped to /Users/mitch/hf-mf-75066B1D-key.bin
+             ```
 
 4. **Dump RFID Contents**
-   
+
    - Run `hf mf dump -k [path-to-keyfile]` while the Proxmark3 is on the spool's RFID tag to dump the contents of the tag using the 16 keys we discovered
    - There should be no errors
    - The output should tell you where your `.bin` file is saved
-      - Example:
-         ```
-         [+] saved 1024 bytes to binary file /Users/mitch/hf-mf-75066B1D-dump.bin
-         ```
+     - Example:
+       ```
+       [+] saved 1024 bytes to binary file /Users/mitch/hf-mf-75066B1D-dump.bin
+       ```
+
 ## Tag Documentation
 
 This contains documentation for the known and unknown data that is contained in each block on the RFID tag.
@@ -444,11 +458,11 @@ Known Values:
 Example Data:
 `AA AA AA AA BB BB __ __ CC CC CC CC __ __ __ __`
 
-| position | length | type        | Description                                  |
-| -------- | ------ | ----------- | -------------------------------------------- |
-| 0 (AA)   | 4      | RGBA        | Color in hex RGBA                            |
-| 4 (BB)   | 2      | uint16 (LE) | Spool Weight in grams (`E8 03` --> 1000 g)   |
-| 8 (CC)   | 8      | float (LE)  | Filament Diameter in milimeters              |
+| position | length | type        | Description                                |
+| -------- | ------ | ----------- | ------------------------------------------ |
+| 0 (AA)   | 4      | RGBA        | Color in hex RGBA                          |
+| 4 (BB)   | 2      | uint16 (LE) | Spool Weight in grams (`E8 03` --> 1000 g) |
+| 8 (CC)   | 8      | float (LE)  | Filament Diameter in milimeters            |
 
 ### Block 6
 
@@ -488,8 +502,8 @@ Example Data:
 Example Data:
 `__ __ __ __ AA AA __ __ __ __ __ __ __ __ __ __`
 
-| position | length | type    | Description               |
-| -------- | ------ | ------- | ------------------------- |
+| position | length | type        | Description                                         |
+| -------- | ------ | ----------- | --------------------------------------------------- |
 | 4 (AA)   | 2      | uint16 (LE) | Spool Width in µm (`E1 19` --> 6625µm --> 66.25mm ) |
 
 ### Block 12
@@ -531,6 +545,7 @@ Example Data:
 | 4 (CC)   | 4      | RGBA        | Second color in _reverse_ hex ABGR |
 
 Known Format Identifiers:
+
 - 00 00 = Empty
 - 02 00 = Color Info
 
@@ -539,15 +554,15 @@ Known Format Identifiers:
 Example Data:
 `AA AA __ __ __ __ __ __ __ __ __ __ __ __ __ __`
 
-| position | length | type        | Description                        |
-| -------- | ------ | ----------- | ---------------------------------- |
-| 0 (AA)   | 2      | **Unknown** | **Unknown**                        |
+| position | length | type        | Description |
+| -------- | ------ | ----------- | ----------- |
+| 0 (AA)   | 2      | **Unknown** | **Unknown** |
 
-## Compatible RFID tags -  By generation
+## Compatible RFID tags - By generation
 
 There are tags known as "Magic Tags" which allow functionality that's not part of the classic MIFARE spec.
 One example is that most Magic Tags allow the UID to be changed, which is normally read-only on MIFARE tags.
-Magic tags are often refered to by their "generation", eg "Magic Gen 1".  Each newer generation increases the functionality, but tends to also be more expensive)
+Magic tags are often refered to by their "generation", eg "Magic Gen 1". Each newer generation increases the functionality, but tends to also be more expensive)
 
 Gen 1 --> **Not compatible**(due to AMS checking if tag is unlockable with command 0x40)
 
