@@ -171,10 +171,10 @@ As of 2024-11-19, keys can now be derived from the UID of a tag.
 from Cryptodome.Protocol.KDF import HKDF
 from Cryptodome.Hash import SHA256
 
-uid=bytes([0x02,0x3b,0x44,0x74])
+uid = bytes([0x02,0x3b,0x44,0x74])
 master = bytes([0x9a,0x75,0x9c,0xf2,0xc4,0xf7,0xca,0xff,0x22,0x2c,0xb9,0x76,0x9b,0x41,0xbc,0x96])
 
-keys=HKDF(uid, 6, master, SHA256, 16, context=b"RFID-A\0")
+keys = HKDF(uid, 6, master, SHA256, 16, context=b"RFID-A\0")
 
 print([a.hex() for a in keys])
 ```
