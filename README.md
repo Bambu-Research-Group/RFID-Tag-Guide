@@ -123,26 +123,23 @@ A Proxmark3 Easy is sufficient for all the tasks that need to be done. You can b
 
 ## Hacking a Bambu Lab Tag and readout of its data
 
-We document here the most simple approach to get all required A-Keys and the data of the tag.
-The easiest way is to sniff the data.
-
-Update November 2024: In 2024 a new backdoor was found which requires no sniffing. Details can be found [here](https://eprint.iacr.org/2024/1275.pdf). Overall this makes it much easier get the keys and the tags data.
+We document here the most simple approach to get all required A-Keys and the data of the tag. The easiest way is to use the `fm11rf08s` script included in the Proxmark3 software.
 
 ### Proxmark3 fm11rf08s recovery script
 
-This script is included in proxmarx3 since its release "Backdoor" and later.
+In 2024, a new backdoor[^rfid-backdoor] was found that makes it much easier to obtain the data from the RFID tags. A script is included in the proxmark3 software since v4.18994 (nicknamed "Backdoor"), which allows us to utilize this backdoor. Before this script was implemented, the tag had to be sniffed by placing the spool in the AMS and sniffing the packets transferred between the tag and the AMS.
 
-Place your reader on the tag, start proxmark3 and run the following command.
+Place your reader on the tag, start proxmark3 (run `pm3`) and run the following command:
 
 `script run fm11rf08s_recovery`
 
-This requires some time but once done you receive a binary key file and a dump.
+This script takes a bit of time, but once it is complete, you will receive a binary key file and a dump.
 
-To visualize the data on the tag you can run now:
+To visualize the data on the tag, run the following:
 
 `script run fm11rf08_full -b`
 
-### Bambu Lab AMS RFID reader location
+### Bambu Lab AMS RFID reader location (legacy)
 
 The Bambu Lab AMS RFID readers are located between slots 1&2 and slots 3&4.
 
@@ -585,3 +582,5 @@ For ease of debugging and lowering the cost of failures the RFID board is revers
 
 As a nice to benefit to have is that you can manufacture boards in different colors.
 ![](rfid-board/Photo_PCB_BBL-RFID.jpg)
+
+[^rfid-backdoor]: https://eprint.iacr.org/2024/1275.pdf
