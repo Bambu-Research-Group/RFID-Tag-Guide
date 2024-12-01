@@ -95,8 +95,8 @@ Here's a high-level summary of how everything works:
 
 ### How to contribute
 
-If you have a Proxmark3 (or other RFID debugging tool), you can sniff and decrypt the contents of your tags and submit them for review.
-The more data we have, the easier it is to compare differences to learn what each byte represents. A lot of the contents have been deciphered (see [Tag stucture](#tag-stucture)), but there is still more unknown data still left.
+If you have a Proxmark3 (or other RFID debugging tool), you can sniff and decrypt the contents of your tags and submit them via [Discord](https://discord.gg/zVfCVubwr7).
+A lot of the contents have been deciphered (see [Tag stucture](#tag-stucture)), but the more data we have, the easier it is to compare differences to learn what each byte represents and double-check our answers.
 
 ## Todos/Timeline/Next steps
 
