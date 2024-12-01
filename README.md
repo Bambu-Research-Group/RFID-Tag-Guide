@@ -110,7 +110,8 @@ The more data we have, the easier it is to compare differences to learn what eac
 - Bambu Lab 3D Printer with AMS or AMS Lite
 - Bambu Lab Filament spool **or** the related tags
 - A Proxmark3-compatible RFID reader
-- The [proxmark3 software](https://github.com/RfidResearchGroup/proxmark3)
+- The [proxmark3 (Iceman fork) software](https://github.com/RfidResearchGroup/proxmark3)
+  - The official version is unmaintained, so we strongly recommend using the Iceman fork; the steps written below are written for the Iceman fork
 
 ### Proxmark3 compatible readers
 
