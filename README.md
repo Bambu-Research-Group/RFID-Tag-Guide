@@ -390,9 +390,6 @@ FUID --> **Works** "Fused UID" aka "write-once UID". Once a UID is written, it c
 
 ## Reverse engineering RFID Board
 
-For ease of debugging and lowering the cost of failures the RFID board is reverse engineered. You can find complete production ready gerber files and bill of materials in rfid-board folder
-
-As a nice to benefit to have is that you can manufacture boards in different colors.
-![](rfid-board/Photo_PCB_BBL-RFID.jpg)
+For ease of debugging and lowering the cost of failures, the RFID board is reverse-engineered. You can find complete production-ready gerber files and a bill of materials in [rfid-board](./rfid-board) folder.
 
 [^rfid-backdoor]: https://eprint.iacr.org/2024/1275.pdf
