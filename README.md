@@ -11,9 +11,8 @@ We are currently working on a way to submit the tag data in a secure way so anal
 <!--ts-->
    * [Project Summary](#project-summary)
       * [FAQs](#faqs)
-      * [How do RFID tags work?](#how-do-rfid-tags-work)
       * [How to contribute](#how-to-contribute)
-   * [Todos/Timeline/Next steps](#todostimelinenext-steps)
+      * [Todos/Timeline/Next steps](#todostimelinenext-steps)
    * [Required Equipment](#required-equipment)
       * [Proxmark3 compatible readers](#proxmark3-compatible-readers)
          * [Proxmark3 Easy](#proxmark3-easy)
@@ -21,6 +20,7 @@ We are currently working on a way to submit the tag data in a secure way so anal
       * [Proxmark3 fm11rf08s recovery script](#proxmark3-fm11rf08s-recovery-script)
       * [Sniffing the tag data (legacy method)](#sniffing-the-tag-data-legacy-method)
    * [Tag Documentation](#tag-documentation)
+   * [How do RFID tags work?](#how-do-rfid-tags-work)
    * [Compatible RFID tags - By generation](#compatible-rfid-tags---by-generation)
    * [Reverse engineering RFID Board](#reverse-engineering-rfid-board)
 <!--te-->
@@ -41,43 +41,12 @@ This is a research group dedicated to documenting the data structures used by Ba
   - Custom AMS firmware that allows custom tags to be read while ignoring the signature
   - See [Todos/Timeline/Next steps](#todostimelinenext-steps) for more info
 
-### How do RFID tags work?
-
-Here's a high-level summary of how everything works:
-
-- Bambu Lab printers use MiFare 13.56MHZ RFID tags
-  - These tags contain a unique ID that is not encrypted (called the UID)
-  - In most cases UID is fixed (not-changable). Some "hackable" RFID tags allow you to set the UID to anything you want
-- Blocks (Encrypted)
-  - MiFare tags also contain "Blocks" of data. Each block contains info about the spool, such as Material, Color, Manufacturing Date, etc.
-  - The blocks are encrypted, meaning that you need to have a KEY to decipher them
-  - Each block is encrypted with a different key
-- Encryption Keys
-  - Keys are unique to each RFID tag. Even if you discover the key for one tag, that doesn't mean you can use that same key to unlock a different tag.
-  - As of 11/19/24, keys can be derived from the UID. After reading the UID from the tag, the KDF (key derivation function) can be used to derive the 16 keys.
-  - (Outdated, sniffing is no longer required now that the KDF is known) Keys can be sniffed by using a device (such as a ProxMark 3) to listen in on the communication between the AMS and the rfid tag.
-  - Once the keys have been sniffed, they can be saved and used to read the contents of the tag directly (without an AMS). (Reminder, the saved keys will ONLY work for the tag they were sniffed from)
-- RSA Signature
-  - One of the blocks contains a 2048-bit RSA Signature
-  - RSA signatures are a way to digitally sign / certify authenticity of content, and they are effectively un-breakable (this is how things like cryptocurrency remain secure)
-  - RSA signatures encompass all of the data of the RFID tag. Changing a single byte somewhere else in the tag would require a completely different signature to be considered genuine
-  - Bambu printers check the content of the tag and then check if the signature is valid. If the signature is invalid, it rejects the tag
-- Cloning Tags
-  - Even though there is a signature, a tag can be cloned
-  - To clone a tag, it must have the same UID, identical content from the data blocks, and the identical RSA signature
-  - Changing even one byte will cause the signature to be invalid, and the tag will be rejected
-- Custom Tags
-  - This is very unlikely to happen, mostly due to the RSA signature. Only Bambu has their "Private Key" which is used to digitally sign these tags.
-  - To create a custom key, you need to know the following info:
-    - RSA Signature Private Key. You'd have to get this from bambu, good luck
-  - Since Bambu Lab will likely not remove the signature requirement, you would need custom AMS firmware to read tags and ignore the signature
-
 ### How to contribute
 
 If you have a Proxmark3 (or other RFID debugging tool), you can sniff and decrypt the contents of your Bambu Lab RFID tags and submit them via [Discord](https://discord.gg/zVfCVubwr7).
 A lot of the contents have been deciphered, but the more data we have, the easier it is to compare differences to learn what each byte represents and double-check our answers.
 
-## Todos/Timeline/Next steps
+### Todos/Timeline/Next steps
 
 - [ ] Tool for automatic trace analysis
 - [ ] Web service for tag submisson with automatic anonymized data publishing to GitHub
@@ -126,6 +95,37 @@ To read how to obtain the tag data using the legacy sniffing method, see the [Ta
 For a description of the blocks of a Bambu Lab RFID tag, see [BambuLabRfid.md](./BambuLabRfid.md).
 
 For a description of an open-source standard proposal, see [OpenSourceRfid.md](./OpenSourceRfid.md).
+
+## How do RFID tags work?
+
+Here's a high-level summary of how everything works:
+
+- Bambu Lab printers use MiFare 13.56MHZ RFID tags
+  - These tags contain a unique ID that is not encrypted (called the UID)
+  - In most cases UID is fixed (not-changable). Some "hackable" RFID tags allow you to set the UID to anything you want
+- Blocks (Encrypted)
+  - MiFare tags also contain "Blocks" of data. Each block contains info about the spool, such as Material, Color, Manufacturing Date, etc.
+  - The blocks are encrypted, meaning that you need to have a KEY to decipher them
+  - Each block is encrypted with a different key
+- Encryption Keys
+  - Keys are unique to each RFID tag. Even if you discover the key for one tag, that doesn't mean you can use that same key to unlock a different tag.
+  - As of 11/19/24, keys can be derived from the UID. After reading the UID from the tag, the KDF (key derivation function) can be used to derive the 16 keys.
+  - (Outdated, sniffing is no longer required now that the KDF is known) Keys can be sniffed by using a device (such as a ProxMark 3) to listen in on the communication between the AMS and the rfid tag.
+  - Once the keys have been sniffed, they can be saved and used to read the contents of the tag directly (without an AMS). (Reminder, the saved keys will ONLY work for the tag they were sniffed from)
+- RSA Signature
+  - One of the blocks contains a 2048-bit RSA Signature
+  - RSA signatures are a way to digitally sign / certify authenticity of content, and they are effectively un-breakable (this is how things like cryptocurrency remain secure)
+  - RSA signatures encompass all of the data of the RFID tag. Changing a single byte somewhere else in the tag would require a completely different signature to be considered genuine
+  - Bambu printers check the content of the tag and then check if the signature is valid. If the signature is invalid, it rejects the tag
+- Cloning Tags
+  - Even though there is a signature, a tag can be cloned
+  - To clone a tag, it must have the same UID, identical content from the data blocks, and the identical RSA signature
+  - Changing even one byte will cause the signature to be invalid, and the tag will be rejected
+- Custom Tags
+  - This is very unlikely to happen, mostly due to the RSA signature. Only Bambu has their "Private Key" which is used to digitally sign these tags.
+  - To create a custom key, you need to know the following info:
+    - RSA Signature Private Key. You'd have to get this from bambu, good luck
+  - Since Bambu Lab will likely not remove the signature requirement, you would need custom AMS firmware to read tags and ignore the signature
 
 ## Compatible RFID tags - By generation
 
