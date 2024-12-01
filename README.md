@@ -165,7 +165,7 @@ If you place the Proxmark in between the AMS reader and the spool, make sure tha
 
 ### Key Derivation
 
-As of 11/19/24, keys can now be derived from the UID of a tag.
+As of 2024-11-19, keys can now be derived from the UID of a tag.
 
 ```python
 from Cryptodome.Protocol.KDF import HKDF
