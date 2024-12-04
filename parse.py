@@ -7,13 +7,18 @@
 import sys
 import struct
 from datetime import datetime
+from pathlib import Path
+
+if not sys.version_info >= (3, 6):
+   print("Python 3.6 or higher is required!")
+   exit(-1)
 
 COMPARISON_BLOCKS = [1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14]
 IMPORTANT_BLOCKS = [0] + COMPARISON_BLOCKS
 
 BYTES_PER_BLOCK = 16
-BLOCKS_PER_TAG = 64
-TOTAL_BYTES = BLOCKS_PER_TAG * BYTES_PER_BLOCK
+BLOCKS_PER_TAG = [64, 72] # 64 = 1KB, 72 = Output from Proxmark fm11rf08 script
+TOTAL_BYTES = [blocks * BYTES_PER_BLOCK for blocks in BLOCKS_PER_TAG]
 
 # Byte conversions
 def bytes_to_string(data):
@@ -21,7 +26,7 @@ def bytes_to_string(data):
 
 def bytes_to_hex(data, chunkify = False):
     output = data.hex().upper()
-    return " ".join((string[0+i:2+i] for i in range(0, len(string), 2))) if chunkify else output
+    return " ".join((output[0+i:2+i] for i in range(0, len(output), 2))) if chunkify else output
 
 def bytes_to_int(data):
     return int.from_bytes(data, 'little')
@@ -77,26 +82,56 @@ class Unit():
         values = self.__get_comparison_values(self, other)
         return values[0] > values[1]
 
+class ColorList(list):
+    def __init__(self, value):
+        if type(value) in [list, tuple]:
+            super().__init__(value)
+        else:
+            super().__init__([value])
+
+    def __str__(self):
+        return " / ".join("#" + c for c in self)
+
+    def __setitem__(self, index, item):
+        super().__setitem__(index, str(item))
+
+    def insert(self, index, item):
+        super().insert(index, str(item))
+
+    def append(self, item):
+        super().append(str(item))
+
+    def extend(self, other):
+        if isinstance(other, type(self)):
+            super().extend(other)
+        else:
+            super().extend(str(item) for item in other)
+
 class Tag():
     def __init__(self, filename, data):
-        # Check to make sure the data is 1KB
-        if len(data) != TOTAL_BYTES:
+        # Check to make sure the data is 1KB or a known alternative
+        if len(data) not in TOTAL_BYTES:
             raise TagLengthMismatchError(len(data))
 
         # Store the raw data
         self.filename = filename
         self.blocks = list(data[0+i:BYTES_PER_BLOCK+i] for i in range(0, len(data), BYTES_PER_BLOCK))
 
+        self.warnings = []
+
         # Check for blank blocks
         for bi in IMPORTANT_BLOCKS:
             if self.blocks[bi] == b'\x00' * BYTES_PER_BLOCK:
-                print(f"Warning! Block {bi} is blank!")
+                self.warnings.append(f"Block {bi} is blank!")
 
         # Parse the data
+        has_extra_color_info = self.blocks[16][0:2] == b'\x02\x00'
+        
         self.data = {
             "uid": bytes_to_hex(self.blocks[0][0:4]),
             "filament_type": bytes_to_string(self.blocks[2]),
             "detailed_filament_type": bytes_to_string(self.blocks[4]),
+            "filament_color_count": bytes_to_int(self.blocks[16][2:4]) if has_extra_color_info else 1,
             "filament_color": "#" + bytes_to_hex(self.blocks[5][0:4]),
             "spool_weight": Unit(bytes_to_int(self.blocks[5][4:6]), "g"),
             "filament_length": Unit(bytes_to_int(self.blocks[14][4:6]), "m"),
@@ -116,10 +151,32 @@ class Tag():
             "x_cam_info": self.blocks[8][0:12],
             "tray_uid": self.blocks[9],
             "production_date": bytes_to_date(self.blocks[12]),
-
-            "unknown": bytes_to_string(self.blocks[13]), # Appears to be some sort of date -- on some tags, this is identical to the production date, but not always
-
+            "unknown_1": bytes_to_string(self.blocks[13]), # Appears to be some sort of date -- on some tags, this is identical to the production date, but not always
+            "unknown_2": self.blocks[17][0:2], # Only been "0100" on the PLA Silk Dual Color, "0000" otherwise
         }
+
+        # Check for a second color
+        if self.data["filament_color_count"] == 2:
+            self.data["filament_color"] += " / #" + bytes_to_hex(self.blocks[16][4:8][::-1])
+
+        # Check for any data in bits that are expected to be blank
+        expected_to_be_blank = {
+            5: [*range(6,8),*range(12,16)],
+            6: range(12,16),
+            10: [*range(0,4), *range(6,16)],
+            14: [*range(0,4), *range(6,16)],
+            17: range(2,16)
+        }
+        for block in range(18,39):
+            if block % 4 == 3:
+                continue # Skip MIFARE encryption key blocks
+            expected_to_be_blank[block] = list(range(0,16))
+
+        for block in expected_to_be_blank:
+            for pos in expected_to_be_blank[block]:
+                byte = self.blocks[block][pos]
+                if byte != 0:
+                    self.warnings.append(f"Data found in block {block}, position {pos} that was expected to be blank (received {byte})")
 
     def __str__(self, blocks_to_output = IMPORTANT_BLOCKS):
         result = ""
@@ -131,6 +188,11 @@ class Tag():
                     result += f"  - {tkey}: {self.data[key][tkey]}\n"
             else:
                 result += f"- {key}: {bytes_to_hex(self.data[key]) if type(self.data[key]) == bytes else self.data[key]}\n"
+
+        if len(self.warnings):
+            result += "- Warnings:\n"
+            for warning in self.warnings:
+                result += f"  - {warning}\n"
 
         return result[:-1]
 
@@ -157,11 +219,12 @@ def load_data(files_to_load, silent = False):
     data = []
     for filename in files_to_load:
         try:
-            with open(filename, "rb") as f:
-                newdata = Tag(filename, f.read())
+            filepath = Path(filename)
+            with open(filepath, "rb") as f:
+                newdata = Tag(filepath, f.read())
                 data.append(newdata)
         except TagLengthMismatchError:
-            if not silent: print(f"{filename} not a valid tag, skipping")
+            if not silent: print(f"{filepath} not a valid tag, skipping")
 
     return data
 

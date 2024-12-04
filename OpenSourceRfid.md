@@ -19,7 +19,15 @@ We want to make a standard that is simple to implement and as future-proof as po
     
 # Backers
 These are companies that are implementing Open 3D-RFID into their printers, filament, add-ons, etc.  If you would like to join this list, please open an Issue on GitHub.
-* [Polar Filament](https://polarfilament.com)
+* Filament Manufacturers (Sorted by date backed):
+  * [Polar Filament](https://polarfilament.com)
+  * [3D Fuel](https://www.3dfuel.com/)
+  * [Ecogenesis Biopolymers](https://ecogenesisbiopolymers.com)
+  * [Numakers](https://numakers.com/)
+* Printers + Hardware:
+  * [OpenSpool](https://www.youtube.com/watch?v=ah7dm-dtQ5w) ([GitHub Source](https://github.com/spuder/OpenSpool))
+  * [Cosmyx](https://www.cosmyx3d.com/)
+  * [Distrifab](https://distrifab.fr/)
 
 # Why RFID?
 What is the benefit of adding RFID chips to filament?
@@ -37,9 +45,10 @@ What is the benefit of adding RFID chips to filament?
 # Add RFID support to your printer
 This standard was designed to be simple to implement in firmware. You will need to add custom firmware and potentially an RFID reader (if your printer doesn't already have one).
 
-RFID support can theoretically be added to any printer using off-the-shelf RFID Modules such as the RC522 (as low as $1). This module communicates over SPI.
+RFID support can theoretically be added to any printer using off-the-shelf RFID Modules such as the PN532 (as low as $3). This module communicates over SPI.
 
-<img src="images/RC522-Reader.jpg" width=200>
+<img src="images/PN532-Reader-Blue.png" width=200>
+<img src="images/PN532-Reader-Red.png" width=200>
 
 Did you make a design to add RFID to your printer? Let us know so we can link to it here!  Designs can be 3D models, or firmware.
 
@@ -120,7 +129,7 @@ This is additional data that not all manufacturers will implement. These fields 
 |-------------|---------------|------------|----|-----|
 | Serial Number / Batch ID | String | 16 | `"1234-ABCD"`, `"2024-01-23-1234"` | An identifier to represent a serial number or batch number from manufacturing. Stored as a string, and this format will vary from manufacturer to manufacturer |
 | Manufacture Date | Int | 4 | `20240123` (Jan 23rd, 2024) | Date code in YYYYMMDD format, stored as a 32-bit integer |
-| Manufacture Time | Int | 3 | `103000` (10:30am), `152301` (3:23:01pm)  | 24-hour time code in HHMMSS format (Hour, Minumte, Second).
+| Manufacture Time | Int | 3 | `103000` (10:30am), `152301` (3:23:01pm)  | 24-hour time code in HHMMSS format (Hour, Minumte, Second), specifying UTC.
 | Spool Core Diameter (mm) | Int | 1 | `100` (mm), `80` (mm) | The diameter of the spool core, which is the part that the filament is wound around. This diameter is to estimate remaining filament by treating the tag as an encoder, and measuring how long it takes for one rotation of a spool.
 | MFI (Melt-flow index) | TBD | TBD | TBD | Format TBD. The melt-flow index describes how "melty" plastic is.  Meltier plastics can usually print faster.  Formula is somewhat complex, and often measured at different temperatures.  For example Corbion LX175 melt flow index is `MFI(210°C/2.16kg) = 6g/10min`, and `MFI(190°C/2.16kg) = 3g/10min`
 | Tolerance (Measured) | Int | 1 | `20` (±0.020mm), `55` (±0.055mm) | Actual tolerance, measured in µm (micrometers). This field is unique to each spool, and should only be populated if per-spool tolerances are measured and recorded during manufacturing. This is not a TARGET tolerance, this is ACTUAL.  If not recorded, leave undefined (0xFF)
