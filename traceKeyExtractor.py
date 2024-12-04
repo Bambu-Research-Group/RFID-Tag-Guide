@@ -28,7 +28,7 @@ def main():
     global pm3Location,dictionaryFilepath,trace
 
     print("--------------------------------------------------------")
-    print("RFID Key Extractor v0.1 - Bambu Research Group 2024")
+    print("RFID Key Extractor v0.2 - Bambu Research Group 2024")
     print("--------------------------------------------------------")
     print("This will extract the keys from a trace file")
     print("that was saved from sniffing communication between")
