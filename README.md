@@ -81,7 +81,7 @@ Place your reader on the tag, start proxmark3 (run `pm3`) and run the following 
 
 `script run fm11rf08s_recovery`
 
-This script takes a bit of time, but once it is complete, you will receive a binary key file and a dump.
+This script takes about 15-20 minutes to complete. Once it has finished, you will receive a binary key file and a dump.
 
 To visualize the data on the tag, run the following:
 
