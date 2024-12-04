@@ -8,10 +8,6 @@ if not sys.version_info >= (3, 6):
    print("Python 3.6 or higher is required!")
    exit(-1)
 
-# List of possible directories for Proxmark3 to try
-# XXX Populate with results for Windows
-pm3_dirs = []
-
 #Global variables
 #Default name of the dictionary file we create
 dictionaryFilename = "myKeyDictionary.dic"  #Arbitrary filename for storing dictionary file
@@ -247,13 +243,7 @@ def get_proxmark3_location():
         pm3_location = which_pm3.parent.parent
         print(f"Found global installation ({pm3_location})!")
         return pm3_location
-
-    # Check pm3_dirs paths
-    pm3_dirs_result = testCommands(pm3_dirs, "bin/pm3", "--help")
-    if pm3_dirs_result:
-        print(f"Found installation in {pm3_dirs_result}!")
-        return pm3_dirs_result
-
+    
     # At this point, we've tried all the paths to find it
     print("Failed to find working 'pm3' command. You can set the Proxmark3 directory via the 'PROXMARK3_DIR' environment variable.")
     exit(-1) # Halt program
