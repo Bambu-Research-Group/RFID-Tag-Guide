@@ -22,7 +22,7 @@ pm3Location = None                            #Calculated. The location of Proxm
 pm3Command = "bin/pm3"                      # The command that works to start proxmark3
 mfNonceBruteCommand = "share/proxmark3/tools/mf_nonce_brute" # The command to execute mfNonceBrute
 
-trace = "";                 #Prompted during runtime. Trace filename that the user provides
+trace = ""                 #Prompted during runtime. Trace filename that the user provides
 
 def main():
     global pm3Location,dictionaryFilepath,trace
@@ -33,9 +33,9 @@ def main():
     print("This will extract the keys from a trace file")
     print("that was saved from sniffing communication between")
     print("the AMS and RFID tag.")
-    print("");
+    print("")
     print("Instructions to sniff and save the trace can be found at")
-    print("https://github.com/Bambu-Research-Group/RFID-Tag-Guide");
+    print("https://github.com/Bambu-Research-Group/RFID-Tag-Guide")
     print("--------------------------------------------------------")
     print("")
 
@@ -44,7 +44,7 @@ def main():
     #Create a dictionary file to store keys that we discover
     print(f"Creating dictionary file '{dictionaryFilename}'")
     dictionaryFile = open(dictionaryFilename, "w")
-    dictionaryFile.close();
+    dictionaryFile.close()
     dictionaryFilepath = os.path.abspath(dictionaryFilename)
     print(f"Saved dictionary to {dictionaryFilepath}")
 
@@ -72,22 +72,22 @@ def discoverKeys():
 
     print("PROGRAM: ", mfNonceBruteCommand)
 
-    keyList = [];
+    keyList = []
 
     # Run a max of 16 times.
     for i in range(16):
-        loopNum = i+1;
+        loopNum = i+1
         print("----------------------")
         print(f"Loop {loopNum} of 16")
 
         #Run PM3 with the trace
         # -o means run without connecting to PM3 hardware
         # -c specifies commands within proxmark 3 software
-        cmd_list = [pm3Location / pm3Command,"-o","-c", f"trace load -f {trace}; trace list -1 -t mf -f {dictionaryFilepath}; exit"];
+        cmd_list = [pm3Location / pm3Command,"-o","-c", f"trace load -f {trace}; trace list -1 -t mf -f {dictionaryFilepath}; exit"]
         print(f"Viewing tracelog with {len(keyList)} discovered keys")
         print(f"pm3 {' '.join(cmd_list[1:])}")
         result = subprocess.run(cmd_list, shell=os.name == 'nt',stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        output = result.stdout;
+        output = result.stdout
 
 
 
@@ -111,20 +111,20 @@ def discoverKeys():
                 print("Found line containing a key:")
                 print(f"    {line}")
                 # split the line into "words", which are whitespace separated
-                words = line.split(" ");
+                words = line.split(" ")
 
                 key = ""
 
                 #find the word "key", and then grab the word directly after it
                 for j in range(len(words)-1):
-                    w = words[j];
+                    w = words[j]
                     if w == "key" or w == "key:":
-                        key = words[j+1];  #Guaranteed to not be out of bounds because we loop to words length - 1
+                        key = words[j+1]  #Guaranteed to not be out of bounds because we loop to words length - 1
                         break
 
                 #If we didn't find a key, skip this line
                 if key == "":
-                    continue;
+                    continue
                 
                 #If key ends with a vertical bar |, remove it
                 key = key.replace('|', '')
@@ -133,7 +133,7 @@ def discoverKeys():
                 #Add this key to our keylist if it's new
                 if key in keyList:
                     print(f"    Duplicate key, ignoring: {key}")
-                    continue;
+                    continue
                 
                 keyList.append(key)
                 print(f"    Found new key: {key}")
@@ -151,7 +151,7 @@ def discoverKeys():
                     if "mf_nonce_brute" in words[j]:
                         #Add the rest of the line to our arguments
                         args = words[j+1:] #can't be out of bounds because we loop to len(words)-1
-                        break;
+                        break
 
                 key = bruteForce(args)
 
@@ -159,14 +159,14 @@ def discoverKeys():
                 key = strip_color_codes(key)
 
                 if key == "":
-                    continue;
+                    continue
                 
                 key = key.upper()
 
                 #Add this key to our keylist if it's new
                 if key in keyList:
                     print(f"    Duplicate key, ignoring: {key}")
-                    continue;
+                    continue
                 
                 keyList.append(key)
                 print(f"    Found new key: {key}")
@@ -179,9 +179,9 @@ def discoverKeys():
         for j in range(len(keyList)):
             print(f"    {j}: {keyList[j]}")
             dictionaryFile.write(keyList[j])
-            dictionaryFile.write("\n");
+            dictionaryFile.write("\n")
         print()
-        dictionaryFile.close();
+        dictionaryFile.close()
     
     #Done! Show results
     print(f"{len(keyList)} keys saved to file: {dictionaryFilepath}")
@@ -208,7 +208,7 @@ def bruteForce(args):
         print(f"    {line}")
 
         #Parse out the key from within the brackets
-        words = line.split(" ");
+        words = line.split(" ")
         for i in range(len(words)-1):
             if words[i] == "[":
                 return words[i+1]
@@ -294,6 +294,5 @@ def testCommands(directories, command, arguments = ""):
     
     return None #We didn't find any program that worked
 
+main() #Run main program
 
-
-main(); #Run main program
