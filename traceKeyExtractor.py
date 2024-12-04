@@ -24,7 +24,7 @@ def main():
     global pm3Location,dictionaryFilepath,trace
 
     print("--------------------------------------------------------")
-    print("RFID Key Extractor v0.2 - Bambu Research Group 2024")
+    print("RFID Key Extractor v0.2.1 - Bambu Research Group 2024")
     print("--------------------------------------------------------")
     print("This will extract the keys from a trace file")
     print("that was saved from sniffing communication between")
@@ -243,7 +243,7 @@ def get_proxmark3_location():
         pm3_location = which_pm3.parent.parent
         print(f"Found global installation ({pm3_location})!")
         return pm3_location
-    
+
     # At this point, we've tried all the paths to find it
     print("Failed to find working 'pm3' command. You can set the Proxmark3 directory via the 'PROXMARK3_DIR' environment variable.")
     exit(-1) # Halt program
