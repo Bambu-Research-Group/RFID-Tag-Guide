@@ -58,8 +58,8 @@ A lot of the contents have been deciphered, but the more data we have, the easie
 - Bambu Lab Filament spool **or** the related tags
 - A Proxmark3-compatible RFID reader
 - The [proxmark3 (Iceman fork) software](https://github.com/RfidResearchGroup/proxmark3)
-  - Make sure you are using the Iceman fork as the original version of the software is unmaintained; all instructions are written for the Iceman fork and will not work on the original version
   - Requires v4.18994 (codename "Backdoor") or higher
+  - You MUST use the Iceman fork as the original version of the software is unmaintained; all instructions and scripts are written for the Iceman fork and will not work on the original version
 
 ### Proxmark3 compatible readers
 
