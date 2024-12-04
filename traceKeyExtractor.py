@@ -202,7 +202,7 @@ def bruteForce(args):
 
         #Search for the line that says valid key. Example: "Valid Key found [ 63654db94d97 ] - matches candidate"
         #In rare cases, multiple possible keys will be found. The "matches candidate" tag should indicate the right one
-        if "Valid Key" not in line or "matches candidate" not in line:
+        if not ("Valid Key" in line and "matches candidate" in line):
             continue
 
         print(f"    {line}")
