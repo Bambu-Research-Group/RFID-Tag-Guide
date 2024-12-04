@@ -294,5 +294,5 @@ def testCommands(directories, command, arguments = ""):
     
     return None #We didn't find any program that worked
 
-main() #Run main program
-
+if __name__ == "__main__":
+    main() #Run main program
