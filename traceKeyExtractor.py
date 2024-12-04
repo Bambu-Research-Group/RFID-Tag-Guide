@@ -28,7 +28,7 @@ def main():
     global pm3Location,dictionaryFilepath,trace
 
     print("--------------------------------------------------------")
-    print("RFID Key Extractor v0.1 - Bambu Research Group 2024")
+    print("RFID Key Extractor v0.2 - Bambu Research Group 2024")
     print("--------------------------------------------------------")
     print("This will extract the keys from a trace file")
     print("that was saved from sniffing communication between")
@@ -200,8 +200,9 @@ def bruteForce(args):
     for line in output.splitlines():
         line = line.decode("utf-8") #Convert from byte array to string
 
-        #Search for the line that says valid key. Example: "Valid Key found [ 63654db94d97 ]
-        if "Valid Key" not in line:
+        #Search for the line that says valid key. Example: "Valid Key found [ 63654db94d97 ] - matches candidate"
+        #In rare cases, multiple possible keys will be found. The "matches candidate" tag should indicate the right one
+        if not ("Valid Key" in line and "matches candidate" in line):
             continue
 
         print(f"    {line}")
