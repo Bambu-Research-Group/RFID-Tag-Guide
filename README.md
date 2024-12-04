@@ -89,6 +89,8 @@ To visualize the data on the tag, run the following:
 
 ### Sniffing the tag data (legacy method)
 
+Before the above script was created, tag data had to be obtained by sniffing the data between the RFID tag and the AMS.
+
 To read how to obtain the tag data using the legacy sniffing method, see the [TagSniffing.md](./TagSniffing.md).
 
 ## Tag Documentation
