@@ -44,17 +44,21 @@ def main():
     dictionaryFilepath = os.path.abspath(dictionaryFilename)
     print(f"Saved dictionary to {dictionaryFilepath}")
 
-    #Instruct the user to create a trace file
-    print()
-    print("Start by creating a trace file. In the proxmark terminal, execute command `hf 14a sniff -c -r`.")
-    print("Then, place the Proxmark3 between the RFID reader and spool.")
-    print("Load in filament and wait for the process to complete, then press the button on the Proxmark3.")
-    print("Finally, in the proxmark terminal, execute command `trace save -f [FILEPATH]` to create the trace file.")
-    print("See the GitHub repository for more details.")
-    print()
+    if len(sys.argv) > 1:
+        # If the user included an argument, assume it's the path to the tracefile
+        trace = os.path.abspath(sys.argv[1])
+    else:
+        #Instruct the user to create a trace file
+        print()
+        print("Start by creating a trace file. In the proxmark terminal, execute command `hf 14a sniff -c -r`.")
+        print("Then, place the Proxmark3 between the RFID reader and spool.")
+        print("Load in filament and wait for the process to complete, then press the button on the Proxmark3.")
+        print("Finally, in the proxmark terminal, execute command `trace save -f [FILEPATH]` to create the trace file.")
+        print("See the GitHub repository for more details.")
+        print()
 
-    #Get the tracename/filepath from user
-    trace = input("Enter trace name or full trace filepath: ")
+        #Get the tracename/filepath from user
+        trace = input("Enter trace name or full trace filepath: ")
 
     discoverKeys()
     
