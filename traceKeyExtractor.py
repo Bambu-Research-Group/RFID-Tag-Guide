@@ -18,10 +18,9 @@ pm3Location = None                            #Calculated. The location of Proxm
 pm3Command = "bin/pm3"                      # The command that works to start proxmark3
 mfNonceBruteCommand = "share/proxmark3/tools/mf_nonce_brute" # The command to execute mfNonceBrute
 
-trace = ""                 #Prompted during runtime. Trace filename that the user provides
 
 def main():
-    global pm3Location,dictionaryFilepath,trace
+    global pm3Location,dictionaryFilepath
 
     print("--------------------------------------------------------")
     print("RFID Key Extractor v0.2.1 - Bambu Research Group 2024")
@@ -60,7 +59,7 @@ def main():
         #Get the tracename/filepath from user
         trace = input("Enter trace name or full trace filepath: ")
 
-    discoverKeys()
+    discoverKeys(trace)
     
     print("Keys obtained. Remove the spool from the AMS and place the Proxmark3 on the spool's tag.")
     print(f"In proxmark terminal, execute command `hf mf fchk -f {dictionaryFilepath} --dump` to create a keyfile from this dictionary.")
@@ -68,7 +67,7 @@ def main():
 
 
 #Loop 16 times to attempt to extract all 16 keys from the tracefile
-def discoverKeys():
+def discoverKeys(traceFilepath):
 
     print("PROGRAM: ", mfNonceBruteCommand)
 
@@ -83,7 +82,7 @@ def discoverKeys():
         #Run PM3 with the trace
         # -o means run without connecting to PM3 hardware
         # -c specifies commands within proxmark 3 software
-        cmd_list = [pm3Location / pm3Command,"-o","-c", f"trace load -f {trace}; trace list -1 -t mf -f {dictionaryFilepath}; exit"]
+        cmd_list = [pm3Location / pm3Command,"-o","-c", f"trace load -f {traceFilepath}; trace list -1 -t mf -f {dictionaryFilepath}; exit"]
         print(f"Viewing tracelog with {len(keyList)} discovered keys")
         print(f"pm3 {' '.join(cmd_list[1:])}")
         result = subprocess.run(cmd_list, shell=os.name == 'nt',stdout=subprocess.PIPE, stderr=subprocess.PIPE)
