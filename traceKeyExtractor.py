@@ -18,10 +18,19 @@ pm3Location = None                            #Calculated. The location of Proxm
 pm3Command = "bin/pm3"                      # The command that works to start proxmark3
 mfNonceBruteCommand = "share/proxmark3/tools/mf_nonce_brute" # The command to execute mfNonceBrute
 
-
-def main():
+def setup():
     global pm3Location,dictionaryFilepath
 
+    pm3Location = get_proxmark3_location()
+
+    #Create a dictionary file to store keys that we discover
+    print(f"Creating dictionary file '{dictionaryFilename}'")
+    dictionaryFile = open(dictionaryFilename, "w")
+    dictionaryFile.close()
+    dictionaryFilepath = os.path.abspath(dictionaryFilename)
+    print(f"Saved dictionary to {dictionaryFilepath}")
+
+def main():
     print("--------------------------------------------------------")
     print("RFID Key Extractor v0.2.1 - Bambu Research Group 2024")
     print("--------------------------------------------------------")
@@ -34,14 +43,8 @@ def main():
     print("--------------------------------------------------------")
     print("")
 
-    pm3Location = get_proxmark3_location()
-
-    #Create a dictionary file to store keys that we discover
-    print(f"Creating dictionary file '{dictionaryFilename}'")
-    dictionaryFile = open(dictionaryFilename, "w")
-    dictionaryFile.close()
-    dictionaryFilepath = os.path.abspath(dictionaryFilename)
-    print(f"Saved dictionary to {dictionaryFilepath}")
+    # Run setup
+    setup()
 
     if len(sys.argv) > 1:
         # If the user included an argument, assume it's the path to the tracefile
