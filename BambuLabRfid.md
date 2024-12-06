@@ -91,6 +91,8 @@ Example Data:
 | 0 (AA)   | 8      | string | Tray Info Index - Material Variant ID |
 | 8 (BB)   | 8      | string | Tray Info Index - Material ID         |
 
+The material IDs all start with the letters "GF" (so far), and the material variant IDs start with the last three letters of the material ID. For example, a variant ID of `A50-K0` is associated with a material ID of `GFA50`. We'll refer to the second part (after the hyphen) of the variant IDs as "color IDs".
+
 Known Material IDs:
 
 - GFA00: Bambu PLA Basic
@@ -121,6 +123,28 @@ Known Material IDs:
 - GFS99: Generic PVA
 - GFU01: Bambu TPU 95A
 - GFU99: Generic TPU
+
+Known Color IDs:
+
+- A0:
+  - For A00: Orange (#FF671FFF)
+  - For G00: Orange (#FF6A13FF)
+- B3: Marine Blue (#0078BFFF)
+- B4: Blue (#0085ADFF)
+- B7: Royal Purple (#483D8BFF)
+- D0: Grey (#8E9089FF)
+- D1: Silver (#A6A9AAFF)
+- G1:
+  - For A15: Nebulae (#424379FF)
+  - Others: Green (#00AE42FF)
+- G6: Green (#00AE42FF)
+- K0, K1: Black (#000000FF)
+- P0: Purple (#D6ABFF80)
+- T3: Neon City (Blue-Magenta) (#0047BBFF / #BB22A3F)
+- W0, W1: White (#FFFFFFFF)
+- W2: Ivory White (#FFFFFFFF)
+- Y3: Bronze (#84754EFF)
+
 
 ## Block 2
 
