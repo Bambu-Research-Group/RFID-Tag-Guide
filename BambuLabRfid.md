@@ -95,11 +95,18 @@ Known Material IDs:
 
 - GFA00: Bambu PLA Basic
 - GFA01: Bambu PLA Matte
+- GFA05: Bambu PLA Silk
+- GFA08: Bambu PLA Sparkle
+- GFA09: Bambu PLA Tough
+- GFA15: Bambu PLA Galaxy
+- GFA50: Bambu PLA-CF
 - GFB00: Bambu ABS
 - GFB98: Generic ASA
 - GFB99: Generic ABS
 - GFC00: Bambu PC
 - GFC99: Generic PC
+- GFG00: Bambu PETG Basic
+- GFG01: Bambu PETG Translucent
 - GFG99: Generic PETG
 - GFL00: PolyLite PLA
 - GFL01: PolyTerra PLA
@@ -110,9 +117,11 @@ Known Material IDs:
 - GFN99: Generic PA
 - GFS00: Bambu Support W
 - GFS01: Bambu Support G
+- GFS02: Bambu Support for PLA
 - GFS99: Generic PVA
 - GFU01: Bambu TPU 95A
 - GFU99: Generic TPU
+
 ## Block 2
 
 Example Data:
