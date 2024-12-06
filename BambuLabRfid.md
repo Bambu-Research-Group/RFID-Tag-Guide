@@ -86,11 +86,33 @@ Example Data:
 Example Data:
 `AA AA AA AA AA AA AA AA BB BB BB BB BB BB BB BB`
 
-| position | length | type   | Description                                   |
-| -------- | ------ | ------ | --------------------------------------------- |
-| 0 (AA)   | 8      | string | Tray Info Index - Material Variant Identifier |
-| 8 (BB)   | 16     | string | Tray Info Index - Unique Material Identifier  |
+| position | length | type   | Description                           |
+| -------- | ------ | ------ | ------------------------------------- |
+| 0 (AA)   | 8      | string | Tray Info Index - Material Variant ID |
+| 8 (BB)   | 8      | string | Tray Info Index - Material ID         |
 
+Known Material IDs:
+
+- GFA00: Bambu PLA Basic
+- GFA01: Bambu PLA Matte
+- GFB00: Bambu ABS
+- GFB98: Generic ASA
+- GFB99: Generic ABS
+- GFC00: Bambu PC
+- GFC99: Generic PC
+- GFG99: Generic PETG
+- GFL00: PolyLite PLA
+- GFL01: PolyTerra PLA
+- GFL98: Generic PLA-CF
+- GFL99: Generic PLA
+- GFN03: Bambu PA-CF
+- GFN98: Generic PA-CF
+- GFN99: Generic PA
+- GFS00: Bambu Support W
+- GFS01: Bambu Support G
+- GFS99: Generic PVA
+- GFU01: Bambu TPU 95A
+- GFU99: Generic TPU
 ## Block 2
 
 Example Data:
