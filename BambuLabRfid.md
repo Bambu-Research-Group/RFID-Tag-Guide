@@ -169,9 +169,9 @@ Example Data:
 Example Data:
 `__ __ __ __ AA AA __ __ __ __ __ __ __ __ __ __`
 
-| position | length | type        | Description                                         |
-| -------- | ------ | ----------- | --------------------------------------------------- |
-| 4 (AA)   | 2      | uint16 (LE) | Spool Width in µm (`E1 19` --> 6625µm --> 66.25mm ) |
+| position | length | type        | Description                                           |
+| -------- | ------ | ----------- | ----------------------------------------------------- |
+| 4 (AA)   | 2      | uint16 (LE) | Spool Width in mm*100 (`E1 19` --> 6625 --> 66.25mm ) |
 
 ## Block 12
 
