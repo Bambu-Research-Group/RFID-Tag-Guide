@@ -63,11 +63,11 @@ All Bambu Lab tags use the same Permission Bits (Access Control)
 Example Data:
 `AA AA AA AA AA AA PP PP PP PP BB BB BB BB BB BB`
 
-| position | length | type    | Description                                                                    |
-| -------- | ------ | ------- | ------------------------------------------------------------------------------ |
-| 0 (AA)   | 6      | RAW Bin | A-Key                                                                          |
-| 6 (PP)   | 4      | RAW Bin | Permission Bits (Access Control)<br>ALWAYS `87 87  87 69` (hex) for Bambu Tags |
-| 10 (BB)  | 6      | RAW Bin | B-Key (always `00 00 00 00 00 00` for Bambu tags)                              |
+| position | length | type    | Description                                                            |
+| -------- | ------ | ------- | ---------------------------------------------------------------------- |
+| 0 (AA)   | 6      | RAW Bin | A-Key                                                                  |
+| 6 (PP)   | 4      | RAW Bin | Permission Bits (Access Control) (always `87 87 87 69` for Bambu Tags) |
+| 10 (BB)  | 6      | RAW Bin | B-Key (always `00 00 00 00 00 00` for Bambu tags)                      |
 
 ## Block 0
 
