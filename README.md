@@ -13,12 +13,12 @@ We are currently working on a way to submit the tag data in a secure way so anal
       * [FAQs](#faqs)
       * [How to contribute](#how-to-contribute)
       * [Todos/Timeline/Next steps](#todostimelinenext-steps)
-   * [Required Equipment](#required-equipment)
+   * [Requirements](#requirements)
       * [Proxmark3 compatible readers](#proxmark3-compatible-readers)
          * [Proxmark3 Easy](#proxmark3-easy)
    * [Hacking a Bambu Lab Tag and readout of its data](#hacking-a-bambu-lab-tag-and-readout-of-its-data)
       * [Proxmark3 fm11rf08s recovery script](#proxmark3-fm11rf08s-recovery-script)
-      * [Sniffing the tag data (legacy method)](#sniffing-the-tag-data-legacy-method)
+      * [Sniffing the tag data with a Proxmark3 (legacy method)](#sniffing-the-tag-data-with-a-proxmark3-legacy-method)
    * [Tag Documentation](#tag-documentation)
    * [How do RFID tags work?](#how-do-rfid-tags-work)
    * [Compatible RFID tags - By generation](#compatible-rfid-tags---by-generation)
@@ -43,7 +43,7 @@ This is a research group dedicated to documenting the data structures used by Ba
 
 ### How to contribute
 
-If you have a Proxmark3 (or other RFID debugging tool), you can sniff and decrypt the contents of your Bambu Lab RFID tags and submit them via [Discord](https://discord.gg/zVfCVubwr7).
+If you have a Proxmark3 (or other RFID debugging tool), you can decrypt the contents of your Bambu Lab RFID tags and submit them via [Discord](https://discord.gg/zVfCVubwr7).
 A lot of the contents have been deciphered, but the more data we have, the easier it is to compare differences to learn what each byte represents and double-check our answers.
 
 ### Todos/Timeline/Next steps
@@ -53,8 +53,10 @@ A lot of the contents have been deciphered, but the more data we have, the easie
 - [ ] Tag content analysis
 - [ ] Generate keys based on an arbitrary UID
 
-## Required Equipment
+## Requirements
 
+- A computer running macOS or Linux, or a Windows computer with a WSL installation
+- Python 3.6 or higher
 - Bambu Lab Filament spool **or** the related tags
 - A Proxmark3-compatible RFID reader
 - The [proxmark3 (Iceman fork) software](https://github.com/RfidResearchGroup/proxmark3)
@@ -87,7 +89,7 @@ To visualize the data on the tag, run the following:
 
 `script run fm11rf08_full -b`
 
-### Sniffing the tag data (legacy method)
+### Sniffing the tag data with a Proxmark3 (legacy method)
 
 Before the above script was created, tag data had to be obtained by sniffing the data between the RFID tag and the AMS.
 
@@ -125,7 +127,7 @@ Here's a high-level summary of how everything works:
   - To clone a tag, it must have the same UID, identical content from the data blocks, and the identical RSA signature
   - Changing even one byte will cause the signature to be invalid, and the tag will be rejected
 - Custom Tags
-  - This is very unlikely to happen, mostly due to the RSA signature. Only Bambu has their "Private Key" which is used to digitally sign these tags.
+  - This is very unlikely to happen, mostly due to the RSA signature. Only Bambu Lab has their "Private Key" which is used to digitally sign these tags.
   - To create a custom key, you need to know the following info:
     - RSA Signature Private Key. You'd have to get this from bambu, good luck
   - Since Bambu Lab will likely not remove the signature requirement, you would need custom AMS firmware to read tags and ignore the signature

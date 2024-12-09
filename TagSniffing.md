@@ -59,7 +59,7 @@ print([a.hex() for a in keys])
    - Load a strand of filament into the AMS. This is what triggers the AMS to attempt to read the RFID tag.
    - Press the button on the ProxMark to end capture after the filament has completed loading
 
-3. **Extract the Keys**
+3. **Obtain the Keys**
 
    1. **Automatic** (recommended)
 
