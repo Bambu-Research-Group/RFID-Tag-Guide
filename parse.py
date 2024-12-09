@@ -6,6 +6,7 @@
 
 import sys
 import struct
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -46,6 +47,26 @@ def bytes_to_date(data):
         hour=int(parts[3]),
         minute=int(parts[4])
     )
+
+# Flipper Helper
+def strip_flipper_data(string):
+    # Remove comments
+    pattern = re.compile(r"^[\w\s]+: [\w\s\d?]+$", re.M)
+    data = dict([x.split(": ") for x in pattern.findall(string.decode())])
+    
+    # Ensure the scan file is for the proper type of tag
+    assert(data.get("Version") == "4")
+    assert(data.get("Data format version") == "2")
+    assert(data.get("Device type") == "Mifare Classic")
+    assert(data.get("Mifare Classic type") == "1K")
+
+    output = b""
+
+    for key in data:
+        if key.startswith("Block "):
+            output += bytes.fromhex(data[key].replace("??", "00"))
+
+    return output
 
 # Classes
 
@@ -110,6 +131,9 @@ class ColorList(list):
 class Tag():
     def __init__(self, filename, data):
         # Check to make sure the data is 1KB or a known alternative
+        if data.startswith(b"Filetype: Flipper NFC"):
+            # Flipper NFC dump
+            data = strip_flipper_data(data)
         if len(data) not in TOTAL_BYTES:
             raise TagLengthMismatchError(len(data))
 
