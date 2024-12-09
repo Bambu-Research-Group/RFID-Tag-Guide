@@ -59,10 +59,12 @@ A lot of the contents have been deciphered, but the more data we have, the easie
 - A computer running macOS or Linux, or a Windows computer with a WSL installation
 - Python 3.6 or higher
 - Bambu Lab Filament spool **or** the related tags
-- A Proxmark3-compatible RFID reader
-- The [proxmark3 (Iceman fork) software](https://github.com/RfidResearchGroup/proxmark3)
-  - Requires v4.18994 (codename "Backdoor") or higher
-  - You MUST use the Iceman fork as the original version of the software is unmaintained; all instructions and scripts are written for the Iceman fork and will not work on the original version
+- An NFC/RFID reader that can read encrypted tags, such as...
+  - A Proxmark3-compatible RFID reader (recommended)
+    - The [proxmark3 (Iceman fork) software](https://github.com/RfidResearchGroup/proxmark3)
+      - Requires v4.18994 (codename "Backdoor") or higher
+      - You MUST use the Iceman fork as the original version of the software is unmaintained; all instructions and scripts are written for the Iceman fork and will not work on the original version
+  - A Flipper Zero
 
 ### Proxmark3 compatible readers
 
@@ -86,6 +88,10 @@ First, obtain the tag's UID:
   1. Run the Proxmark3 software by running `pm3` in the terminal
   2. Place the Proxmark3 device on the RFID tag of the spool
   3. Run `hf mf info` and look for the UID line item
+- Flipper Zero
+  1. Open the NFC app and scan the tag
+  2. The Flipper will attempt to decrypt the tag, but you can skip the "Nested Dictionary (Backdoor)" step for speed
+  3. The UID of the tag will appear on-screen
 - Bambu Lab AMS
   1. Load the spool into an AMS slot and wait for it to finish loading
   2. View the spool's details on the printer's touchscreen, Bambu Studio or Bambu Handy
@@ -99,6 +105,14 @@ Then, use the keys file to extract the data from the RFID tag:
   1. Run the Proxmark3 software by running `pm3` in the terminal
   2. Place the Proxmark3 device on the RFID tag of the spool
   3. Run `hf mf dump -k ./keys.dic` to dump the RFID tag's contents
+- Flipper Zero
+  1. Open the qFlipper program and connect your Flipper to your computer
+    - You may also connect the SD card directly to your computer
+  2. Navigate to `SD Card/nfc/assets/`
+  3. Copy the `mf_classic_dict_user.nfc` file to your computer
+  4. Copy the contents of `keys.dic` to `mf_classic_dict_user.nfc`
+  5. Copy `mf_classic_dict_user.nfc` back onto your Flipper
+  6. Use the NFC app to scan your tag
 
 ### Proxmark3 fm11rf08s recovery script
 
