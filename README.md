@@ -17,6 +17,7 @@ We are currently working on a way to submit the tag data in a secure way so anal
       * [Proxmark3 compatible readers](#proxmark3-compatible-readers)
          * [Proxmark3 Easy](#proxmark3-easy)
    * [Hacking a Bambu Lab Tag and readout of its data](#hacking-a-bambu-lab-tag-and-readout-of-its-data)
+      * [Deriving the keys](#deriving-the-keys)
       * [Proxmark3 fm11rf08s recovery script](#proxmark3-fm11rf08s-recovery-script)
       * [Sniffing the tag data with a Proxmark3 (legacy method)](#sniffing-the-tag-data-with-a-proxmark3-legacy-method)
    * [Tag Documentation](#tag-documentation)
@@ -75,6 +76,30 @@ A Proxmark3 Easy is sufficient for all the tasks that need to be done. You can b
 
 We document here the most simple approach to get all required A-Keys and the data of the tag. The easiest way is to use the `fm11rf08s` script included in the Proxmark3 software.
 
+### Deriving the keys
+
+A way to derive the keys from the UID of an RFID tag was discovered, which unlocked the ability to scan and scrape RFID tag data without sniffing, as well as with other devices like the Flipper Zero. A script is included in the repository to derive the keys from the UID of a tag.
+
+First, obtain the tag's UID:
+
+- Proxmark3
+  1. Run the Proxmark3 software by running `pm3` in the terminal
+  2. Place the Proxmark3 device on the RFID tag of the spool
+  3. Run `hf mf info` and look for the UID line item
+- Bambu Lab AMS
+  1. Load the spool into an AMS slot and wait for it to finish loading
+  2. View the spool's details on the printer's touchscreen, Bambu Studio or Bambu Handy
+  3. The UID is the first eight characters of the spool's serial number
+
+Next, run the key derivation script and pipe its output to a file by running `python3 deriveKeys.py [UID] > ./keys.dic`.
+
+Then, use the keys file to extract the data from the RFID tag:
+
+- Proxmark3
+  1. Run the Proxmark3 software by running `pm3` in the terminal
+  2. Place the Proxmark3 device on the RFID tag of the spool
+  3. Run `hf mf dump -k ./keys.dic` to dump the RFID tag's contents
+
 ### Proxmark3 fm11rf08s recovery script
 
 In 2024, a new backdoor[^rfid-backdoor] was found that makes it much easier to obtain the data from the RFID tags. A script is included in the proxmark3 software since v4.18994 (nicknamed "Backdoor"), which allows us to utilize this backdoor. Before this script was implemented, the tag had to be sniffed by placing the spool in the AMS and sniffing the packets transferred between the tag and the AMS.
@@ -91,7 +116,7 @@ To visualize the data on the tag, run the following:
 
 ### Sniffing the tag data with a Proxmark3 (legacy method)
 
-Before the above script was created, tag data had to be obtained by sniffing the data between the RFID tag and the AMS.
+Before the above methods were developed, tag data had to be obtained by sniffing the data between the RFID tag and the AMS using a Proxmark3-compatible device.
 
 To read how to obtain the tag data using the legacy sniffing method, see the [TagSniffing.md](./TagSniffing.md).
 
