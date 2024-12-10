@@ -138,7 +138,9 @@ To read how to obtain the tag data using the legacy sniffing method, see the [Ta
 
 For a description of the blocks of a Bambu Lab RFID tag, see [BambuLabRfid.md](./BambuLabRfid.md).
 
-For a description of an open-source standard proposal, see [OpenSourceRfid.md](./OpenSourceRfid.md).
+For a description of the blocks of a Creality RFID tag, see [CrealityRfid.md](./CrealityRfid.md).
+
+An open-source standard proposal, Open 3D-RFID, is being incubated in this repository.  For a description of the standard, see [OpenSourceRfid.md](./OpenSourceRfid.md).
 
 ## How do RFID tags work?
 
