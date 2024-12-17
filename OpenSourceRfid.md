@@ -1,21 +1,29 @@
-# Open Source RFID Standard (Open 3D-RFID)
-More AMS clones are coming, and there shouldn't be a proprietary format for every 3D printer.
-This standard is designed to create compatibility across different 3D printers and Filament Manufacturers by creating a format that everyone can follow
+# OpenTag: Open Source RFID Standard
+RFID is becoming more prevalent, with each company launching their own RFID system that is incompatible with the rest.
+OpenTag strives to be a standard that allows RFID tags to work across 3D Printer Brands, Filament Brands, and Accessory Brands.
 
-We want to make a standard that is simple to implement and as future-proof as possible. Therefore, it's important to get input from Filament Manufacturers, 3D Printer Manufacturers, and smart people in the 3D Printer community.
+OpenTag aims to standardize the following:
+* **Hardware** - The specific underlying RFID technology
+* **Mechanical Requirements** - Positioning of tag on the spool
+* **Data Structure** - What data should be stored on the RFID tag, and how that data should be formatted
+* **Web API** - How extended data should be formatted when an optional online spool lookup is requested
+
 
 <img src="images/SpoolTag.jpg" height=300>
 
 # Table of Contents
 * [Backers](#backers)
 * [Why RFID](#why-rfid)
+* [OpenTag Standards](#opentag-standards)
+    * [Hardware Standard](#hardware-standard)
+    * [Mechanical Standard](#mechanical-standard)
+    * [Data Structure Standard](#data-structure-standard)
+    * [Web API Standard](#web-api-standard)
 * [Add RFID support to your printer](#add-rfid-support-to-your-printer)
-* [RFID Hardware](#rfid-hardware)
-* [Mechanical Requirements](#mechanical-requirements)
-* [Data Structure](#data-structure)
-    * [RFID Memory](#rfid-memory)
-    * [Lookup Tables vs Plain-Text](#lookup-tables-vs-plain-text)
-    * [Data Points](#data-points)
+* [OpenTag Consortium](#opentag-consortium)
+    * [Voting Members](#voting-members)
+    * [Non-Voting Members](#non-voting-members)
+* [Previous Considerations](#previous-considerations)
     
 # Backers
 These are companies that are implementing Open 3D-RFID into their printers, filament, add-ons, etc.  If you would like to join this list, please open an Issue on GitHub.
@@ -52,67 +60,36 @@ RFID support can theoretically be added to any printer using off-the-shelf RFID 
 
 Did you make a design to add RFID to your printer? Let us know so we can link to it here!  Designs can be 3D models, or firmware.
 
-# RFID Hardware
-MiFare 13.56MHZ Classic 1K tags
-
-These are cheap, common, and allow 1kilobyte of data to be stored on them, which is plenty of space to store required information.  13.56Mhz readers are also very low-cost, and there are plenty of arduino-compatible reader/writers to allow user-made printer upgrades to add RFID support.
-
-# Mechanical Requirements
-Requirements are not set in stone.  Still open to discussion. 
-
-Requirements
-* Tag center should be 56.0mm away from the center of the spool (see pic)
-* The tag should never be more than 4.0mm away from the outside edge of the spool.  For spool sides thicker than 4mm, there must be a cutout to embed the tag, or the tag should be fixed to the outside of the spool
-* Two tags should be used, one on each end of the spool
-
-<img src="images/TagLocation.png" width="400">
-
-# Data Structure
-
-## RFID Memory
-MiFare 1K chips store 1024 bytes across 16 **sectors**, 4 **blocks** per sector, and 16 bytes per block.  The last block of each sector contains key information, and cannot be used for custom data. This means that each sector contains 3 blocks of usable data, for a total of 48 bytes of usable memory per sector
+# OpenTag Standards
+## Hardware Standard
+NFC NTAG216: 13.56mhz 888-byte
 
 <img src="images/mifareclassicsticker.jpg" width="200">
 
-Note: There are 2k chips that allow 2048 bytes, but they are less common and more expensive.
+NTAG216 tags are cheap, common, and allow 888 bytes of data, which is plenty of space to store required information. NFC tags such as NTAG216 can be read/written with android smartphones. 13.56mhz RFID modules are plentiful and low-cost and are arduino-compatible to allow for new projects to be spun up.
 
-## Lookup Tables vs Plain-Text
-This is still open to debate, feel free to weigh in.
+NFC NTAG216 was chosen over MIFARE 1K Classic tags, which is what the Bambu AMS uses.  NTAG216 was chosen over MIFARE 1K for the following reasons:
+* More memory (NTAG216: 888-bytes usable, MF1K: 768-bytes usable)
+* Smartphone Support: NTAG216 can be read from smartphones, while MF1K requires a dedicated reader
 
-In general, this project prefers plain-text over lookup tables for things like material, color, etc.
+## Mechanical Standard
+* Tag placement: center should be 56.0mm away from the center of the spool (see pic)
+* The tag should never be more than 4.0mm away from the external surface of the spool. For spool sides thicker than 4mm,there must be a cutout to embed the tag, or the tag should be fixed to the outside of the spool
+* Two tags should be used, one on each end of the spool, directly across from eachother
 
-**Plain Text**: Plain text will store things like color + material as strings.  Examples: `PLA`, `ABS`, `High-Speed PLA`.  Plain text data takes up more room on the chip, but it allows us to future-proof against new materials that don't exist yet.  Downsides about plain text is that there can be variance in naming convention.  One brand might use `HS PLA` and another might use `High-Speed PLA` or even `Fast PLA`.  The freedom to create new materials comes at the cost of inconsistent naming conventions. This makes it difficult if a 3D printer wants to perform special operations based on the material.
-Free text also allows manufacturers to decide on their own material names without needing prior approval to be added to a list of approved materials.
-Plain text will need a max-string limit, eg "16 bytes".  All strings will occupy this amount of memory, regardless of whether or not they use the entire length.
+<img src="images/TagLocation.png" width="400">
 
-**Plain Text Example:**
+## Data Structure Standard
 
-All strings use 16 bytes of memory, unused space is wasted:
- | RFID Memory Contents | Material Name  | Memory Impact |
- |----------------------|----------------|---------------|
- | `"PLA"`              | PLA            | 16-bytes      |
- | `"ABS"`              | ABS            | 16-bytes      |
- | `"High-Speed PLA"`   | High-Speed PLA | 16-bytes      |
-    
-**Lookup Table**: Lookup tables would map a number to a material. This uses significantly less memory, as the tag only needs to store a number, likely as a 2-byte number (allowing 65,536 different materials). A 2-byte ID would use much less memory than plain-text such as `High-Speed PLA` (which is 14 bytes).  Lookup tables put more stress on 3D printer manufacturers because the firmware would have to store a copy of this lookup table.  If a new material is released in the future, then the printer's firmware would need to be updated to know of its existance.  There would also need to be a committee to decide which materials are allowed to be added to this lookup table.  For example, there are many variants of PLA alone, such as `PLA`, `PLA+`, `HTPLA`, `ePLA`,`Fast-PLA`,`Soft PLA`,`Tough PLA`,`Smoothable PLA`, etc.  There will likely be many more materials that may never catch on.  Once they are added to this lookup table, they will never go away.
-
-**Lookup table example:**
- | Material ID | Material Name | Memory Impact |
- |-------------|---------------|---------------|
- | 1           | PLA           | 2 bytes       |
- | 2           | ABS           | 2 bytes       |
- | 3           | High-Speed PLA| 2 bytes       |
-
-## Data Points
 This is a list of data that will live on the RFID chip, separated into required and optional data.  All REQUIRED data must be populated to be compliant with this open source RFID protocol.
 
-1K chips have 1024 bytes of total memory, with 768 bytes of usable memory (remaining memory is used for keys/encryption)
+NTAG216 tags have 888 bytes of total memory.
 
 ### Required Data
 All chips MUST contain this information, otherwise they are considered non-compliant
 | Field | Data Type | Size (bytes) | Example | Description
 |-------------|---------------|------------|----|-----|
-| Tag Version | Int | 2 | `1234` | RFID tag data format version to allow future compatibility in the event that the data format changes dramatically. Stored as an int with implied decimal points. Eg `1000` -> `version 1.000`|
+| Tag Version | Int | 2 | `1234` | RFID tag data format version to allow future compatibility in the event that the data format changes dramatically. Stored as an int with 3 implied decimal points. Eg `1000` -> `version 1.000`|
 | Filament Manufacturer | String | 16 | `"Polar Filament"` | String representation of filament manufacturer.  16 bytes is the max data length per-block. Longer names will be abbreviated or truncated |
 | Material Name | String | 16 | `"PLA"` or `"Glass-Filled PC"` | Material name in plain text |
 | Color Name | String | 32 | `"Blue"` or `"Electric Watermellon"` | Color in plain text. Color spans 2-blocks |
@@ -123,7 +100,7 @@ All chips MUST contain this information, otherwise they are considered non-compl
 | Density | Int | 2 | `1240` (1.240g/cm<sup>3</sup>), `3900` (3.900g/cm<sup>3</sup>) | Filament density, measured in µg (micrograms) per cubic centimeter.
 
 ### Optional Data
-This is additional data that not all manufacturers will implement. These fields are populated if available.  All unused fields should be populated with "-1" (all 1's in binary, eg 0xFFFFFFFFFFFFFFFF)
+This is additional data that not all manufacturers will implement, typically due to technological restrictions. These fields are populated if available.  All unused fields must be populated with "-1" (all 1's in binary, eg 0xFFFFFFFFFFFFFFFF)
 
 | Field | Data Type | Size (bytes) | Example | Description
 |-------------|---------------|------------|----|-----|
@@ -141,6 +118,47 @@ This is additional data that not all manufacturers will implement. These fields 
 | Color Hex | Int | 3 | `0xffa64d` (Light orange color) | Color hexcode. Hex is a 3-byte number in the format 0xRRGGBB (Red, Green, Blue, one byte each) |
 | Max Dry Temp (C) | Int | 1 | `55` (55C), `50` (50C) Maximum drying temperature in Degrees-C. Drying above this temperature can damage the filament
 
+### Web API Standard
+Some tags can contain extended data that doesn't fit or doesn't belong on the RFID tag itself.  One example is a diameter graph, which is too much data to be stored within only 888 bytes of memory.
 
-## Memory Map
-A list of where each datapoint lives in memory, sorted into sectors and blocks.  This will be generated after the [Data Points](#data-points) section has been mostly finalized.
+These complex variables can be looked up using the "web api" url that is on the RFID tag.
+
+The format of this data should be JSON
+The exact contents of this data is still open to discussion, and it is not required to launch the OpenTag standard.  The web API can be implemented in the future without affecting the launch of OpenTag. 
+
+## OpenTag Consortium
+The OpenTag Consortium is a collaborative group of 3D printing companies, hobbyists, RFID experts, and other stakeholders committed to maintaining and evolving the OpenTag RFID standard specification. The consortium operates under a structured membership model, ensuring a balance of inclusivity and effective decision-making.
+
+### Voting Members
+Voting members play a critical role in the governance of the OpenTag standard. They have the authority to vote on proposals related to modifying the specification. Their decisions shape the future direction of OpenTag, ensuring it meets the needs of the community and industry.
+
+To maintain fairness and inclusivity, the voting seats are divided equally between:
+
+* Industry Representatives: Voting members representing companies and organizations involved in 3D printing, RFID, and related fields.
+* Community Representatives: Voting members from the broader community, including hobbyists, independent developers, and RFID experts.
+
+This balanced structure ensures that no single group dominates decision-making, fostering a standard that reflects the interests of both professional and grassroots contributors.
+
+### Non-Voting Members
+Non-voting members are integral to the consortium's ecosystem, contributing ideas and fostering collaboration. While they cannot directly vote on proposals, they can:
+
+* **Propose Changes**: Submit new ideas or modifications to the specification, which voting members will evaluate and vote on.
+* **Elect Voting Members**: Participate in elections to select voting members through a popular vote, ensuring representation aligns with the community’s vision.
+This dual-tier structure enables broad participation while maintaining an efficient and organized decision-making process.
+
+
+## Previous Considerations
+These are topics that are commonly brought up when learning about OpenTag.  Below is a quick summary of each topic, and why we decided to settle on the standards we defined.
+
+* NTAG216 vs MIFARE:
+    * NTAG216 is compatible with smartphones, and has slightly more usable memory than MIFARE tags
+    * MIFARE uses about 25% of memory to encrypt data, preventing read/write operations, which is not applicable for OpenTag because of the open source nature
+* JSON vs Memory Map:
+    * Formats such as JSON (human-readable text) takes up considerably more more memory than memory mapped.  For example, defining something like Printing Temperature would be `PrintTemp:225` which is 13-bytes, vs storing a memory mapped 2-byte number.  Tokens could be reduced, but that also defeats the purpose of using JSON in the first place, which is often for readability.
+    * Tags only have 888 bytes of memory, which would be eaten up quickly
+* Lookup Tables
+    * OpenTag does NOT use lookup tables, which would be too difficult to maintain due to the decentralized nature of this standard.
+    * Lookup tables can become out of date, which would require regular "firmware updates" to devices that read tags to make sure they've downloaded the most recent table.
+    * Storing lookup tables consumes more memory on the device that reads tags
+    * On-demand lookup (via internet) would require someone host a database. Hosting this data would have costs associated with it, and would also put the control of the entire OpenTag format in the hands of a single person/company
+    * Rather than representing data as a number (such as "company #123 = Example Company), the plain-text company name should be used instead
