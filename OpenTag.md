@@ -1,4 +1,4 @@
-# Open Source RFID Standard (Open 3D-RFID)
+# Open Source RFID Standard (OpenTag)
 More AMS clones are coming, and there shouldn't be a proprietary format for every 3D printer.
 This standard is designed to create compatibility across different 3D printers and Filament Manufacturers by creating a format that everyone can follow
 
@@ -18,7 +18,7 @@ We want to make a standard that is simple to implement and as future-proof as po
     * [Data Points](#data-points)
     
 # Backers
-These are companies that are implementing Open 3D-RFID into their printers, filament, add-ons, etc.  If you would like to join this list, please open an Issue on GitHub.
+These are companies that are implementing OpenTag into their printers, filament, add-ons, etc.  If you would like to join this list, please open an Issue on GitHub.
 * Filament Manufacturers (Sorted by date backed):
   * [Polar Filament](https://polarfilament.com)
   * [3D Fuel](https://www.3dfuel.com/)
