@@ -30,7 +30,6 @@ DICTIONARY_BIN_FILEPATH = ""        #Calculated based on the tag UID
 PM3_LOCATION = None                 #Calculated. The location of Proxmark3 as a Path object
 PM3_COMMAND = "bin/pm3"             #The command that works to start proxmark3
 PM3_COMMAND_FAST = "bin/proxmark3"  #Command to start the proxmark3 faster, but requires the correct UART port
-BACKDOOR_SCRIPT = "share/proxmark3/pyscripts/mf_backdoor_dump.py" 
 UART_PORT = ""                      #Calculated during first connection to Proxmark3, speeds up future connections
 
 def main(args):
@@ -69,8 +68,6 @@ def main(args):
     DICTIONARY_FILEPATH = str(outDir / dictionaryFilename)
     dictionaryBinFilename = dictionaryFilename + ".bin"
     DICTIONARY_BIN_FILEPATH = str(outDir / dictionaryBinFilename)
-    #print(DICTIONARY_FILEPATH)
-    #print(DICTIONARY_BIN_FILEPATH)
     
     usedBackdoorMethod = False
     if args.backdoor:
