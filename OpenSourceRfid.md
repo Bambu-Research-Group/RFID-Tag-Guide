@@ -66,14 +66,14 @@ NFC NTAG216: 13.56 MHz 888-byte tags
 
 <img src="images/mifareclassicsticker.jpg" width="200">
 
-NTAG216 tags are cheap, common, and allow 888 bytes of data, which is plenty of space to store required information. NFC tags such as NTAG216 can be read/written with smartphones. 13.56 MHz RFID modules are plentiful, low-cost and Arduino-compatible, allowing for easy integration.
+NTAG216 tags are cheap and common. They allow 888 bytes of data, which is plenty of space to store required information. NFC tags such as NTAG216 can be read/written with smartphones. 13.56 MHz RFID modules are plentiful, low-cost and Arduino-compatible, allowing for easy integration.
 
 NFC NTAG216 was chosen over MIFARE 1K Classic tags, which is what the Bambu AMS uses, for the following reasons:
 * More memory (NTAG216: 888-bytes usable, MF1K: 768-bytes usable)
 * Smartphone Support: NTAG216 can be read from smartphones, while MF1K requires a dedicated reader
 
 ## Mechanical Standard
-* Tag placement: center should be 56.0mm away from the center of the spool (see pic)
+* Tag placement: The center should be 56.0mm away from the center of the spool (see pic)
 * The tag should never be more than 4.0mm away from the external surface of the spool
   * For spool sides thicker than 4mm, there must be a cutout to embed the tag, or the tag should be fixed to the outside of the spool
 * Two tags should be used, one on each end of the spool, directly across from each other
@@ -155,7 +155,7 @@ These are topics that are commonly brought up when learning about OpenTag.  Belo
     * NTAG216 is compatible with smartphones and has slightly more usable memory than MIFARE tags
     * MIFARE uses about 25% of memory to encrypt data, preventing read/write operations, which is not applicable for OpenTag because of the open-source nature
 * JSON vs Memory Map:
-    * Formats such as JSON (human-readable text) takes up considerably more more memory than memory mapped.  For example, defining something like Printing Temperature would be `PrintTemp:225` which is 13-bytes, vs storing a memory mapped 2-byte number.  Tokens could be reduced, but that also defeats the purpose of using JSON in the first place, which is often for readability.
+    * Formats such as JSON (human-readable text) takes up considerably more more memory than memory mapped.  For example, defining something like Printing Temperature would be `PrintTemp:225` which is 13 bytes, instead of storing a memory mapped 2-byte number.  Tokens could be reduced, but that also defeats the purpose of using JSON in the first place, which is often for readability.
     * NTAG216 tags only have 888 bytes of usable memory, which would be eaten up quickly
 * Lookup Tables
     * OpenTag does NOT use lookup tables, which would be too difficult to maintain due to the decentralized nature of this standard.
