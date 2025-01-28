@@ -32,6 +32,7 @@ These are companies that are implementing Open 3D-RFID into their printers, fila
   * [3D Fuel](https://www.3dfuel.com/)
   * [Ecogenesis Biopolymers](https://ecogenesisbiopolymers.com)
   * [Numakers](https://numakers.com/)
+  * [American Filament](https://americanfilament.us)
 * Printers + Hardware:
   * [OpenSpool](https://www.youtube.com/watch?v=ah7dm-dtQ5w) ([GitHub Source](https://github.com/spuder/OpenSpool))
   * [Cosmyx](https://www.cosmyx3d.com/)
