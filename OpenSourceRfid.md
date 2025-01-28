@@ -62,20 +62,21 @@ Did you make a design to add RFID to your printer? Let us know so we can link to
 
 # OpenTag Standards
 ## Hardware Standard
-NFC NTAG216: 13.56mhz 888-byte
+NFC NTAG216: 13.56 MHz 888-byte tags
 
 <img src="images/mifareclassicsticker.jpg" width="200">
 
-NTAG216 tags are cheap, common, and allow 888 bytes of data, which is plenty of space to store required information. NFC tags such as NTAG216 can be read/written with android smartphones. 13.56mhz RFID modules are plentiful and low-cost and are arduino-compatible to allow for new projects to be spun up.
+NTAG216 tags are cheap, common, and allow 888 bytes of data, which is plenty of space to store required information. NFC tags such as NTAG216 can be read/written with smartphones. 13.56 MHz RFID modules are plentiful, low-cost and Arduino-compatible, allowing for easy integration.
 
-NFC NTAG216 was chosen over MIFARE 1K Classic tags, which is what the Bambu AMS uses.  NTAG216 was chosen over MIFARE 1K for the following reasons:
+NFC NTAG216 was chosen over MIFARE 1K Classic tags, which is what the Bambu AMS uses, for the following reasons:
 * More memory (NTAG216: 888-bytes usable, MF1K: 768-bytes usable)
 * Smartphone Support: NTAG216 can be read from smartphones, while MF1K requires a dedicated reader
 
 ## Mechanical Standard
 * Tag placement: center should be 56.0mm away from the center of the spool (see pic)
-* The tag should never be more than 4.0mm away from the external surface of the spool. For spool sides thicker than 4mm,there must be a cutout to embed the tag, or the tag should be fixed to the outside of the spool
-* Two tags should be used, one on each end of the spool, directly across from eachother
+* The tag should never be more than 4.0mm away from the external surface of the spool
+  * For spool sides thicker than 4mm, there must be a cutout to embed the tag, or the tag should be fixed to the outside of the spool
+* Two tags should be used, one on each end of the spool, directly across from each other
 
 <img src="images/TagLocation.png" width="400">
 
@@ -83,7 +84,7 @@ NFC NTAG216 was chosen over MIFARE 1K Classic tags, which is what the Bambu AMS 
 
 This is a list of data that will live on the RFID chip, separated into required and optional data.  All REQUIRED data must be populated to be compliant with this open source RFID protocol.
 
-NTAG216 tags have 888 bytes of total memory.
+NTAG216 tags have 888 bytes of usable memory.
 
 ### Required Data
 All chips MUST contain this information, otherwise they are considered non-compliant
@@ -121,10 +122,10 @@ This is additional data that not all manufacturers will implement, typically due
 ### Web API Standard
 Some tags can contain extended data that doesn't fit or doesn't belong on the RFID tag itself.  One example is a diameter graph, which is too much data to be stored within only 888 bytes of memory.
 
-These complex variables can be looked up using the "web api" url that is on the RFID tag.
+These complex variables can be looked up using the "web API" URL that is stored on the RFID tag.
 
-The format of this data should be JSON
-The exact contents of this data is still open to discussion, and it is not required to launch the OpenTag standard.  The web API can be implemented in the future without affecting the launch of OpenTag. 
+The format of this data should be JSON.
+The exact contents of this data are still open to discussion, and it is not required to launch the OpenTag standard.  The web API can be implemented in the future without affecting the launch of OpenTag. 
 
 ## OpenTag Consortium
 The OpenTag Consortium is a collaborative group of 3D printing companies, hobbyists, RFID experts, and other stakeholders committed to maintaining and evolving the OpenTag RFID standard specification. The consortium operates under a structured membership model, ensuring a balance of inclusivity and effective decision-making.
@@ -151,14 +152,14 @@ This dual-tier structure enables broad participation while maintaining an effici
 These are topics that are commonly brought up when learning about OpenTag.  Below is a quick summary of each topic, and why we decided to settle on the standards we defined.
 
 * NTAG216 vs MIFARE:
-    * NTAG216 is compatible with smartphones, and has slightly more usable memory than MIFARE tags
-    * MIFARE uses about 25% of memory to encrypt data, preventing read/write operations, which is not applicable for OpenTag because of the open source nature
+    * NTAG216 is compatible with smartphones and has slightly more usable memory than MIFARE tags
+    * MIFARE uses about 25% of memory to encrypt data, preventing read/write operations, which is not applicable for OpenTag because of the open-source nature
 * JSON vs Memory Map:
     * Formats such as JSON (human-readable text) takes up considerably more more memory than memory mapped.  For example, defining something like Printing Temperature would be `PrintTemp:225` which is 13-bytes, vs storing a memory mapped 2-byte number.  Tokens could be reduced, but that also defeats the purpose of using JSON in the first place, which is often for readability.
-    * Tags only have 888 bytes of memory, which would be eaten up quickly
+    * NTAG216 tags only have 888 bytes of usable memory, which would be eaten up quickly
 * Lookup Tables
     * OpenTag does NOT use lookup tables, which would be too difficult to maintain due to the decentralized nature of this standard.
-    * Lookup tables can become out of date, which would require regular "firmware updates" to devices that read tags to make sure they've downloaded the most recent table.
+    * Lookup tables can quickly become outdated, which would require regular updates to tag readers to make sure they've downloaded the most recent table.
     * Storing lookup tables consumes more memory on the device that reads tags
-    * On-demand lookup (via internet) would require someone host a database. Hosting this data would have costs associated with it, and would also put the control of the entire OpenTag format in the hands of a single person/company
+    * On-demand lookup (via the internet) would require someone to host a database. Hosting this data would have costs associated with it, and would also put the control of the entire OpenTag format in the hands of a single person/company
     * Rather than representing data as a number (such as "company #123 = Example Company), the plain-text company name should be used instead
