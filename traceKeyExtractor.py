@@ -8,10 +8,6 @@ if not sys.version_info >= (3, 6):
    print("Python 3.6 or higher is required!")
    exit(-1)
 
-# List of possible directories for Proxmark3 to try
-# XXX Populate with results for Windows
-pm3_dirs = []
-
 #Global variables
 #Default name of the dictionary file we create
 dictionaryFilename = "myKeyDictionary.dic"  #Arbitrary filename for storing dictionary file
@@ -22,45 +18,51 @@ pm3Location = None                            #Calculated. The location of Proxm
 pm3Command = "bin/pm3"                      # The command that works to start proxmark3
 mfNonceBruteCommand = "share/proxmark3/tools/mf_nonce_brute" # The command to execute mfNonceBrute
 
-trace = "";                 #Prompted during runtime. Trace filename that the user provides
-
-def main():
-    global pm3Location,dictionaryFilepath,trace
-
-    print("--------------------------------------------------------")
-    print("RFID Key Extractor v0.2 - Bambu Research Group 2024")
-    print("--------------------------------------------------------")
-    print("This will extract the keys from a trace file")
-    print("that was saved from sniffing communication between")
-    print("the AMS and RFID tag.")
-    print("");
-    print("Instructions to sniff and save the trace can be found at")
-    print("https://github.com/Bambu-Research-Group/RFID-Tag-Guide");
-    print("--------------------------------------------------------")
-    print("")
+def setup():
+    global pm3Location,dictionaryFilepath
 
     pm3Location = get_proxmark3_location()
 
     #Create a dictionary file to store keys that we discover
     print(f"Creating dictionary file '{dictionaryFilename}'")
     dictionaryFile = open(dictionaryFilename, "w")
-    dictionaryFile.close();
+    dictionaryFile.close()
     dictionaryFilepath = os.path.abspath(dictionaryFilename)
     print(f"Saved dictionary to {dictionaryFilepath}")
 
-    #Instruct the user to create a trace file
-    print()
-    print("Start by creating a trace file. In the proxmark terminal, execute command `hf 14a sniff -c -r`.")
-    print("Then, place the Proxmark3 between the RFID reader and spool.")
-    print("Load in filament and wait for the process to complete, then press the button on the Proxmark3.")
-    print("Finally, in the proxmark terminal, execute command `trace save -f [FILEPATH]` to create the trace file.")
-    print("See the GitHub repository for more details.")
-    print()
+def main():
+    print("--------------------------------------------------------")
+    print("RFID Key Extractor v0.2.1 - Bambu Research Group 2024")
+    print("--------------------------------------------------------")
+    print("This will extract the keys from a trace file")
+    print("that was saved from sniffing communication between")
+    print("the AMS and RFID tag.")
+    print("")
+    print("Instructions to sniff and save the trace can be found at")
+    print("https://github.com/Bambu-Research-Group/RFID-Tag-Guide")
+    print("--------------------------------------------------------")
+    print("")
 
-    #Get the tracename/filepath from user
-    trace = input("Enter trace name or full trace filepath: ")
+    # Run setup
+    setup()
 
-    discoverKeys()
+    if len(sys.argv) > 1:
+        # If the user included an argument, assume it's the path to the tracefile
+        trace = os.path.abspath(sys.argv[1])
+    else:
+        #Instruct the user to create a trace file
+        print()
+        print("Start by creating a trace file. In the proxmark terminal, execute command `hf 14a sniff -c -r`.")
+        print("Then, place the Proxmark3 between the RFID reader and spool.")
+        print("Load in filament and wait for the process to complete, then press the button on the Proxmark3.")
+        print("Finally, in the proxmark terminal, execute command `trace save -f [FILEPATH]` to create the trace file.")
+        print("See the GitHub repository for more details.")
+        print()
+
+        #Get the tracename/filepath from user
+        trace = input("Enter trace name or full trace filepath: ")
+
+    discoverKeys(trace)
     
     print("Keys obtained. Remove the spool from the AMS and place the Proxmark3 on the spool's tag.")
     print(f"In proxmark terminal, execute command `hf mf fchk -f {dictionaryFilepath} --dump` to create a keyfile from this dictionary.")
@@ -68,26 +70,26 @@ def main():
 
 
 #Loop 16 times to attempt to extract all 16 keys from the tracefile
-def discoverKeys():
+def discoverKeys(traceFilepath):
 
     print("PROGRAM: ", mfNonceBruteCommand)
 
-    keyList = [];
+    keyList = []
 
     # Run a max of 16 times.
     for i in range(16):
-        loopNum = i+1;
+        loopNum = i+1
         print("----------------------")
         print(f"Loop {loopNum} of 16")
 
         #Run PM3 with the trace
         # -o means run without connecting to PM3 hardware
         # -c specifies commands within proxmark 3 software
-        cmd_list = [pm3Location / pm3Command,"-o","-c", f"trace load -f {trace}; trace list -1 -t mf -f {dictionaryFilepath}; exit"];
+        cmd_list = [pm3Location / pm3Command,"-o","-c", f"trace load -f {traceFilepath}; trace list -1 -t mf -f {dictionaryFilepath}; exit"]
         print(f"Viewing tracelog with {len(keyList)} discovered keys")
         print(f"pm3 {' '.join(cmd_list[1:])}")
         result = subprocess.run(cmd_list, shell=os.name == 'nt',stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        output = result.stdout;
+        output = result.stdout
 
 
 
@@ -111,20 +113,20 @@ def discoverKeys():
                 print("Found line containing a key:")
                 print(f"    {line}")
                 # split the line into "words", which are whitespace separated
-                words = line.split(" ");
+                words = line.split(" ")
 
                 key = ""
 
                 #find the word "key", and then grab the word directly after it
                 for j in range(len(words)-1):
-                    w = words[j];
+                    w = words[j]
                     if w == "key" or w == "key:":
-                        key = words[j+1];  #Guaranteed to not be out of bounds because we loop to words length - 1
+                        key = words[j+1]  #Guaranteed to not be out of bounds because we loop to words length - 1
                         break
 
                 #If we didn't find a key, skip this line
                 if key == "":
-                    continue;
+                    continue
                 
                 #If key ends with a vertical bar |, remove it
                 key = key.replace('|', '')
@@ -133,7 +135,7 @@ def discoverKeys():
                 #Add this key to our keylist if it's new
                 if key in keyList:
                     print(f"    Duplicate key, ignoring: {key}")
-                    continue;
+                    continue
                 
                 keyList.append(key)
                 print(f"    Found new key: {key}")
@@ -151,7 +153,7 @@ def discoverKeys():
                     if "mf_nonce_brute" in words[j]:
                         #Add the rest of the line to our arguments
                         args = words[j+1:] #can't be out of bounds because we loop to len(words)-1
-                        break;
+                        break
 
                 key = bruteForce(args)
 
@@ -159,14 +161,14 @@ def discoverKeys():
                 key = strip_color_codes(key)
 
                 if key == "":
-                    continue;
+                    continue
                 
                 key = key.upper()
 
                 #Add this key to our keylist if it's new
                 if key in keyList:
                     print(f"    Duplicate key, ignoring: {key}")
-                    continue;
+                    continue
                 
                 keyList.append(key)
                 print(f"    Found new key: {key}")
@@ -179,9 +181,9 @@ def discoverKeys():
         for j in range(len(keyList)):
             print(f"    {j}: {keyList[j]}")
             dictionaryFile.write(keyList[j])
-            dictionaryFile.write("\n");
+            dictionaryFile.write("\n")
         print()
-        dictionaryFile.close();
+        dictionaryFile.close()
     
     #Done! Show results
     print(f"{len(keyList)} keys saved to file: {dictionaryFilepath}")
@@ -208,7 +210,7 @@ def bruteForce(args):
         print(f"    {line}")
 
         #Parse out the key from within the brackets
-        words = line.split(" ");
+        words = line.split(" ")
         for i in range(len(words)-1):
             if words[i] == "[":
                 return words[i+1]
@@ -247,12 +249,6 @@ def get_proxmark3_location():
         pm3_location = which_pm3.parent.parent
         print(f"Found global installation ({pm3_location})!")
         return pm3_location
-
-    # Check pm3_dirs paths
-    pm3_dirs_result = testCommands(pm3_dirs, "bin/pm3", "--help")
-    if pm3_dirs_result:
-        print(f"Found installation in {pm3_dirs_result}!")
-        return pm3_dirs_result
 
     # At this point, we've tried all the paths to find it
     print("Failed to find working 'pm3' command. You can set the Proxmark3 directory via the 'PROXMARK3_DIR' environment variable.")
@@ -294,6 +290,5 @@ def testCommands(directories, command, arguments = ""):
     
     return None #We didn't find any program that worked
 
-
-
-main(); #Run main program
+if __name__ == "__main__":
+    main() #Run main program
