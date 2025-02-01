@@ -14,13 +14,8 @@ We are currently working on a way to submit the tag data in a secure way so anal
    * [Required Equipment](#required-equipment)
       * [Proxmark3 compatible readers](#proxmark3-compatible-readers)
          * [Proxmark3 Easy](#proxmark3-easy)
-   * [Hacking a Bambulab Tag and readout of its data](#hacking-a-bambulab-tag-and-readout-of-its-data)
-      * [Proxmark3 fm11rf08s recovery script](#proxmark3-fm11rf08s-recovery-script)
-      * [Bambulab AMS RFID reader location](#bambulab-ams-rfid-reader-location)
-      * [Bambulab AMS Lite RFID reader location (legacy)](#bambulab-ams-lite-rfid-reader-location-legacy)
-      * [Proxmark3 placement for sniffing (legacy)](#proxmark3-placement-for-sniffing-legacy)
-      * [Key Derivation](#key-derivation)
-      * [Dump RFID Contents (.bin) (legacy)](#dump-rfid-contents-bin-legacy)
+   * [Dumping a Bambulab Tag and readout of its data](#dumping-a-bambulab-tag-and-readout-of-its-data)
+      * [Alternate dump method: fm11rf08s recovery script](#alternate-dump-method-fm11rf08s-recovery-script)
    * [Tag Documentation](#tag-documentation)
       * [Block Overview](#block-overview)
       * [MIFARE Encryption Keys](#mifare-encryption-keys)
@@ -40,6 +35,10 @@ We are currently working on a way to submit the tag data in a secure way so anal
       * [Block 17](#block-17)
    * [Compatible RFID tags -  By generation](#compatible-rfid-tags----by-generation)
    * [Reverse engineering RFID Board](#reverse-engineering-rfid-board)
+   * [Legacy dump method: Sniffing](#legacy-dump-method-Sniffing)
+      * [Bambulab AMS RFID reader location](#bambulab-ams-rfid-reader-location)
+      * [Proxmark3 placement for sniffing](#proxmark3-placement-for-sniffing)
+      * [Dump RFID Contents (.bin)](#dump-rfid-contents-bin)
 <!--te-->
 
 ## Project Summary
@@ -48,6 +47,8 @@ This is a research group dedicated to documenting the data structures used by Ba
 ### FAQs
  * **Can I clone tags?**
    * Yes, you can read and clone tags using a tool such as a Proxmark3
+   * However, most cheap changeable UID tags won't actually work for cloning because the AMS unit can detect them (and in some cases actually breaks them).
+   * "Write-once" or "Fused UID (FUID)" tags should work for cloning, but they can't be changed after the first clone operation
  * **Can I create custom tags?**
    * No, tags are digitally signed. Even if you modify the contents, the printer will reject any tags without a valid RSA signature
    * An [Open Source RFID Tag](OpenSourceRfid.md) has been proposed to allow anyone to create / modify their own tags. This must be adopted by printer manufacturers, or you can mod your own printer for support
@@ -111,13 +112,46 @@ The more data we have, the easier it is to compare differences to learn what eac
 
 A Proxmark3 Easy is sufficient for all the tasks that need to be done. You can buy a clone from Alixepress, Amazon or Dangerous Things.
 
-## Hacking a Bambulab Tag and readout of its data
-We document here the most simple approach to get all required A-Keys and the data of the tag.
-The easiest way is to sniff the data.
+## Dumping a Bambulab Tag and readout of its data
+The `tagDump.py` script will derive all the access keys needed to read the tag data based on its UID, and then connect to a Proxmark3 to dump all of the tag contents.
 
-Update November 2024: In 2024 a new backdoor was found which requires no sniffing. Details can be found [here](https://eprint.iacr.org/2024/1275.pdf). Overall this makes it much easier get the keys and the tags data.
+Requirements:
+- [Python](https://www.python.org/downloads/) 3.6 or later
+- Python's [PyCryptodomex package](https://pypi.org/project/pycryptodomex/) (usually can be installed with `pip install pycryptodomex`)
+- A Proxmark3 that is already connected and setup so that running `pm3` connects to it successfully. Make sure you have the latest build of the [firmware](https://github.com/RfidResearchGroup/proxmark3) installed as well.
 
-### Proxmark3 fm11rf08s recovery script
+> [!NOTE]
+> If the PyCroptodomex package is not installed, the script will use an alternative method to dump all the tag data. However, this dump will not contain any of the correct access keys, so it can only be used to view/parse the tag data, not clone the tag.
+
+Place the Proxmark3 antenna as close to the target tag as possible and then run the script. Depending on your OS and Python setup, one of the following commands should work:
+```
+./tagDump.py
+python ./tagDump.py
+python3 ./tagDump.py
+```
+
+This will generate two dump files in the current directory (or a different directory using the `-d` flag): one binary dump (for parsing or cloning) and one JSON dump (human-readable representation of the bytes).
+
+You can run the `parse.py` script on the binary dump to parse it into human-readable information about the filament it describes.
+
+**Key Derivation**
+For those curious, this is the key derivation formula for A keys:
+
+```python
+from Cryptodome.Protocol.KDF import HKDF
+from Cryptodome.Hash import SHA256
+
+uid=bytes([0x02,0x3b,0x44,0x74])
+master = bytes([0x9a,0x75,0x9c,0xf2,0xc4,0xf7,0xca,0xff,0x22,0x2c,0xb9,0x76,0x9b,0x41,0xbc,0x96])
+
+keys=HKDF(uid, 6, master, SHA256, 16, context=b"RFID-A\0")
+
+print([a.hex() for a in keys])
+```
+
+### Alternate dump method: fm11rf08s recovery script
+
+In 2024 a new backdoor was found which requires no sniffing. Details can be found [here](https://eprint.iacr.org/2024/1275.pdf). Overall this makes it much easier get the keys and the tags data.
 
 This script is included in proxmarx3 since its release "Backdoor" and later.
 
@@ -129,194 +163,8 @@ This requires some time but once done you receive a binary key file and a dump.
 
 To visualize the data on the tag you can run now:
 
-`script run fm11rf08_full -b`
+`script run fm11rf08s_full -b`
 
-### Bambulab AMS RFID reader location
-The Bambulab AMS RFID readers are located between slots 1&2 and slots 3&4.
-
-![](images/filament-slots.jpg)
-
-### Bambulab AMS Lite RFID reader location (legacy)
-The Bambulab AMS Lite RFID readers are located at the base of each spool holder.
-
-For sniffing, you will need to place the Proxmark in between the RFID tag and the reader on the AMS. As there is not much clearance, it is recommended to temporarily remove the low frequency radio (the topmost piece) if you can, as it will not be used in this process.
-
-### Proxmark3 placement for sniffing (legacy)
-
-For sniffing, you will need to place the Proxmark3 against the reader.  On the AMS lite, you must place it in between the reader and the spool.  On the AMS, it is recommended to place it between the reader and the spool, but you may place it on the other side (for example, load the spool into slot 1 and place the Proxmark3 against the reader in slot 2).
-
-> [!TIP]
-> As there is not much clearance, it may be helpful to disassemble the Proxmark3 Easy and remove the top and middle layers.  For this particular process, you will only need the bottom-most layer.
-
-If you place the Proxmark in between the AMS reader and the spool, make sure that spool rotates so that the RFID tag moves away from the reader, otherwise the AMS will assume that it is reading the tag from its neighboring slot and attempt to rewind it until it cannot see the RFID tag.
-
-### Key Derivation ###
-As of 11/19/24, keys can now be derived from the UID of a tag.
-
-```python
-from Cryptodome.Protocol.KDF import HKDF
-from Cryptodome.Hash import SHA256
-
-uid=bytes([0x02,0x3b,0x44,0x74])
-master = bytes([0x9a,0x75,0x9c,0xf2,0xc4,0xf7,0xca,0xff,0x22,0x2c,0xb9,0x76,0x9b,0x41,0xbc,0x96]) 
-
-keys=HKDF(uid, 6, master, SHA256, 16, context=b"RFID-A\0")
-
-print([a.hex() for a in keys])
-```
-
-
-### Dump RFID Contents (.bin) (legacy)
-
-
-1. **Run ProxMark3 Software**
-
-   In a terminal, run `pm3` to start the Proxmark3 Software
-
-2. **Sniff Communication**
-
-   - Start sniffing with: `hf 14a sniff -c -r`<br>
-   (hf=High Frequency, 14a=Tag Type, Sniff=command, -c and -r mean "capture on triggers instead of continuously)
-
-   - Place your Proxmark3 between the tag and the AMS. Recommended: Use tape to hold it in place.
-   - Load a strand of filament into the AMS. This is what triggers the AMS to attempt to read the RFID tag.
-   - Press the button on the ProxMark to end capture after the filament has completed loading
-
-3. **Extract the Keys**
-
-   1. **Automatic** (recommended)
-
-      1. Save the trace results to a file with: `trace save -f [FILENAME]`
-
-      2. Open a new terminal window and run the trace key extractor script in this repository with Python 3: `python3 traceKeyExtractor.py`
-
-      3. Input the trace results filepath or drag and drop it into the terminal window
-
-      4. After the keys are extracted, return to the Proxmark3 software
-
-      5. Remove the spool from the AMS and hold the Proxmark3 against the RFID tag of the spool
-
-      6. Run `hf mf fchk -f [dictionaryFilepath] --dump` to create a key file
-
-            - The program will report the destination of the key file that it saved. Copy this filepath to your clipboard.
-
-              - Example:
-
-                ```
-                [+] Found keys have been dumped to /Users/mitch/hf-mf-75066B1D-key.bin
-                ```
-
-   2. **Manual** (not recommended)
-
-      1. **Create a Key Dictionary**
-
-         - We will discover keys one at a time and save them to a dictionary file.
-         - Navigate to your Proxmark3 software installation directory. This will be specific to your Operating System and Installation.
-            - macOS (Intel) Example: `/usr/local/Cellar/proxmark3/4.17768/share/proxmark3/`
-            - macOS (ARM) Eample: `/opt/homebrew/Cellar/proxmark3/4.17768/share/proxmark3/`
-            - Windows Example: TBD
-            - Linux Example: TBD
-         - Open a text editor and save a blank file called `myDictionary.dic` into the `dictionaries/` folder of your Proxmark3 software installation directory.
-
-            (You can call this file anything you want, but for the rest of this example, we will refer to it as "myDictionary")
-
-         - Leave this file open, we will continue to add keys to it in the next step
-
-      2. **Extract Keys From Trace**
-         - Run `trace list -t mf -f myDictionary` to view the trace that was recorded from sniffing in the previous step.
-
-            This uses the key dictionary `myDictionary.dic` that we created in step 3.
-         - Read the output and look for anything that mentions a key.
-            - Three Possible Formats:
-               - `key E0B50731BE27 prng WEAK` - Follow Step 5
-               - `nested probable key: 50B0318A4FE7` - Follow Step 6
-               - `Nested authentication detected.` - Follow Step 7
-              
-            - Each of these 3 entries can provide us with a valid key.  Follow step 5, 6, or 7 depending on which type of key you encounter.
-
-      3. **First Key - Plain Text**
-         - Example: `key E0B50731BE27 prng WEAK`
-         - This is the first key that was discovered by sniffing AMS traffic.
-         - Copy/paste this key into the `myDictionary.dic` file that you created in step 3, then save the file.
-      4. **Nested Probable Key**
-         - Example: `nested probable key: 50B0318A4FE7`
-         - Copy/paste this key into the `myDictionary.dic` file that you created in step 3, then save the file.
-      5. **Nested Authentication Key**
-         - Example:
-            ```
-            Nested authentication detected.
-            tools/mf_nonce_brute/mf_nonce_brute 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C
-            ```
-         - Open a second terminal window, and change directories into your Proxmark3 software installation directory. This is specific to your OS and PM3 installation.
-            - macOS/Linux: `cd $(brew --prefix proxmark3)/share/proxmark3/`
-            - Windows: TBD
-         - CD into the tools folder `cd tools/`
-         - Copy the command from ProxMark starting at `mf_nonce_brute`, including all the arguments (random letters/numbers) after it, and run the program from the `tools/` directory.
-            - Example (macOS/Linux): `./mf_nonce_brute 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C`
-            - Example (Windows): `mf_nonce_brute.exe 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C`
-         - The program will discover a key. Copy/paste this key into your `myDictionary.dic` file, and SAVE IT.
-            - Example Output:
-               ```
-               Valid Key found [ 202efd3dcdfd ]
-               ```
-      6. **Check Keys (Optional)**
-         - If you want to check how many valid keys you've discovered, you can do this test
-         - This is optional, and you can choose to wait until you have discovered all of the keys
-         - **WARNING**: Performing a key check will erase the trace that you recorded during step 2, and will require you to re-sniff data (repeat step 2)
-            - If you want to save your trace to avoid re-sniffing, use `trace save -f <trace-name>` and `trace load -f <trace-name>`
-
-         - Run `hf mf fchk --1k -f myDictionary` to test your keys
-            - Example Output (showing 11/16 keys discovered):
-               ```
-               [+] found keys:
-               
-               [+] -----+-----+--------------+---+--------------+----
-               [+]  Sec | Blk | key A        |res| key B        |res
-               [+] -----+-----+--------------+---+--------------+----
-               [+]  000 | 003 | E0B50731BE27 | 1 | ------------ | 0
-               [+]  001 | 007 | 63654DB94D97 | 1 | ------------ | 0
-               [+]  002 | 011 | 387C06EFFDC8 | 1 | ------------ | 0
-               [+]  003 | 015 | 38963E577E43 | 1 | ------------ | 0
-               [+]  004 | 019 | 8A3EA2564692 | 1 | ------------ | 0
-               [+]  005 | 023 | 935E0F11857A | 1 | ------------ | 0
-               [+]  006 | 027 | EBC8F7D23A06 | 1 | ------------ | 0
-               [+]  007 | 031 | DD6128F13D4C | 1 | ------------ | 0
-               [+]  008 | 035 | ------------ | 0 | ------------ | 0
-               [+]  009 | 039 | 4E470B09521F | 1 | ------------ | 0
-               [+]  010 | 043 | 50EB8811A69C | 1 | ------------ | 0
-               [+]  011 | 047 | 4BDD25091824 | 1 | ------------ | 0
-               [+]  012 | 051 | ------------ | 0 | ------------ | 0
-               [+]  013 | 055 | ------------ | 0 | ------------ | 0
-               [+]  014 | 059 | ------------ | 0 | ------------ | 0
-               [+]  015 | 063 | ------------ | 0 | ------------ | 0
-               [+] -----+-----+--------------+---+--------------+----
-               [+] ( 0:Failed / 1:Success )
-               ```
-
-      7. **Find Remaining Keys**
-         - Repeat step 4 until all 16 keys are discovered
-         - Your dictionary may be larger than 16 entries if you accidentally copied a duplicate key or an invalid key. These invalid entries are fine, and you can ignore them
-         - **Recommended**: When you think you have discovered all 16 keys, perform step 8 to verify that your keys are correct.
-
-      8. **Convert Dictionary to Key File**
-
-         - Remove the spool from the AMS and hold the Proxmark3 against the RFID tag of the spool
-         - Run `hf mf fchk --1k -f myDictionary --dump` to create a key file
-         - The program will report the destination of the key file that it saved. Copy this filepath to your clipboard
-            - Example:
-               ```
-               [+] Found keys have been dumped to /Users/mitch/hf-mf-75066B1D-key.bin
-               ```
-
-4. **Dump RFID Contents**
-   
-   - Run `hf mf dump -k [path-to-keyfile]` while the Proxmark3 is on the spool's RFID tag to dump the contents of the tag using the 16 keys we discovered
-   - There should be no errors
-   - The output should tell you where your `.bin` file is saved
-      - Example:
-         ```
-         [+] saved 1024 bytes to binary file /Users/mitch/hf-mf-75066B1D-dump.bin
-         ```
 ## Tag Documentation
 
 This contains documentation for the known and unknown data that is contained in each block on the RFID tag.
@@ -549,15 +397,15 @@ There are tags known as "Magic Tags" which allow functionality that's not part o
 One example is that most Magic Tags allow the UID to be changed, which is normally read-only on MIFARE tags.
 Magic tags are often refered to by their "generation", eg "Magic Gen 1".  Each newer generation increases the functionality, but tends to also be more expensive)
 
-Gen 1 --> **Not compatible**(due to AMS checking if tag is unlockable with command 0x40)
+Gen 1 --> **Not compatible** (due to AMS checking if tag is unlockable with command 0x40)
 
-Gen 2 --> **Works**
+Gen 2 --> **Most don't work** (AMS writes invalid data to block0, soft-bricking the tag; see https://github.com/Bambu-Research-Group/RFID-Tag-Guide/issues/41)
 
 Gen 2 OTW --> **Not tested**
 
 Gen 3 --> **Not tested**
 
-Gen 4 --> **Not tested**(The best option but pricey and hard to source in small chip formfactor)
+Gen 4 --> **Not tested** (The best option but pricey and hard to source in small chip formfactor)
 
 FUID --> **Works** "Fused UID" aka "write-once UID". Once a UID is written, it cannot be changed
 
@@ -567,3 +415,180 @@ For ease of debugging and lowering the cost of failures the RFID board is revers
 
 As a nice to benefit to have is that you can manufacture boards in different colors.
 ![](rfid-board/Photo_PCB_BBL-RFID.jpg)
+
+## Legacy dump method: Sniffing
+
+Originally the only way to get the access keys for a tag was to sniff the communication between the AMS reader and tag with a Proxmark3, and then perform several complex steps to extract the keys and create a dump. The two methods described above are much easier and faster than this method, but the instructions are left here for now for informational purposes.
+
+### Bambulab AMS RFID reader locations
+The Bambulab AMS RFID readers are located between slots 1&2 and slots 3&4.
+
+![](images/filament-slots.jpg)
+
+The Bambulab AMS Lite RFID readers are located at the base of each spool holder and form a loop around the middle of the spool.
+
+![](https://cdn-forum.bambulab.com/original/3X/9/e/9e43d489dfd67cfee6fb877355306b4a3e9e27a9.jpeg)
+
+For sniffing, you will need to place the Proxmark in between the RFID tag and the reader on the AMS. As there is not much clearance, you may need to remove the antenna cover (on the RDv4 version) or the low frequency radio (the topmost piece on other versions) if you can, as it will not be used in this process.
+
+### Proxmark3 placement for sniffing
+
+For sniffing, you will need to place the Proxmark3 against the reader.  On the AMS Lite, you must place it in between the reader and the spool.  On the AMS, it is recommended to place it between the reader and the spool, but you may place it on the other side (for example, load the spool into slot 1 and place the Proxmark3 against the reader in slot 2).
+
+> [!TIP]
+> As there is not much clearance, it may be helpful to disassemble the Proxmark3 Easy and remove the top and middle layers.  For this particular process, you will only need the bottom-most layer.
+
+If you place the Proxmark in between the AMS reader and the spool, make sure that spool rotates so that the RFID tag moves away from the reader, otherwise the AMS will assume that it is reading the tag from its neighboring slot and attempt to rewind it until it cannot see the RFID tag.
+
+
+### Dump RFID Contents (.bin)
+
+
+1. **Run ProxMark3 Software**
+
+   In a terminal, run `pm3` to start the Proxmark3 Software
+
+2. **Sniff Communication**
+
+   - Start sniffing with: `hf 14a sniff -c -r`<br>
+   (hf=High Frequency, 14a=Tag Type, Sniff=command, -c and -r mean "capture on triggers instead of continuously)
+
+   - Place your Proxmark3 between the tag and the AMS. Recommended: Use tape to hold it in place.
+   - Load a strand of filament into the AMS. This is what triggers the AMS to attempt to read the RFID tag.
+   - Press the button on the ProxMark to end capture after the filament has completed loading
+
+3. **Extract the Keys**
+
+   1. **Automatic** (recommended)
+
+      1. Save the trace results to a file with: `trace save -f [FILENAME]`
+
+      2. Open a new terminal window and run the trace key extractor script in this repository with Python 3: `python3 traceKeyExtractor.py`
+
+      3. Input the trace results filepath or drag and drop it into the terminal window
+
+      4. After the keys are extracted, return to the Proxmark3 software
+
+      5. Remove the spool from the AMS and hold the Proxmark3 against the RFID tag of the spool
+
+      6. Run `hf mf fchk -f [dictionaryFilepath] --dump` to create a key file
+
+            - The program will report the destination of the key file that it saved. Copy this filepath to your clipboard.
+
+              - Example:
+
+                ```
+                [+] Found keys have been dumped to /Users/mitch/hf-mf-75066B1D-key.bin
+                ```
+
+   2. **Manual** (not recommended)
+
+      1. **Create a Key Dictionary**
+
+         - We will discover keys one at a time and save them to a dictionary file.
+         - Navigate to your Proxmark3 software installation directory. This will be specific to your Operating System and Installation.
+            - macOS (Intel) Example: `/usr/local/Cellar/proxmark3/4.17768/share/proxmark3/`
+            - macOS (ARM) Eample: `/opt/homebrew/Cellar/proxmark3/4.17768/share/proxmark3/`
+            - Windows Example: TBD
+            - Linux Example: TBD
+         - Open a text editor and save a blank file called `myDictionary.dic` into the `dictionaries/` folder of your Proxmark3 software installation directory.
+
+            (You can call this file anything you want, but for the rest of this example, we will refer to it as "myDictionary")
+
+         - Leave this file open, we will continue to add keys to it in the next step
+
+      2. **Extract Keys From Trace**
+         - Run `trace list -t mf -f myDictionary` to view the trace that was recorded from sniffing in the previous step.
+
+            This uses the key dictionary `myDictionary.dic` that we created in step 3.
+         - Read the output and look for anything that mentions a key.
+            - Three Possible Formats:
+               - `key E0B50731BE27 prng WEAK` - Follow Step 5
+               - `nested probable key: 50B0318A4FE7` - Follow Step 6
+               - `Nested authentication detected.` - Follow Step 7
+
+            - Each of these 3 entries can provide us with a valid key.  Follow step 5, 6, or 7 depending on which type of key you encounter.
+
+      3. **First Key - Plain Text**
+         - Example: `key E0B50731BE27 prng WEAK`
+         - This is the first key that was discovered by sniffing AMS traffic.
+         - Copy/paste this key into the `myDictionary.dic` file that you created in step 3, then save the file.
+      4. **Nested Probable Key**
+         - Example: `nested probable key: 50B0318A4FE7`
+         - Copy/paste this key into the `myDictionary.dic` file that you created in step 3, then save the file.
+      5. **Nested Authentication Key**
+         - Example:
+            ```
+            Nested authentication detected.
+            tools/mf_nonce_brute/mf_nonce_brute 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C
+            ```
+         - Open a second terminal window, and change directories into your Proxmark3 software installation directory. This is specific to your OS and PM3 installation.
+            - macOS/Linux: `cd $(brew --prefix proxmark3)/share/proxmark3/`
+            - Windows: TBD
+         - CD into the tools folder `cd tools/`
+         - Copy the command from ProxMark starting at `mf_nonce_brute`, including all the arguments (random letters/numbers) after it, and run the program from the `tools/` directory.
+            - Example (macOS/Linux): `./mf_nonce_brute 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C`
+            - Example (Windows): `mf_nonce_brute.exe 75066b1d 4db2f2ac 0101 70fcdd3d 328eb1e6 1101 28b75cfd 0010 5196401C`
+         - The program will discover a key. Copy/paste this key into your `myDictionary.dic` file, and SAVE IT.
+            - Example Output:
+               ```
+               Valid Key found [ 202efd3dcdfd ]
+               ```
+      6. **Check Keys (Optional)**
+         - If you want to check how many valid keys you've discovered, you can do this test
+         - This is optional, and you can choose to wait until you have discovered all of the keys
+         - **WARNING**: Performing a key check will erase the trace that you recorded during step 2, and will require you to re-sniff data (repeat step 2)
+            - If you want to save your trace to avoid re-sniffing, use `trace save -f <trace-name>` and `trace load -f <trace-name>`
+
+         - Run `hf mf fchk --1k -f myDictionary` to test your keys
+            - Example Output (showing 11/16 keys discovered):
+               ```
+               [+] found keys:
+
+               [+] -----+-----+--------------+---+--------------+----
+               [+]  Sec | Blk | key A        |res| key B        |res
+               [+] -----+-----+--------------+---+--------------+----
+               [+]  000 | 003 | E0B50731BE27 | 1 | ------------ | 0
+               [+]  001 | 007 | 63654DB94D97 | 1 | ------------ | 0
+               [+]  002 | 011 | 387C06EFFDC8 | 1 | ------------ | 0
+               [+]  003 | 015 | 38963E577E43 | 1 | ------------ | 0
+               [+]  004 | 019 | 8A3EA2564692 | 1 | ------------ | 0
+               [+]  005 | 023 | 935E0F11857A | 1 | ------------ | 0
+               [+]  006 | 027 | EBC8F7D23A06 | 1 | ------------ | 0
+               [+]  007 | 031 | DD6128F13D4C | 1 | ------------ | 0
+               [+]  008 | 035 | ------------ | 0 | ------------ | 0
+               [+]  009 | 039 | 4E470B09521F | 1 | ------------ | 0
+               [+]  010 | 043 | 50EB8811A69C | 1 | ------------ | 0
+               [+]  011 | 047 | 4BDD25091824 | 1 | ------------ | 0
+               [+]  012 | 051 | ------------ | 0 | ------------ | 0
+               [+]  013 | 055 | ------------ | 0 | ------------ | 0
+               [+]  014 | 059 | ------------ | 0 | ------------ | 0
+               [+]  015 | 063 | ------------ | 0 | ------------ | 0
+               [+] -----+-----+--------------+---+--------------+----
+               [+] ( 0:Failed / 1:Success )
+               ```
+
+      7. **Find Remaining Keys**
+         - Repeat step 4 until all 16 keys are discovered
+         - Your dictionary may be larger than 16 entries if you accidentally copied a duplicate key or an invalid key. These invalid entries are fine, and you can ignore them
+         - **Recommended**: When you think you have discovered all 16 keys, perform step 8 to verify that your keys are correct.
+
+      8. **Convert Dictionary to Key File**
+
+         - Remove the spool from the AMS and hold the Proxmark3 against the RFID tag of the spool
+         - Run `hf mf fchk --1k -f myDictionary --dump` to create a key file
+         - The program will report the destination of the key file that it saved. Copy this filepath to your clipboard
+            - Example:
+               ```
+               [+] Found keys have been dumped to /Users/mitch/hf-mf-75066B1D-key.bin
+               ```
+
+4. **Dump RFID Contents**
+
+   - Run `hf mf dump -k [path-to-keyfile]` while the Proxmark3 is on the spool's RFID tag to dump the contents of the tag using the 16 keys we discovered
+   - There should be no errors
+   - The output should tell you where your `.bin` file is saved
+      - Example:
+         ```
+         [+] saved 1024 bytes to binary file /Users/mitch/hf-mf-75066B1D-dump.bin
+         ```

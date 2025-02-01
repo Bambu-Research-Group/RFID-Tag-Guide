@@ -296,4 +296,7 @@ def testCommands(directories, command, arguments = ""):
 
 
 
-main(); #Run main program
+# Run main program only when being called as a standalone script
+# That way other programs can import functions from here
+if __name__ == '__main__':
+    main()
