@@ -76,7 +76,7 @@ A Proxmark3 Easy is sufficient for all the tasks that need to be done. You can b
 
 ## Hacking a Bambu Lab Tag and readout of its data
 
-We document here the most simple approach to get all required A-Keys and the data of the tag. The easiest way is to use the `fm11rf08s` script included in the Proxmark3 software.
+We document here the most simple approach to get all required A-Keys and the data of the tag. The easiest way is to derive the keys using the Python script in this repository.
 
 ### Deriving the keys
 
