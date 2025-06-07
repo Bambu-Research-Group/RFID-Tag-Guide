@@ -1,8 +1,8 @@
 # Bambu Lab RFID Tag Guide
 
-This guide gives you a basic overview how you can decrypt and read your tags. Since we don't know how Bambu Lab will react on this guide and the general reverse engineering of the tags: **Please don't share you tag's UID and the related keys for now.**
+This guide gives you a basic overview how you can decrypt and read your tags.
 
-We are currently working on a way to submit the tag data in a secure way so analysis on the data could be done.
+[View Collection of Tags](https://github.com/queengooborg/Bambu-Lab-RFID-Library)
 
 [![Link to Discord](https://img.shields.io/badge/Discord-join_now-blue?style=flat-square&logo=discord&logoColor=white&label=Discord&color=blue)](https://discord.gg/zVfCVubwr7)
 
@@ -32,11 +32,11 @@ This is a research group dedicated to documenting the data structures used by Ba
 
 ### FAQs
 
-- **Can I clone tags?**
-  - Yes, you can read and clone tags using a tool such as a Proxmark3
 - **Can I create custom tags?**
   - No, tags are digitally signed. Even if you modify the contents, the printer will reject any tags without a valid RSA signature
   - An [Open Source RFID Tag](OpenSourceRfid.md) has been proposed to allow anyone to create / modify their own tags. This must be adopted by printer manufacturers, or you can mod your own printer for support
+- **Can I clone tags?**
+  - Yes, you can read and clone tags using a tool such as a Proxmark3. Check out our [collection of scanned tags](https://github.com/queengooborg/Bambu-Lab-RFID-Library)
 - **What are the next steps for this project?**
   - Decyphering the rest of the unknown tag content
   - Custom AMS firmware that allows custom tags to be read while ignoring the signature
@@ -50,7 +50,6 @@ A lot of the contents have been deciphered, but the more data we have, the easie
 ### Todos/Timeline/Next steps
 
 - [ ] Tool for automatic trace analysis
-- [ ] Web service for tag submisson with automatic anonymized data publishing to GitHub
 - [x] Tag content analysis
 - [x] Generate keys based on an arbitrary UID
 
