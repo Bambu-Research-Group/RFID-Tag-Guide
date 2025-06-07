@@ -51,8 +51,8 @@ A lot of the contents have been deciphered, but the more data we have, the easie
 
 - [ ] Tool for automatic trace analysis
 - [ ] Web service for tag submisson with automatic anonymized data publishing to GitHub
-- [ ] Tag content analysis
-- [ ] Generate keys based on an arbitrary UID
+- [x] Tag content analysis
+- [x] Generate keys based on an arbitrary UID
 
 ## Requirements
 
