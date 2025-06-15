@@ -88,22 +88,25 @@ NTAG216 tags have 888 bytes of usable memory.
 
 ### Memory Map - Open Tag Lite
 This is designed to fit within 144 bytes (address 0x10-0x9F), which is for NTAG213, the smallest and cheapest variant of compatible tags.
+All strings are UTF-8 unless specified otherwise.
+All integers are unsigned, big endian, unless specified otherwise.
 
 | Field                     | Data Type | Start Address  | Size (bytes)  | Usage          | Example                        | Description |
 |---------------------------|-----------|----------------|---------------|----------------|--------------------------------|-------------|
 | Tag Format                | String    | 0x10           | 2             | Operational    | `OT`                           | This is always "OT" for "Open Tag", this helps differentiate between the OpenTag and other formats. If a tag doesn't start with "OT", it is not OpenTag format. |
-| Tag Version               | Int       | 0x12           | 2             | Operational    | `1234`                         | RFID tag data format version to allow future compatibility in the event that the data format changes dramatically. Stored as an int with 3 implied decimal points. Eg `1000` -> version `1.000`. |
-| Filament Manufacturer     | String    | 0x14           | 16            | Display-only   | `"Polar Filament"`             | String representation of filament manufacturer. 16 bytes is the max data length per-block. Longer names will be abbreviated or truncated. |
+| Tag Version               | Int       | 0x12           | 2             | Operational    | `1234`                         | RFID tag data format version to allow future compatibility in the event that the data format changes dramatically. Stored as an int with 3 implied decimal points. Eg `1000` → version `1.000`. |
+| Filament Manufacturer     | String    | 0x14           | 16            | Display-only   | `"Polar Filament"`             | String representation of filament manufacturer. 16 bytes is the max data length per block. Longer names will be abbreviated or truncated. |
 | Base Material Name        | String    | 0x24           | 5             | Display-only   | `"PLA"`, `"PETG"`, `"PCTFE"`   | Material name in plain text, excluding any modifiers. |
 | Material Modifiers        | String    | 0x29           | 5             | Display-only   | `"CF"`, `"HF"`, `"Pro"`, `"Silk"` | Material subcategory or modifier in plain text to give more context to the base material. Long modifiers may need to be abbreviated. |
 | Color Name                | String    | 0x2E           | 32            | Display-only   | `"Blue"`, `"Electric Watermelon"` | Color in plain text. |
-| Diameter (Target)         | Int       | 0x4E           | 2             | Operational    | `1750`, `2850`                 | Filament diameter (target) in µm (micrometers). Eg `1750` -> `1.750mm`. |
+| Color RGB                 | Int[1+1+1]| 0xC4           | 3             | Display-only   | `[255, 166, 77]`               | Color stored as 3 separate 1-byte integers for red, green, and blue, in the sRGB color space. This is used for UI previews or rendering. |
+| Diameter (Target)         | Int       | 0x4E           | 2             | Operational    | `1750`, `2850`                 | Filament diameter (target) in µm (micrometers). Eg `1750` → `1.750mm`. |
 | Weight (Nominal, grams)   | Int       | 0x50           | 2             | Operational    | `1000`, `5000`, `750`          | Filament weight in grams, excluding spool weight. This is the TARGET weight (e.g., 1kg). Actual measured weight is stored in a different field. |
-| Print Temp (C)            | Int       | 0x52           | 2             | Operational    | `210`, `240`                   | The recommended print temperature in degrees Celsius. |
-| Bed Temp (C)              | Int       | 0x54           | 2             | Operational    | `60`, `80`                     | The recommended bed temperature in degrees Celsius. |
-| Density                   | Int       | 0x56           | 2             | Operational    | `1240`, `3900`                 | Filament density in µg (micrograms) per cubic centimeter. Eg `1240` -> `1.240g/cm³`. |
+| Print Temp (×5 °C)        | Int       | 0x52           | 1             | Operational    | `42`                           | Recommended print temperature in degrees Celsius, stored as 5× the actual value. For example, `42` represents `210°C`. |
+| Bed Temp (×5 °C)          | Int       | 0x53           | 1             | Operational    | `12`, `16`                     | Recommended bed temperature in degrees Celsius, stored as 5× the actual value. For example, `12` = `60°C`. |
+| Density                   | Int       | 0x56           | 2             | Operational    | `1240`, `3900`                 | Filament density in µg (micrograms) per cubic centimeter. Eg `1240` → `1.240g/cm³`. |
 | RESERVED                  | —         | 0x58–0x6C      | —             | —              | —                              | Reserved for future use. This goes up to the memory limit of NTAG213. |
-| Online Data URL           | String    | 0x6D           | 32            | Operational    | `pfil.us?i=8078-RQSR`          |  URL to access online JSON additional parameters. Formatted without `https` to save space. |
+| Online Data URL           | String (ASCII) | 0x6D           | 32            | Operational    | `pfil.us?i=8078-RQSR`          | URL to access online JSON additional parameters. Formatted without `https` to save space. |
 
 
 ### Memory Map - Extended Data
@@ -112,29 +115,28 @@ This memory address starts at address 144, which is just outside the range of NT
 
 We should do our best to remain within memory address, which has a max address of 0x20B.
 
-| Field                             | Data Type | Start Address | Size (bytes) | Usage        | Example                  | Description |
-|----------------------------------|-----------|---------------|---------------|--------------|--------------------------|-------------|
-| Serial Number / Batch ID         | String    | 0xA0          | 16            | Operational  | `1234-ABCD`, `2024-01-23-1234` | An identifier to represent a serial number or batch number from manufacturing. Stored as a string, and this format will vary from manufacturer to manufacturer. |
-| Manufacture Date                 | Int       | 0xB0          | 4             | Operational  | `20240123`               | Date code in YYYYMMDD format, stored as a 32-bit integer. |
-| Manufacture Time                 | Int       | 0xB4          | 3             | Operational  | `103000`, `152301`       | 24-hour time code in HHMMSS format (Hour, Minute, Second), specifying UTC. |
-| Spool Core Diameter (mm)         | Int       | 0xB7          | 1             | Operational  | `100`, `80`              | The diameter of the spool core. Used to estimate remaining filament based on encoder behavior. |
-| MFI Temp (°C)                    | Int       | 0xB8          | 1             | Operational  | `210`                    | Temperature in degrees Celsius at which the melt flow index was measured. |
-| MFI Load (×100g)                 | Int       | 0xB9          | 1             | Operational  | `216`                    | Load used in the MFI test, stored as centigrams. For 2.16kg, store `216`. |
-| MFI Value (×10 g/10min)          | Int       | 0xBA          | 1             | Operational  | `63`                     | Melt Flow Index value ×10. For example, 6.3 g/10min is stored as `63`. |
-| Tolerance (Measured)             | Int       | 0xBB          | 1             | Operational  | `20`, `55`               | Actual measured tolerance in µm (micrometers). Unique per spool. If not recorded, leave as 0xFF. |
-| Empty Spool Weight (g)           | Int       | 0xBC          | 2             | Operational  | `105`                    | Empty spool weight in grams, used to estimate remaining filament. |
-| Filament Weight (Measured)       | Int       | 0xBE          | 2             | Operational  | `1002`                   | Measured filament weight in grams, excluding the spool. Not the target weight. |
-| Filament Length (Measured)       | Int       | 0xC0          | 2             | Operational  | `336`                    | Measured filament length in meters, unique per spool. |
-| TD (Transmission Distance)       | Int       | 0xC2          | 2             | Operational  | `2540`                   | Transmission Distance in µm. The thickness where no light passes. See HueForge. |
-| Color Hex                        | Int       | 0xC4          | 3             | Operational  | `0xffa64d`               | RGB color in 3-byte hex format (0xRRGGBB). Used for UI or preview. |
-| Max Dry Temp (°C)                | Int       | 0xC7          | 1             | Operational  | `50`, `55`               | Maximum drying temperature in °C. Drying above this temp may damage filament. |
-| Dry Time (Hours)                 | Int       | 0xC8          | 1             | Operational  | `4`, `8`, `12`           | Recommended drying time in whole hours. |
-| Min Print Temp (°C)              | Int       | 0xC9          | 1             | Operational  | `190`                    | Minimum recommended nozzle temperature for printing. |
-| Max Print Temp (°C)              | Int       | 0xCA          | 1             | Operational  | `225`                    | Maximum recommended nozzle temperature for printing. |
-| Volumetric Speed Min (×10 mm³/s) | Int       | 0xCB          | 1             | Operational  | `20`                     | Minimum recommended volumetric speed, stored as mm³/s ×10. |
-| Volumetric Speed Max (×10 mm³/s) | Int       | 0xCC          | 1             | Operational  | `120`                    | Maximum safe volumetric speed, stored as mm³/s ×10. |
-| Volumetric Speed Recommended     | Int       | 0xCD          | 1             | Operational  | `80`                     | Recommended default volumetric speed, stored as mm³/s ×10. |
-| RESERVED                         | —         | 0xCE–0x1FF    | —             | —            | —                        | Reserved for future use, this goes up to the memory limit of NTAG215. |
+| Field                             | Data Type     | Start Address | Size (bytes) | Usage        | Example                  | Description |
+|----------------------------------|---------------|---------------|---------------|--------------|--------------------------|-------------|
+| Serial Number / Batch ID         | String        | 0xA0          | 16            | Display-Only  | `1234-ABCD`, `2024-01-23-1234` | Identifier for a spool batch or serial number. Format varies from manufacturer to manufacturer |
+| Manufacture Date (Y, M, D)       | Int[2+1+1]    | 0xB0          | 4             | Display-Only  | `[2024, 01, 23]`         | Stored as 2 bytes for year, then 1 byte for month and 1 byte for day. |
+| Manufacture Time (H, M, S, UTC)  | Int[1+1+1]    | 0xB4          | 3             | Display-Only  | `[10, 30, 45]`           | Stored as 1 byte each for hour, minute, and second in 24-hour UTC. |
+| Spool Core Diameter (mm)         | Int           | 0xB7          | 1             | Operational  | `100`, `80`              | Core diameter in mm. |
+| MFI Temp (°C)                    | Int           | 0xB8          | 1             | Operational  | `210`                    | MFI test temperature. |
+| MFI Load (×100g)                 | Int           | 0xB9          | 1             | Operational  | `216`                    | MFI test load (e.g. 216 = 2.16kg). |
+| MFI Value (×10 g/10min)          | Int           | 0xBA          | 1             | Operational  | `63`                     | MFI ×10 value. |
+| Tolerance (Measured)             | Int           | 0xBB          | 1             | Operational  | `20`, `55`               | Measured tolerance in µm. |
+| Empty Spool Weight (g)           | Int           | 0xBC          | 2             | Operational  | `105`                    | Weight of empty spool. |
+| Filament Weight (Measured)       | Int           | 0xBE          | 2             | Operational  | `1002`                   | Weight of filament only. |
+| Filament Length (Measured)       | Int           | 0xC0          | 2             | Operational  | `336`                    | Length in meters. |
+| TD (Transmission Distance)       | Int           | 0xC2          | 2             | Operational  | `2540`                   | Opaque thickness in µm. |
+| Max Dry Temp (°C)                | Int           | 0xC4          | 1             | Operational  | `50`, `55`               | Max safe drying temp. |
+| Dry Time (Hours)                 | Int           | 0xC5          | 1             | Operational  | `4`, `8`, `12`           | Recommended drying time. |
+| Min Print Temp (°C)              | Int           | 0xC6          | 1             | Operational  | `190`                    | Minimum nozzle temp. |
+| Max Print Temp (°C)              | Int           | 0xC7          | 1             | Operational  | `225`                    | Maximum nozzle temp. |
+| Volumetric Speed Min (×10 mm³/s)| Int            | 0xC8          | 1             | Operational  | `20`                     | Min speed recommendation. |
+| Volumetric Speed Max (×10 mm³/s)| Int            | 0xC9          | 1             | Operational  | `120`                    | Max safe speed. |
+| Volumetric Speed Recommended     | Int           | 0xCA          | 1             | Operational  | `80`                     | Default recommended speed. |
+| RESERVED                         | —             | 0xCB–0x1FF    | —             | —            | —                        | Reserved for future use. |
 
 ### Web API Standard
 Some tags can contain extended data that doesn't fit or doesn't belong on the RFID tag itself.  One example is a diameter graph, which is too much data to be stored within only 888 bytes of memory.
