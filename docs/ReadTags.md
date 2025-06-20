@@ -26,7 +26,7 @@ hf mf dump
 ```
 This process should only take a few seconds with an expected output similar to below, (to keep things short, dumps of key and data were omitted)
 ```
-[=] -----------------------------------Add commentMore actions
+[=] -----------------------------------
 [=]  UID 4b... XX XX XX XX
 [=] -----------------------------------
 
@@ -48,6 +48,11 @@ This process should only take a few seconds with an expected output similar to b
 [+] Saved 1024 bytes to binary file `C:\Users\exiom\Desktop\ProxSpace\pm3/hf-mf-XXXXXXXX-dump.bin`
 [+] Saved to json file C:\Users\exiom\Desktop\ProxSpace\pm3/hf-mf-XXXXXXXX-dump.json
 ```
+Once the above command is completed you will see that the data dump and keys will have been saved to the working folder of PM3.
+
+You can find out what each block of data means here, [Bambu Lab Filament Tag Documentation](./docs/BambuLabRfid.md)
+
+Below continues with more technical explainations and legacy methods. If that doesn't interests you, your instructions are complete here.
 
 ### Deriving the keys
 
