@@ -28,7 +28,11 @@ Name inside the brackets are alternative names these tags are generally named un
 More information on the use of magic cards can be found at https://github.com/RfidResearchGroup/proxmark3/blob/master/doc/magic_cards_notes.md#mifare-classic-uscuid
 
 ## Writing to Blank tags
-⚠ *(To ease frustrations caused by typos when issuing commands, I encourage you to use the copy button on the right, especially when multiple commands are issued using the same line)* ⚠
+⚠ *If you purchased bare coil tags and have trouble reading them, try spacing them away from your Proxmark 3 (10mm worked for me).* ⚠
+
+⚠ *ALWAYS CHECK THAT YOU CAN CONSISTENTLY READ YOUR TAG USING THE INFO COMMAND BEFORE ATTEMPTING TO WRITE TO THEM.* ⚠
+
+⚠ *To ease frustrations caused by typos when issuing commands, I encourage you to use the copy button on the right, especially when multiple commands are issued using the same line.* ⚠
 
 ### FUID
 FUIDs are marketed as "write once UID", it has a default UID of `AA55C396` and will allow writes to block 0 in this state. It will lock once written to.
@@ -59,7 +63,7 @@ For simplity, you need to copy the desired source dump file (hf-mf-XXXXXXXX-dump
 
 To write to the FUID tag, we will issue the following command (replace hf-mf-XXXXXXXX-dump.bin with the file name of your source dump file)
 ```
-hf mf restore -u XXXXXXXX --force
+hf mf restore --force -u XXXXXXXX
 ```
 Expected Output:
 ```
@@ -134,7 +138,7 @@ hf mf dump --ns
 #### Seal UFUID
 Before you can use this tag, you will need to seal the UFUID tag by issuing the following commands, otherwise it will respond to Magic Card Gen1 commands which the AMS will identify and ignore the tag. 
 
-⚠ (Please use the copy button on the right, as this procedure depends on you issuing the chain of commands succesively and completing the full set within a very short period of time.) ⚠
+⚠ *Please use the copy button on the right, as this procedure depends on you issuing the chain of commands succesively and completing the full set within a very short period of time.* ⚠
 ```
 hf 14a raw -a -k -b 7 40;hf 14a raw -k 43;hf 14a raw -k -c e100;hf 14a raw -c 85000000000000000000000000000008
 ```
