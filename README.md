@@ -15,10 +15,10 @@ Please visit the [Bambu Lab RFID Library Repository](https://github.com/queengoo
    * [Requirements](#requirements)
       * [Proxmark3 compatible readers](#proxmark3-compatible-readers)
          * [Proxmark3 Easy](#proxmark3-easy)
-   * [Bambu Lab Tag documentation as well as other brands and Open 3D-RFID](#tag-documentation)
+   * [Tag Documentation](#tag-documentation)
    * [How do RFID tags work?](#how-do-rfid-tags-work)
    * [Hacking a Bambu Lab Tag and readout of its data](#hacking-a-bambu-lab-tag-and-readout-of-its-data)
-   * [RFID tag cloning and compatible RFID tags](#rfid-tag-cloning)
+   * [RFID Tag Cloning](#rfid-tag-cloning)
    * [Reverse engineering RFID Board](#reverse-engineering-rfid-board)
 <!--te-->
 
