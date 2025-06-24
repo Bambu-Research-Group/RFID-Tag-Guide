@@ -72,11 +72,11 @@ A Proxmark3 Easy is sufficient for all the tasks that need to be done. You can b
 
 ## Tag Documentation
 
-For a description of the blocks of a Bambu Lab RFID tag, see [BambuLabRfid.md](./docs/BambuLabRfid.md).
+For a description of the blocks of a Bambu Lab RFID tag, see [docs/BambuLabRfid.md](./docs/BambuLabRfid.md).
 
-For a description of the blocks of a Creality RFID tag, see [CrealityRfid.md](./docs/CrealityRfid.md).
+For a description of the blocks of a Creality RFID tag, see [docs/CrealityRfid.md](./docs/CrealityRfid.md).
 
-An open-source standard proposal, Open 3D-RFID, is being incubated in this repository.  For a description of the standard, see [OpenSourceRfid.md](./docs/OpenSourceRfid.md).
+An open-source standard proposal, OpenTag, is being incubated in this repository.  For a description of the standard, see [docs/OpenTag.md](./docs/OpenTag.md).
 
 ## How do RFID tags work?
 

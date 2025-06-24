@@ -50,7 +50,7 @@ This process should only take a few seconds with an expected output similar to b
 ```
 Once the above command is completed you will see that the data dump and keys will have been saved to the working folder of PM3.
 
-You can find out what each block of data means here, [Bambu Lab Filament Tag Documentation](./docs/BambuLabRfid.md)
+You can find out what each block of data means here, [Bambu Lab Filament Tag Documentation](./BambuLabRfid.md)
 
 Below continues with more technical explainations and legacy methods. If that doesn't interests you, your instructions are complete here.
 
@@ -108,4 +108,4 @@ To visualize the data on the tag, run the following:
 
 Before the above methods were developed, tag data had to be obtained by sniffing the data between the RFID tag and the AMS using a Proxmark3-compatible device.
 
-To read how to obtain the tag data using the legacy sniffing method, see the [TagSniffing.md](./docs/TagSniffing.md).
+To read how to obtain the tag data using the legacy sniffing method, see the [TagSniffing.md](./TagSniffing.md).
