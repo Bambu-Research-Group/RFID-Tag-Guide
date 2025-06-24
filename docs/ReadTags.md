@@ -1,58 +1,32 @@
 # Hacking a Bambu Lab Tag and readout of its data
 
- We have documented here all the approaches we discovered along the way to get all required keys and data out of the tag. Instructions here are mainly focused on using the _**Proxmark 3**_, as this is what we have and use. There are many other devices capable of doing this, if you have discovered other ways of doing this and would like to contribute to it's documentation, please feel free to submit a pull request.
- 
-Currently, the easiest way is using the built-in function of the latest version of Proxmark3 (Iceman fork).
+This document describes the various approaches for scanning Bambu Lab RFID tags.
+If you have a Proxmark3 device, the easiest way to scan tags is using the built-in `bambukeys` function. Otherwise, if you have another RFID scanning device like a Flipper Zero, a Python script is provided in order to derive the keys from the UID of the tag.
 
-## Table of contents
+> [!NOTE]
+> Please consider submitting your scanned tags to the [Bambu Lab RFID Library](https://github.com/queengooborg/Bambu-Lab-RFID-Library) repository!
+
+# Table of contents
+
 <!--ts-->
-* [Dumping Tags using Proxmark3](#dumping-tags-using-proxmark3-iceman-fork)
-* [Deriving the keys](#deriving-the-keys)
-* [Proxmark3 fm11rf08s recovery script](#proxmark3-fm11rf08s-recovery-script)
-* [Sniffing the tag data with a Proxmark3 (legacy method)](#sniffing-the-tag-data-with-a-proxmark3-legacy-method)
+      * [Dumping Tags using Proxmark3](#dumping-tags-using-proxmark3)
+      * [Deriving the keys](#deriving-the-keys)
+      * [Proxmark3 fm11rf08s recovery script (legacy method)](#proxmark3-fm11rf08s-recovery-script-legacy-method)
+      * [Sniffing the tag data with a Proxmark3 (legacy method)](#sniffing-the-tag-data-with-a-proxmark3-legacy-method)
 <!--te-->
 
-### Dumping Tags using Proxmark3 (Iceman fork)
-As of 29th of May 2025, [pelrun](https://github.com/pelrun) has implemented functions into pm3 which allows for a much faster and simpler process to generate the keys and dump files from Bambu Lab filament RFID tags. Please update your copy of pm3 by running 
-```git pull```
-To replicate your own tags or contribute to the library, you can easily make dump and key files of your own tags by running the following commands, after placing the tag on your Proxmark 3,
-```
-hf mf bambukeys -r -d;hf mf dump
-```
-or
+### Dumping Tags using Proxmark3
+
+As of Proxmark3 v4.20469, a new command has been implemented to scan a Bambu Lab RFID tag and automatically derive the keys, offering a fast, one-command way to scan tags.
+
+To scan a tag with this method, place the Proxmark3 device on the tag and run `pm3` in the terminal. Then, in the `pm3` prompt, run:
+
 ```
 hf mf bambukeys -r -d
 hf mf dump
 ```
-This process should only take a few seconds with an expected output similar to below, (to keep things short, dumps of key and data were omitted)
-```
-[=] -----------------------------------
-[=]  UID 4b... XX XX XX XX
-[=] -----------------------------------
 
-[+] Saved 192 bytes to binary file `C:\Users\exiom\Desktop\ProxSpace\pm3/hf-mf-XXXXXXXX-key.bin`
-[+] Loaded binary key file `C:\Users\exiom\Desktop\ProxSpace\pm3/hf-mf-XXXXXXXX-key.bin`
-[=] Reading sector access bits...
-[=] .................
-[+] Finished reading sector access bits
-[=] Dumping all blocks from card...
-[-] Sector... 15 block... 3 ( ok )
-[+] Succeeded in dumping all blocks
-
-[+] time: 10 seconds
-
-[=] -----+-----+-------------------------------------------------+-----------------
-[=]  sec | blk | data                                            | ascii
-[=] -----+-----+-------------------------------------------------+-----------------
-
-[+] Saved 1024 bytes to binary file `C:\Users\exiom\Desktop\ProxSpace\pm3/hf-mf-XXXXXXXX-dump.bin`
-[+] Saved to json file C:\Users\exiom\Desktop\ProxSpace\pm3/hf-mf-XXXXXXXX-dump.json
-```
-Once the above command is completed you will see that the data dump and keys will have been saved to the working folder of PM3.
-
-You can find out what each block of data means here, [Bambu Lab Filament Tag Documentation](./BambuLabRfid.md)
-
-Below continues with more technical explainations and legacy methods. If that doesn't interests you, your instructions are complete here.
+This process should only take a few seconds. Once the process is complete, the dump will be saved to your current working directory.
 
 ### Deriving the keys
 
@@ -90,7 +64,7 @@ Then, use the keys file to extract the data from the RFID tag:
   5. Copy `mf_classic_dict_user.nfc` back onto your Flipper
   6. Use the NFC app to scan your tag
 
-### Proxmark3 fm11rf08s recovery script
+### Proxmark3 fm11rf08s recovery script (legacy method)
 
 In 2024, a new backdoor[^rfid-backdoor] was found that makes it much easier to obtain the data from the RFID tags. A script is included in the proxmark3 software since v4.18994 (nicknamed "Backdoor"), which allows us to utilize this backdoor. Before this script was implemented, the tag had to be sniffed by placing the spool in the AMS and sniffing the packets transferred between the tag and the AMS.
 
@@ -102,7 +76,7 @@ This script takes about 15-20 minutes to complete. Once it has finished, you wil
 
 To visualize the data on the tag, run the following:
 
-`script run fm11rf08_full -b`
+`script run fm11rf08s_full -b`
 
 ### Sniffing the tag data with a Proxmark3 (legacy method)
 
