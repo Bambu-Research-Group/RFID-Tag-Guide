@@ -155,7 +155,7 @@ Example Data:
 | position | length | type       | description             |
 | -------- | ------ | ---------- | ----------------------- |
 | 0 (AA)   | 12     | RAW Bin    | X Cam info              |
-| 12 (BB)  | 4      | float (LE) | **Nozzle Diameter...?** |
+| 12 (BB)  | 4      | float (LE) | Minimum Nozzle Diameter |
 
 ## Block 9
 
