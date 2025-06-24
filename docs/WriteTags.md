@@ -70,16 +70,17 @@ An unlocked tag will have the following magic capabilities:
 > [!IMPORTANT]
 > ALWAYS CHECK THAT YOU CAN CONSISTENTLY READ YOUR TAG USING THE INFO COMMAND BEFORE ATTEMPTING TO WRITE TO THEM.
 
-To write a dump to the tag, run the following command in `pm3` (replace `/path/to/dump.bin` with the actual filepath of your dump):
+To write a dump to the tag, run one of the following commands in `pm3` (replace `/path/to/dump.bin` with the actual filepath of your dump):
+
+Gen 4 UFUID:
 ```
-hf mf restore --force -f /path/to/dump.bin -k /path/to/keys.bin
+hf mf cload -f /path/to/dump.bin
 ```
 
-> [!NOTE]
-> If you have a Gen 4 UFUID tag, it is recommended use the following command instead:
-> ```
-> hf mf cload -f /path/to/dump.bin
-> ```
+Other Tag Type:
+```
+hf mf restore --force -f /path/to/dump.bin
+```
 
 You can verify that the tag has been successfully written by running `hf mf info` again.  The UID should now match the UID of your dump.
 
