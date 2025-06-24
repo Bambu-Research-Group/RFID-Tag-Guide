@@ -3,8 +3,12 @@
 This document serves as a guide for copying tag dumps onto new tags.
 This guide is written for the Proxmark3, however this may also be performed with other devices like the Flipper Zero.
 
+> [!WARNING]
+> This guide comes with **ABSOLUTELY NO WARRANTY.** Proceed at your own risk!
+
 # Table of contents
 <!--ts-->
+   * [Requirements](#requirements)
    * [Compatible RFID tags - By generation](#compatible-rfid-tags---by-generation)
    * [Identifying Tag Type](#identifying-tag-type)
       * [Gen 2](#gen-2)
@@ -13,6 +17,10 @@ This guide is written for the Proxmark3, however this may also be performed with
    * [Writing Tag Dumps](#writing-tag-dumps)
       * [Seal UFUID](#seal-ufuid)
 <!--te-->
+
+## Requirements
+
+Please view the [Requirements section of the README](../README.md#requirements).
 
 ## Compatible RFID tags - By generation
 

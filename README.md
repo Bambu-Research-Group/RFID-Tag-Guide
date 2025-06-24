@@ -52,6 +52,7 @@ A lot of the contents have been deciphered, but the more data we have, the easie
 
 ## Requirements
 
+- Basic command line knowledge
 - A computer running macOS or Linux, or a Windows computer with a WSL installation
 - Python 3.6 or higher
 - Bambu Lab Filament spool **or** the related tags
