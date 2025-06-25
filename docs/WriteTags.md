@@ -4,7 +4,11 @@ This document serves as a guide for copying tag dumps onto new tags.
 This guide is written for the Proxmark3, however this may also be performed with other devices like the Flipper Zero.
 
 > [!WARNING]
-> This guide comes with **ABSOLUTELY NO WARRANTY.** Proceed at your own risk!
+> This guide comes with **ABSOLUTELY NO WARRANTY.**
+> 
+> While we try to take the utmost care in writing this guide, however software and hardware can change, making this guide outdated.
+> 
+> Currently only write-once tags work with consistency, many of the described commands are irreversible, so proceed at your own risk!
 
 # Table of contents
 <!--ts-->
