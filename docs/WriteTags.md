@@ -53,7 +53,7 @@ hf mf info
 
 The tag type can be identified based upon its magic capabilities.  Note that if the tag reports no magic capabilities, it is either incompatible or has already been locked.
 
-> [!WARNING]
+> [!CAUTION]
 > It is IMPORTANT to identify and follow instructions appropriate for your tag, as some commands are specific to the tag type and not always compatible with other tags, running incorrect commands can be irreversible, rendering the tag useless.
 
 ### Gen 2
