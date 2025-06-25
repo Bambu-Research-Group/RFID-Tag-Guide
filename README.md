@@ -1,8 +1,7 @@
 # Bambu Lab RFID Tag Guide
+This repository contains the collective research of the Bambu Lab Filament RFID Tags and serves as a guide to give you a basic overview how you can decrypt and read your tags.
 
-This guide gives you a basic overview how you can decrypt and read your tags.
-
-[View Collection of Tags](https://github.com/queengooborg/Bambu-Lab-RFID-Library)
+Please visit the [Bambu Lab RFID Library Repository](https://github.com/queengooborg/Bambu-Lab-RFID-Library) to view our collection of tags.
 
 [![Link to Discord](https://img.shields.io/badge/Discord-join_now-blue?style=flat-square&logo=discord&logoColor=white&label=Discord&color=blue)](https://discord.gg/zVfCVubwr7)
 
@@ -16,13 +15,10 @@ This guide gives you a basic overview how you can decrypt and read your tags.
    * [Requirements](#requirements)
       * [Proxmark3 compatible readers](#proxmark3-compatible-readers)
          * [Proxmark3 Easy](#proxmark3-easy)
-   * [Hacking a Bambu Lab Tag and readout of its data](#hacking-a-bambu-lab-tag-and-readout-of-its-data)
-      * [Deriving the keys](#deriving-the-keys)
-      * [Proxmark3 fm11rf08s recovery script](#proxmark3-fm11rf08s-recovery-script)
-      * [Sniffing the tag data with a Proxmark3 (legacy method)](#sniffing-the-tag-data-with-a-proxmark3-legacy-method)
    * [Tag Documentation](#tag-documentation)
    * [How do RFID tags work?](#how-do-rfid-tags-work)
-   * [Compatible RFID tags - By generation](#compatible-rfid-tags---by-generation)
+   * [Hacking a Bambu Lab Tag and readout of its data](#hacking-a-bambu-lab-tag-and-readout-of-its-data)
+   * [RFID Tag Cloning](#rfid-tag-cloning)
    * [Reverse engineering RFID Board](#reverse-engineering-rfid-board)
 <!--te-->
 
@@ -44,7 +40,8 @@ This is a research group dedicated to documenting the data structures used by Ba
 
 ### How to contribute
 
-If you have a Proxmark3 (or other RFID debugging tool), you can decrypt the contents of your Bambu Lab RFID tags and submit them via [Discord](https://discord.gg/zVfCVubwr7).
+If you have a Proxmark3 (or other RFID debugging tool), you can decrypt the contents of your Bambu Lab RFID tags and submit them via [Discord](https://discord.gg/zVfCVubwr7), or alternatively submit a Pull Request to the [Bambu Lab RFID Library Repository](https://github.com/queengooborg/Bambu-Lab-RFID-Library).
+
 A lot of the contents have been deciphered, but the more data we have, the easier it is to compare differences to learn what each byte represents and double-check our answers.
 
 ### Todos/Timeline/Next steps
@@ -55,13 +52,14 @@ A lot of the contents have been deciphered, but the more data we have, the easie
 
 ## Requirements
 
+- Basic command line knowledge
 - A computer running macOS or Linux, or a Windows computer with a WSL installation
 - Python 3.6 or higher
 - Bambu Lab Filament spool **or** the related tags
 - An NFC/RFID reader that can read encrypted tags, such as...
   - A Proxmark3-compatible RFID reader (recommended)
     - The [proxmark3 (Iceman fork) software](https://github.com/RfidResearchGroup/proxmark3)
-      - Requires v4.18994 (codename "Backdoor") or higher
+      - Requires v4.20469 or higher
       - You MUST use the Iceman fork as the original version of the software is unmaintained; all instructions and scripts are written for the Iceman fork and will not work on the original version
   - A Flipper Zero
 
@@ -73,73 +71,13 @@ A lot of the contents have been deciphered, but the more data we have, the easie
 
 A Proxmark3 Easy is sufficient for all the tasks that need to be done. You can buy a clone from Alixepress, Amazon or Dangerous Things.
 
-## Hacking a Bambu Lab Tag and readout of its data
-
-We document here the most simple approach to get all required A-Keys and the data of the tag. The easiest way is to derive the keys using the Python script in this repository.
-
-### Deriving the keys
-
-A way to derive the keys from the UID of an RFID tag was discovered, which unlocked the ability to scan and scrape RFID tag data without sniffing, as well as with other devices like the Flipper Zero. A script is included in the repository to derive the keys from the UID of a tag.
-
-First, obtain the tag's UID:
-
-- Proxmark3
-  1. Run the Proxmark3 software by running `pm3` in the terminal
-  2. Place the Proxmark3 device on the RFID tag of the spool
-  3. Run `hf mf info` and look for the UID line item
-- Flipper Zero
-  1. Open the NFC app and scan the tag
-  2. The Flipper will attempt to decrypt the tag, but you can skip the "Nested Dictionary (Backdoor)" step for speed
-  3. The UID of the tag will appear on-screen
-- Bambu Lab AMS
-  1. Load the spool into an AMS slot and wait for it to finish loading
-  2. View the spool's details on the printer's touchscreen, Bambu Studio or Bambu Handy
-  3. The UID is the first eight characters of the spool's serial number
-
-Next, run the key derivation script and pipe its output to a file by running `python3 deriveKeys.py [UID] > ./keys.dic`.
-
-Then, use the keys file to extract the data from the RFID tag:
-
-- Proxmark3
-  1. Run the Proxmark3 software by running `pm3` in the terminal
-  2. Place the Proxmark3 device on the RFID tag of the spool
-  3. Run `hf mf dump -k ./keys.dic` to dump the RFID tag's contents
-- Flipper Zero
-  1. Open the qFlipper program and connect your Flipper to your computer
-    - You may also connect the SD card directly to your computer
-  2. Navigate to `SD Card/nfc/assets/`
-  3. Copy the `mf_classic_dict_user.nfc` file to your computer
-  4. Copy the contents of `keys.dic` to `mf_classic_dict_user.nfc`
-  5. Copy `mf_classic_dict_user.nfc` back onto your Flipper
-  6. Use the NFC app to scan your tag
-
-### Proxmark3 fm11rf08s recovery script
-
-In 2024, a new backdoor[^rfid-backdoor] was found that makes it much easier to obtain the data from the RFID tags. A script is included in the proxmark3 software since v4.18994 (nicknamed "Backdoor"), which allows us to utilize this backdoor. Before this script was implemented, the tag had to be sniffed by placing the spool in the AMS and sniffing the packets transferred between the tag and the AMS.
-
-Place your reader on the tag, start proxmark3 (run `pm3`) and run the following command:
-
-`script run fm11rf08s_recovery`
-
-This script takes about 15-20 minutes to complete. Once it has finished, you will receive a binary key file and a dump.
-
-To visualize the data on the tag, run the following:
-
-`script run fm11rf08_full -b`
-
-### Sniffing the tag data with a Proxmark3 (legacy method)
-
-Before the above methods were developed, tag data had to be obtained by sniffing the data between the RFID tag and the AMS using a Proxmark3-compatible device.
-
-To read how to obtain the tag data using the legacy sniffing method, see the [TagSniffing.md](./TagSniffing.md).
-
 ## Tag Documentation
 
-For a description of the blocks of a Bambu Lab RFID tag, see [BambuLabRfid.md](./BambuLabRfid.md).
+For a description of the blocks of a Bambu Lab RFID tag, see [docs/BambuLabRfid.md](./docs/BambuLabRfid.md).
 
-For a description of the blocks of a Creality RFID tag, see [CrealityRfid.md](./CrealityRfid.md).
+For a description of the blocks of a Creality RFID tag, see [docs/CrealityRfid.md](./docs/CrealityRfid.md).
 
-An open-source standard proposal, Open 3D-RFID, is being incubated in this repository.  For a description of the standard, see [OpenSourceRfid.md](./OpenSourceRfid.md).
+An open-source standard proposal, OpenTag, is being incubated in this repository.  For a description of the standard, see [docs/OpenTag.md](./docs/OpenTag.md).
 
 ## How do RFID tags work?
 
@@ -172,23 +110,13 @@ Here's a high-level summary of how everything works:
     - RSA Signature Private Key. You'd have to get this from bambu, good luck
   - Since Bambu Lab will likely not remove the signature requirement, you would need custom AMS firmware to read tags and ignore the signature
 
-## Compatible RFID tags - By generation
+## Hacking a Bambu Lab Tag and readout of its data
 
-There are tags known as "Magic Tags" which allow functionality that's not part of the classic MIFARE spec.
-One example is that most Magic Tags allow the UID to be changed, which is normally read-only on MIFARE tags.
-Magic tags are often refered to by their "generation", eg "Magic Gen 1". Each newer generation increases the functionality, but tends to also be more expensive)
+Please visit [docs/ReadTags.md](./docs/ReadTags.md), where we documented all the approaches we discovered along the way to get all required keys and data out of the tag.
 
-Gen 1 --> **Not compatible**(due to AMS checking if tag is unlockable with command 0x40)
+## RFID Tag Cloning
 
-Gen 2 --> **Works**
-
-Gen 2 OTW --> **Not tested**
-
-Gen 3 --> **Not tested**
-
-Gen 4 --> **Not tested**(The best option but pricey and hard to source in small chip formfactor)
-
-FUID --> **Works** "Fused UID" aka "write-once UID". Once a UID is written, it cannot be changed
+Please visit [docs/WriteTags.md](./docs/WriteTags.md), where we documented all the current and past ways of cloning Bambu Lab filament RFID tags and compatible RFID tags used to clone them.
 
 ## Reverse engineering RFID Board
 
