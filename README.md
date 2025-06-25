@@ -112,11 +112,11 @@ Here's a high-level summary of how everything works:
 
 ## Hacking a Bambu Lab Tag and readout of its data
 
-Please visit [ReadTags.md](./docs/ReadTags.md), where we documented all the approaches we discovered along the way to get all required keys and data out of the tag.
+Please visit [docs/ReadTags.md](./docs/ReadTags.md), where we documented all the approaches we discovered along the way to get all required keys and data out of the tag.
 
 ## RFID Tag Cloning
 
-Please visit [WriteTags.md](./docs/WriteTags.md), where we documented all the current and past ways of cloning Bambu Lab filament RFID tags and compatible RFID tags used to clone them.
+Please visit [docs/WriteTags.md](./docs/WriteTags.md), where we documented all the current and past ways of cloning Bambu Lab filament RFID tags and compatible RFID tags used to clone them.
 
 ## Reverse engineering RFID Board
 
