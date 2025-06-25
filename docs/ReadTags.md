@@ -22,11 +22,44 @@ As of Proxmark3 v4.20469, a new command has been implemented to scan a Bambu Lab
 To scan a tag with this method, place the Proxmark3 device on the tag and run `pm3` in the terminal. Then, in the `pm3` prompt, run:
 
 ```
+hf mf bambukeys -r -d;hf mf dump
+```
+or
+```
 hf mf bambukeys -r -d
 hf mf dump
 ```
 
-This process should only take a few seconds. Once the process is complete, the dump will be saved to your current working directory.
+This process should only take a few seconds with an expected output similar to below, (to keep things short, dumps of keys and data were truncated)
+
+```
+[=] -----------------------------------
+[=]  UID 4b... XX XX XX XX
+[=] -----------------------------------
+
+[+] Saved 192 bytes to binary file `Path\to\your\ProxSpace\pm3/hf-mf-XXXXXXXX-key.bin`
+[+] Loaded binary key file `Path\to\your\ProxSpace\pm3/hf-mf-XXXXXXXX-key.bin`
+[=] Reading sector access bits...
+[=] .................
+[+] Finished reading sector access bits
+[=] Dumping all blocks from card...
+[-] Sector... 15 block... 3 ( ok )
+[+] Succeeded in dumping all blocks
+
+[+] time: 10 seconds
+
+[=] -----+-----+-------------------------------------------------+-----------------
+[=]  sec | blk | data                                            | ascii
+[=] -----+-----+-------------------------------------------------+-----------------
+
+[+] Saved 1024 bytes to binary file `Path\to\your\ProxSpace\pm3/hf-mf-XXXXXXXX-dump.bin`
+[+] Saved to json file Path\to\your\ProxSpace\pm3/hf-mf-XXXXXXXX-dump.json
+```
+Once the above command is completed you will see that the data dump and keys will have been saved to the working directory of PM3.
+
+You can find out what each block of data means here, [Bambu Lab Filament Tag Documentation](/BambuLabRfid.md)
+
+Below continues with more technical explainations and legacy methods. If that doesn't interests you, your instructions are complete here.
 
 ### Deriving the keys
 
