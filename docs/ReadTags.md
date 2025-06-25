@@ -9,10 +9,10 @@ If you have a Proxmark3 device, the easiest way to scan tags is using the built-
 # Table of contents
 
 <!--ts-->
-      * [Dumping Tags using Proxmark3](#dumping-tags-using-proxmark3)
-      * [Deriving the keys](#deriving-the-keys)
-      * [Proxmark3 fm11rf08s recovery script (legacy method)](#proxmark3-fm11rf08s-recovery-script-legacy-method)
-      * [Sniffing the tag data with a Proxmark3 (legacy method)](#sniffing-the-tag-data-with-a-proxmark3-legacy-method)
+* [Dumping Tags using Proxmark3](#dumping-tags-using-proxmark3)
+* [Deriving the keys](#deriving-the-keys)
+* [Proxmark3 fm11rf08s recovery script (legacy method)](#proxmark3-fm11rf08s-recovery-script-legacy-method)
+* [Sniffing the tag data with a Proxmark3 (legacy method)](#sniffing-the-tag-data-with-a-proxmark3-legacy-method)
 <!--te-->
 
 ### Dumping Tags using Proxmark3
