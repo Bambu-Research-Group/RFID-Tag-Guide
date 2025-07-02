@@ -125,7 +125,7 @@ This script takes about 15-20 minutes to complete. Once it has finished, you wil
 
 To visualize the data on the tag, run the following:
 
-`script run fm11rf08_full -b`
+`script run fm11rf08s_full -b`
 
 ### Sniffing the tag data with a Proxmark3 (legacy method)
 
