@@ -2,17 +2,14 @@
 
 # Python script to parse Bambu Lab RFID tag data
 # Created for https://github.com/Bambu-Research-Group/RFID-Tag-Guide
-# Written by Vinyl Da.i'gyu-Kazotetsu (www.queengoob.org), 2024
+# Written by Vinyl Da.i'gyu-Kazotetsu (www.queengoob.org), 2024-2025
 
 import sys
-import struct
 import re
-from datetime import datetime
+import json
 from pathlib import Path
 
-if not sys.version_info >= (3, 6):
-   print("Python 3.6 or higher is required!")
-   exit(-1)
+from lib import bytes_to_string, bytes_to_hex, bytes_to_int, bytes_to_float, bytes_to_date
 
 COMPARISON_BLOCKS = [1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14]
 IMPORTANT_BLOCKS = [0] + COMPARISON_BLOCKS
@@ -20,33 +17,6 @@ IMPORTANT_BLOCKS = [0] + COMPARISON_BLOCKS
 BYTES_PER_BLOCK = 16
 BLOCKS_PER_TAG = [64, 72] # 64 = 1KB, 72 = Output from Proxmark fm11rf08 script
 TOTAL_BYTES = [blocks * BYTES_PER_BLOCK for blocks in BLOCKS_PER_TAG]
-
-# Byte conversions
-def bytes_to_string(data):
-    return data.decode('ascii').replace('\x00', ' ').strip()
-
-def bytes_to_hex(data, chunkify = False):
-    output = data.hex().upper()
-    return " ".join((output[0+i:2+i] for i in range(0, len(output), 2))) if chunkify else output
-
-def bytes_to_int(data):
-    return int.from_bytes(data, 'little')
-
-def bytes_to_float(data):
-    return struct.unpack('<f', data)[0]
-
-def bytes_to_date(data):
-    string = bytes_to_string(data)
-    parts = string.split("_")
-    if len(parts) < 5:
-        return string # Not a date we can process, if it's a date at all
-    return datetime(
-        year=int(parts[0]),
-        month=int(parts[1]),
-        day=int(parts[2]),
-        hour=int(parts[3]),
-        minute=int(parts[4])
-    )
 
 # Flipper Helper
 def strip_flipper_data(string):
@@ -130,10 +100,20 @@ class ColorList(list):
 
 class Tag():
     def __init__(self, filename, data):
-        # Check to make sure the data is 1KB or a known alternative
+        # Proxmark3 JSON dump
+        try:
+            json_data = json.loads(data)
+            if json_data.get("Created") == "proxmark3":
+                data = b"".join([bytes.fromhex(json_data["blocks"][key].replace("??", "00")) for key in json_data["blocks"]])
+        except ValueError:
+            # We know that the data isn't JSON now
+            pass
+
+        # Flipper NFC dump
         if data.startswith(b"Filetype: Flipper NFC"):
-            # Flipper NFC dump
             data = strip_flipper_data(data)
+
+        # Check to make sure the data is 1KB or a known alternative
         if len(data) not in TOTAL_BYTES:
             raise TagLengthMismatchError(len(data))
 
