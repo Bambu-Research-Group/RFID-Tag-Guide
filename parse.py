@@ -163,7 +163,7 @@ class Tag():
             "spool_width": Unit(bytes_to_int(self.blocks[10][4:6]) / 100, "mm"),
             "material_id": bytes_to_string(self.blocks[1][8:16]),
             "variant_id": bytes_to_string(self.blocks[1][0:8]),
-            "nozzle_diameter": Unit(round(bytes_to_float(self.blocks[8][12:16]), 1), "mm"),
+            "min_nozzle_diameter": Unit(round(bytes_to_float(self.blocks[8][12:16]), 1), "mm"),
             "temperatures": {
                 "min_hotend": Unit(bytes_to_int(self.blocks[6][10:12]), "C"),
                 "max_hotend": Unit(bytes_to_int(self.blocks[6][8:10]), "C"),
