@@ -2,11 +2,12 @@
 
 # Python script to parse Bambu Lab RFID tag data
 # Created for https://github.com/Bambu-Research-Group/RFID-Tag-Guide
-# Written by Vinyl Da.i'gyu-Kazotetsu (www.queengoob.org), 2024
+# Written by Vinyl Da.i'gyu-Kazotetsu (www.queengoob.org), 2024-2025
 
 import sys
 import struct
 import re
+import json
 from datetime import datetime
 from pathlib import Path
 
@@ -130,10 +131,20 @@ class ColorList(list):
 
 class Tag():
     def __init__(self, filename, data):
-        # Check to make sure the data is 1KB or a known alternative
+        # Proxmark3 JSON dump
+        try:
+            json_data = json.loads(data)
+            if json_data.get("Created") == "proxmark3":
+                data = b"".join([bytes.fromhex(json_data["blocks"][key].replace("??", "00")) for key in json_data["blocks"]])
+        except ValueError:
+            # We know that the data isn't JSON now
+            pass
+
+        # Flipper NFC dump
         if data.startswith(b"Filetype: Flipper NFC"):
-            # Flipper NFC dump
             data = strip_flipper_data(data)
+
+        # Check to make sure the data is 1KB or a known alternative
         if len(data) not in TOTAL_BYTES:
             raise TagLengthMismatchError(len(data))
 
