@@ -17,14 +17,14 @@ Summary of what kind of data is stored in each block. Detailed info for each blo
 | 1 | 3 | [Block 7](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to Bambu Lab |
 | 2 | 0 | [Block 8](#block-8) X Cam Info, Nozzle Diameter |
 | 2 | 1 | [Block 9](#block-9) Tray UID |
-| 2 | 2 | [Block 10](#block-10) Spool Width |
+| 2 | 2 | [Block 10](#block-10) Supplier ID |
 | 2 | 3 | [Block 11](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to Bambu Lab |
 | 3 | 0 | [Block 12](#block-12) Production Date/Time |
-| 3 | 1 | [Block 13](#block-13) Short Production Date/Time |
+| 3 | 1 | [Block 13](#block-13) Production Batch |
 | 3 | 2 | [Block 14](#block-14) Filament Length |
 | 3 | 3 | [Block 15](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to Bambu Lab |
 | 4 | 0 | [Block 16](#block-16) Extra Color Info |
-| 4 | 1 | [Block 17](#block-17) **Unknown** |
+| 4 | 1 | [Block 17](#block-17) Color Type |
 | 4 | 2 | **Empty** |
 | 4 | 3 | [Block 19](#mifare-encryption-keys) MIFARE encryption keys, Unrelated to Bambu Lab |
 | 5 | 0 | **Empty** |
@@ -63,11 +63,11 @@ All Bambu Lab tags use the same Permission Bits (Access Control)
 Example Data:
 `AA AA AA AA AA AA PP PP PP PP BB BB BB BB BB BB`
 
-| position | length | type    | Description                                                            |
-| -------- | ------ | ------- | ---------------------------------------------------------------------- |
-| 0 (AA)   | 6      | RAW Bin | A-Key                                                                  |
+| position | length | type    | Description                                                  |
+| -------- | ------ | ------- | ------------------------------------------------------------ |
+| 0 (AA)   | 6      | RAW Bin | A-Key                                                        |
 | 6 (PP)   | 4      | RAW Bin | Permission Bits (Access Control) (always `87 87 87 69` for Bambu Tags) |
-| 10 (BB)  | 6      | RAW Bin | B-Key (always `00 00 00 00 00 00` for Bambu tags)                      |
+| 10 (BB)  | 6      | RAW Bin | B-Key (Some tags use `00 00 00 00 00 00`.)                   |
 
 ## Block 0
 
@@ -171,9 +171,9 @@ Example Data:
 Example Data:
 `__ __ __ __ AA AA __ __ __ __ __ __ __ __ __ __`
 
-| position | length | type        | Description                                           |
-| -------- | ------ | ----------- | ----------------------------------------------------- |
-| 4 (AA)   | 2      | uint16 (LE) | Spool Width in mm*100 (`E1 19` --> 6625 --> 66.25mm ) |
+| position | length | type        | Description |
+| -------- | ------ | ----------- | ----------- |
+| 4 (AA)   | 2      | uint16 (LE) | Supplier ID |
 
 ## Block 12
 
@@ -189,40 +189,35 @@ Example Data:
 Example Data:
 `AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA AA`
 
-| position | length | type   | Description                        |
-| -------- | ------ | ------ | ---------------------------------- |
-| 0 (AA)   | 16     | string | **Short Production Date/Time...?** |
+| position | length | type   | Description                          |
+| -------- | ------ | ------ | ------------------------------------ |
+| 0 (AA)   | 16     | string | Use date as batch (`YY_MM_DD_HH_mm`) |
 
 ## Block 14
 
 Example Data:
 `__ __ __ __ AA AA __ __ __ __ __ __ __ __ __ __`
 
-| position | length | type        | Description                       |
-| -------- | ------ | ----------- | --------------------------------- |
-| 4 (AA)   | 2      | uint16 (LE) | **Filament length in meters...?** |
+| position | length | type        | Description         |
+| -------- | ------ | ----------- | ------------------- |
+| 4 (AA)   | 2      | uint16 (LE) | Filament length (m) |
 
 ## Block 16
 
 Example Data:
-`AA AA BB BB CC CC CC CC __ __ __ __ __ __ __ __`
+`AA AA BB BB CC CC CC CC DD DD DD DD EE EE EE EE`
 
-| position | length | type        | Description                        |
-| -------- | ------ | ----------- | ---------------------------------- |
-| 0 (AA)   | 2      | uint16 (LE) | Format Identifier                  |
-| 2 (BB)   | 2      | uint16 (LE) | Color Count                        |
-| 4 (CC)   | 4      | RGBA        | Second color in _reverse_ hex ABGR |
-
-Known Format Identifiers:
-
-- 00 00 = Empty
-- 02 00 = Color Info
+| position     | length | type        | Description                        |
+| ------------ | ------ | ----------- | ---------------------------------- |
+| 0 (AA)       | 2      | uint16 (LE) | Version Number                     |
+| 2 (BB)       | 2      | uint16 (LE) | Color Count                        |
+| 4 (CC/DD/EE) | 4      | RGBA        | Second color in _reverse_ hex ABGR |
 
 ## Block 17
 
 Example Data:
 `AA AA __ __ __ __ __ __ __ __ __ __ __ __ __ __`
 
-| position | length | type        | Description |
-| -------- | ------ | ----------- | ----------- |
-| 0 (AA)   | 2      | **Unknown** | **Unknown** |
+| position | length | type        | Description              |
+| -------- | ------ | ----------- | ------------------------ |
+| 0 (AA)   | 2      | uint16 (LE) | Color Tpye (Always zero) |
